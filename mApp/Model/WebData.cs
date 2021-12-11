@@ -43,6 +43,8 @@ public class WebDatas
                     break;
                 case UpdateOption.Empty:
                     Trace.WriteLine($"   Stock Close Day");
+                    updateTime = targetTime;
+                    Trace.WriteLine($"   Update LastDay");
                     break;
                 case UpdateOption.LostConnect:
                     Trace.WriteLine($"   [Error] Lost Connect... Waiting For Reconnecting...3");

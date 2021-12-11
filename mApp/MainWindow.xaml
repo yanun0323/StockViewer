@@ -17,17 +17,6 @@
         <viewmodel:MainViewModel x:Name="mainViewModel"/>
     </Window.DataContext>
 
-    <Window.Resources>
-        <Button x:Name="searchListButton" x:Key="searchListButton">
-            <Style TargetType="Button">
-                <Setter Property="FontSize" Value="20"/>
-                <Setter Property="Foreground" Value="#555555"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="HorizontalAlignment" Value="Center"/>
-            </Style>
-        </Button>
-    </Window.Resources>
-
     <Border BorderThickness="0"
             Background="#FFE5E5E5">
         <Grid>
@@ -41,18 +30,35 @@
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Row="0" x:Name ="SearchBoxGrid">
+                <Popup IsOpen="False" x:Name="searchBoxPopup" PopupAnimation="Slide" AllowsTransparency="True"
+                            PlacementTarget="{Binding ElementName=SearchBoxGrid}" Placement="Bottom"
+                            Width="{Binding ElementName=SearchBox, Path=Width}"  Panel.ZIndex="99" 
+                            MaxHeight="500" HorizontalOffset="{Binding ElementName=SearchBox, Path=Margin.Left}" >
+                    <Border x:Name="searchBoxPopupBorder" BorderThickness="1" CornerRadius="10" BorderBrush="Gray" Background="White">
+                        <ScrollViewer x:Name="searchBoxPopupScroll" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+                            <StackPanel x:Name="searchBoxPopupStack" Orientation="Vertical">
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                    <Popup.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="BorderThickness" Value="1"/>
+                            <Setter Property="CornerRadius" Value="10"/>
+                        </Style>
+                    </Popup.Resources>
+                </Popup>
+                
                 <TextBox x:Name ="SearchBox"
                             HorizontalAlignment="Left"
+                            VerticalContentAlignment="Center"
                             BorderThickness="0"
-                            Text="Search..." 
-                            TextWrapping="Wrap" 
+                            Text= "{Binding SearchWords, UpdateSourceTrigger=PropertyChanged}" 
                             FontSize="25"
-                            Foreground="#cccccc"
-                            VerticalAlignment="Center" 
-                            Width="335"
+                            Foreground="LightGray"
+                            Width="340"
                             Height="45"
-                            Margin="12,0,0,0"
-                            Padding="8,5,0,0"
+                            Margin="10,0,0,0"
+                            Padding="10,0,0,0"
                             TextChanged="SearchBox_TextChanged"
                             GotFocus="SearchBox_GotFocus"
                             LostFocus="SearchBox_LostFocus"
@@ -64,29 +70,17 @@
                     </TextBox.Resources>
                 </TextBox>
             </Grid>
-            <Popup x:Name="searchBoxPopup" PopupAnimation="Slide" PlacementTarget="{Binding ElementName=SearchBoxGrid}" Placement="Bottom"
-                       Width="{Binding ElementName=SearchBox, Path=Width}" IsOpen="False">
-                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" MaxHeight="500">
-                    <StackPanel x:Name="searchBoxPopupStack" Orientation="Vertical"/>
-                </ScrollViewer>
-                <Popup.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="10"/>
-                    </Style>
-                </Popup.Resources>
-            </Popup>
 
             <!-- Stock Information -->
             <Grid Grid.Row="0" Grid.Column="1" Margin="10,5,10,5" HorizontalAlignment="Stretch" VerticalAlignment="Center"
                   x:Name="DisplayStock">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1.5 *"/>
+                    <ColumnDefinition Width="5*"/>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="1.2*"/>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="1.5*"/>
                     <ColumnDefinition Width="2.5*"/>
-                    <ColumnDefinition Width="1.4*"/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition Width="1.5*"/>
-                    <ColumnDefinition Width="1.5*"/>
-                    <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.Resources>
                     <Style x:Key="Title" TargetType="Label">
@@ -103,17 +97,15 @@
                 </Grid.Resources>
 
                 <Label Grid.Column="0" Style="{StaticResource Title}"
-                            Content="{Binding DisplayStock.Id}" x:Name="displayStockId"/>
-                <Label Grid.Column="1" Style="{StaticResource Title}"
-                            Content="{Binding DisplayStock.Name}" x:Name="displayStockName"/>
+                            Content="{Binding TitleStock.Name}"/>
 
-                <Label Grid.Column="2"  FontSize="30" FontWeight="SemiBold" Foreground="{Binding TitleStock.Spread_Color}" 
-                            Content="{Binding TitleStock.tradingData.End}" x:Name="displayStockPrice_End" Height="50" VerticalAlignment="Bottom"/>
+                <Label Grid.Column="1"  FontSize="30" FontWeight="SemiBold" Foreground="{Binding TitleStock.Spread_Color}" 
+                            Content="{Binding TitleStock.TradingData.End}" x:Name="displayStockPrice_End" Height="50" VerticalAlignment="Bottom"/>
 
-                <Label Grid.Column="3"  FontSize="20" FontWeight="SemiBold" Foreground="{Binding TitleStock.Spread_Color}" VerticalAlignment="Center"
+                <Label Grid.Column="2"  FontSize="20" FontWeight="SemiBold" Foreground="{Binding TitleStock.Spread_Color}" VerticalAlignment="Center"
                             Content="{Binding TitleStock.SpreadWithSymbol}" x:Name="displayStockPrice_Spread"/>
 
-                <Grid Grid.Column="4">
+                <Grid Grid.Column="3">
                     <Grid.RowDefinitions>
                         <RowDefinition/>
                         <RowDefinition/>
@@ -123,7 +115,7 @@
                             Content="開  "/>
 
                         <Label Grid.Row="0"  FontSize="18" FontWeight="SemiBold" Foreground="Gray" Padding="Auto"
-                            Content="{Binding TitleStock.tradingData.Start}" x:Name="displayStockPrice_Start"/>
+                            Content="{Binding TitleStock.TradingData.Start}" x:Name="displayStockPrice_Start"/>
                     </StackPanel>
                     <StackPanel Grid.Row="1" Orientation="Horizontal">
                         <Label FontSize="18" Foreground="#585858" Padding="Auto"
@@ -134,7 +126,7 @@
                     </StackPanel>
 
                 </Grid>
-                <Grid Grid.Column="5">
+                <Grid Grid.Column="4">
                     <Grid.RowDefinitions>
                         <RowDefinition/>
                         <RowDefinition/>
@@ -144,7 +136,7 @@
                             Content="高  "/>
 
                         <Label Grid.Row="0"  FontSize="18" FontWeight="SemiBold" Foreground="Gray"  Padding="Auto"
-                            Content="{Binding TitleStock.tradingData.Max}" x:Name="displayStockPrice_A"/>
+                            Content="{Binding TitleStock.TradingData.Max}" x:Name="displayStockPrice_A"/>
                     </StackPanel>
                     <StackPanel Grid.Row="1" Orientation="Horizontal">
                         <Label FontSize="18" Foreground="#585858" Padding="Auto"
@@ -152,12 +144,12 @@
 
 
                         <Label Grid.Row="1"  FontSize="18" FontWeight="SemiBold" Foreground="Gray"   Padding="Auto"
-                            Content="{Binding TitleStock.tradingData.Min}" x:Name="displayStockPrice_B"/>
+                            Content="{Binding TitleStock.TradingData.Min}" x:Name="displayStockPrice_B"/>
                     </StackPanel>
 
                 </Grid>
 
-                <Grid Grid.Column="6">
+                <Grid Grid.Column="5">
                     <Grid.RowDefinitions>
                         <RowDefinition/>
                         <RowDefinition/>
@@ -167,14 +159,14 @@
                             Content="成交量  "/>
 
                         <Label FontSize="18" Foreground="#585858" Padding="Auto"
-                            Content="{Binding TitleStock.tradingData.Volume}" x:Name="displayStockPrice_Volume"/>
+                            Content="{Binding TitleStock.TradingData.Volume}" x:Name="displayStockPrice_Volume"/>
                     </StackPanel>
                     <StackPanel Grid.Row="1" Orientation="Horizontal">
                         <Label FontSize="18" Foreground="#585858" Padding="Auto"
                             Content="成交值  "/>
 
                         <Label  FontSize="18" Foreground="#585858" Padding="Auto"
-                            Content="{Binding TitleStock.tradingData.VolumeMoney}" x:Name="displayStockPrice_VolumeMoney"/>
+                            Content="{Binding TitleStock.TradingData.VolumeMoney}" x:Name="displayStockPrice_VolumeMoney"/>
                     </StackPanel>
 
                 </Grid>
@@ -291,7 +283,7 @@
                         <Setter Property="MinHeight" Value="70"/>
                     </Style>
                     <Style x:Key="Gap" TargetType="RowDefinition">
-                        <Setter Property="Height" Value="10"/>
+                        <Setter Property="Height" Value="5"/>
                     </Style>
                 </Grid.Resources>
 
@@ -304,10 +296,10 @@
 
                 <!-- Main Chart -->
                 <Grid Grid.Row="0" x:Name ="MainChartGrid">
-                    <Border CornerRadius="10" Background="white" Margin="5,0"
+                    <Border CornerRadius="10" Background="#222" Margin="5,0"
                             x:Name="MainChart" Grid.ColumnSpan="2" Grid.RowSpan="3">
                         <ScrollViewer 
-                            x:Name="MainChartScroll"  Background="white" 
+                            x:Name="MainChartScroll"
                             ScrollViewer.VerticalScrollBarVisibility="Disabled" 
                             ScrollViewer.HorizontalScrollBarVisibility="Hidden" 
                             PreviewMouseWheel="Scale_PreviewMouseWheel"
@@ -315,15 +307,7 @@
                             MouseDown="K_Chart_MouseDown"
                             MouseMove="K_Chart_MouseMove">
 
-                            <Canvas x:Name ="MainChartCanvas" Background="Black"/>
-                            <!--
-                            <view:MainChart MainChartStock="{Binding DisplayStock}"/>
-                            <Canvas x:Name ="MainChartCanvas" Background="Black" 
-                                            PreviewMouseWheel="Scale_PreviewMouseWheel"
-                                            Width="auto"
-                                            MouseDown="K_Chart_MouseDown"
-                                            MouseMove="K_Chart_MouseMove"/>
-                            -->
+                            <Canvas x:Name ="MainChartCanvas"/>
                         </ScrollViewer>
                     </Border>
                 </Grid>
@@ -341,7 +325,7 @@
 
                     <!-- Sub Chart 1 -->
                     <Grid Grid.Row="0">
-                        <Border CornerRadius="10" Background="white" Margin="5,0" x:Name="SubChart1">
+                        <Border CornerRadius="10" Background="{Binding ElementName=MainChart, Path=Background}" Margin="5,0" x:Name="SubChart1">
                             <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Visible">
 
 
@@ -362,7 +346,7 @@
 
                         <!-- Sub Chart 2 -->
                         <Grid Grid.Row="0">
-                            <Border CornerRadius="10" Background="white" Margin="5,0" x:Name="SubChart2">
+                            <Border CornerRadius="10" Background="{Binding ElementName=MainChart, Path=Background}" Margin="5,0" x:Name="SubChart2">
                                 <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Visible">
 
 
@@ -382,7 +366,7 @@
 
                             <!-- Sub Chart 3 -->
                             <Grid>
-                                <Border CornerRadius="10" Background="white" Margin="5,0" x:Name="SubChart3">
+                                <Border CornerRadius="10" Background="{Binding ElementName=MainChart, Path=Background}" Margin="5,0" x:Name="SubChart3">
                                     <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Visible">
 
 
@@ -394,7 +378,7 @@
 
                             <!-- Sub Chart 4 -->
                             <Grid Grid.Row="2">
-                                <Border CornerRadius="10" Background="white" Margin="5,0" x:Name="SubChart4">
+                                <Border CornerRadius="10" Background="{Binding ElementName=MainChart, Path=Background}" Margin="5,0" x:Name="SubChart4">
                                     <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Visible">
 
 

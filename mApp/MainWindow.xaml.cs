@@ -9,11 +9,13 @@ namespace mAPP
     /// </summary>
     public partial class MainWindow : Window
     {
-        private int ChartLine = 10;
+        //private int ChartLine = 10;
+
         public MainWindow()
         {
             InitializeComponent();
             GenerateMainChart();
+            //GenerateSearchPopup();
         }
         private void GenerateMainChart()
         {
@@ -62,86 +64,86 @@ namespace mAPP
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (SearchBox.Text.Length > 1)
-                OpenSearchPopup((TextBox)sender!);
+            string serach = mainViewModel.SearchWords;
+            if(serach.Length == 1 && !IsNumber(serach[0]))
+                OpenSearchPopup();
+            else if (serach.Length > 1 && serach != "Search...")
+                OpenSearchPopup();
             else
-            CloseSearchPopup((TextBox)sender!);
-        }
-        private void TextBoxFind_TextInput(object sender, TextCompositionEventArgs e)
-        {
+            CloseSearchPopup();
+
+            static bool IsNumber(char cha) => cha <= '9' && cha >= '0';
         }
 
         private void SearchBox_GotFocus(object sender, RoutedEventArgs e)
         {
+            SearchBox.Foreground = Brushes.DarkGray;
             SearchBox.Text = "";
         }
 
         private void SearchBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            CloseSearchPopup((TextBox)sender!);
-            if (SearchBox.Text == "")
-                SearchBox.Text = "Search...";
+            CloseSearchPopup();
+            if (mainViewModel.SearchWords == "")
+                mainViewModel.SearchWords = "Search...";
+
+            SearchBox.Foreground = Brushes.LightGray;
         }
 
         private void SearchBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Return)
+            if (e.Key == Key.Return && searchBoxPopupStack.Children.Count > 0)
             {
-                //mainViewModel.Update_DisplayStock(SearchBox.Text);
+                Button button = (Button) searchBoxPopupStack.Children[0];
+                string id = (string)button.Content;
+                mainViewModel.Update_DisplayStock(id.Split(" ")[0]);
+                mainViewModel.SearchWords = "";
             }
         }
-
-        private void OpenSearchPopup(TextBox sender)
+        private void OpenSearchPopup()
         {
-            if (searchBoxPopupStack == null)
-                searchBoxPopupStack = new();
-
-            searchBoxPopupStack.HorizontalAlignment = HorizontalAlignment.Center;
-            searchBoxPopupStack.Orientation = Orientation.Vertical;
-            
-            foreach (var found in mainViewModel.StockList.Where(x => x.Contains(SearchBox.Text)))
+            if (searchBoxPopup == null || searchBoxPopupStack == null) 
+                return;
+            searchBoxPopupStack.Children.Clear();
+            var found = mainViewModel.StockList.Where(x => x.Contains(SearchBox.Text));
+            foreach (var name in found)
             {
-                Button stock = new();
-                stock.Content = found!;
-                stock.Background = Brushes.White;
-                stock.ClickMode = ClickMode.Press;
-                stock.FontSize = 20;
-                stock.HorizontalAlignment = HorizontalAlignment.Center;
-                stock.VerticalAlignment = VerticalAlignment.Center;
-                stock.Foreground = Brushes.Gray;
-                stock.Click += SearchContextMenu_Selected;
-                //stock.MouseDown += SearchContextMenu_Selected;
-                searchBoxPopupStack.Children.Add(stock);
+                Button button = new();
+                button.Content = name!;
+                button.Background = Brushes.White;
+                button.ClickMode = ClickMode.Press;
+                button.FontSize = 20;
+                button.HorizontalAlignment = HorizontalAlignment.Center;
+                button.VerticalAlignment = VerticalAlignment.Center;
+                button.Foreground = Brushes.Gray;
+                button.HorizontalContentAlignment = HorizontalAlignment.Left;
+                button.BorderThickness = new(0);
+                button.Width = searchBoxPopup.Width - 2 * searchBoxPopupBorder.CornerRadius.TopLeft;
+                button.Click += SearchResult_Selected;
+                searchBoxPopupStack.Children.Add(button);
             }
-            searchBoxPopup.IsOpen = true;
+            if (found.Any())
+                searchBoxPopup!.IsOpen = true;
+            else
+                searchBoxPopup!.IsOpen = false;
+
+            searchBoxPopupScroll.ScrollToTop();
         }
-        private void CloseSearchPopup(TextBox sender)
+        private void CloseSearchPopup()
         {
             if (searchBoxPopup == null || !searchBoxPopup.IsOpen)
                 return;
 
-            searchBoxPopup.IsOpen = false;
-            searchBoxPopup.Child = null;
-            SearchBox.Text = "";
+            searchBoxPopup!.IsOpen = false;
+            searchBoxPopupStack.Children.Clear();
+            mainViewModel.SearchWords = "";
         }
-
-        private void SearchContextMenu_Selected(object sender, MouseButtonEventArgs e)//MouseButtonEventArgs e)
+        private void SearchResult_Selected(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine($"A");
-            Button stock = (Button)sender;
-            string id = (string)stock.Content;
-            id = id.Split(" ")[0];
-            Trace.WriteLine($"{id} {stock.Name} {stock.Name.Split(" ")[0]} {stock.Name.Split(" ")[1]}");
-            mainViewModel.Update_DisplayStock(id);
-
-        }
-        private void SearchContextMenu_Selected(object sender, RoutedEventArgs e)//MouseButtonEventArgs e)
-        {
-            Trace.WriteLine($"B");
-            Button stock = (Button)sender;
-            string id = (string)stock.Content;
+            Button button = (Button)sender;
+            string id = (string)button.Content;
             mainViewModel.Update_DisplayStock(id.Split(" ")[0]);
-
+            CloseSearchPopup();
         }
 
 

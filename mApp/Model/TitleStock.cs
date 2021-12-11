@@ -1,15 +1,31 @@
 ﻿namespace mApp.Model; 
 public class TitleStock
 {
-    public TradingData tradingData { get; set; }
+    public string Name { get; set; }
+    public TradingData TradingData { get; set; }
     public string SpreadWithSymbol { get; set; }
     public SolidColorBrush Spread_Color { get; set; }
 
-    public TitleStock(TradingData mTD)
+    public TitleStock(Stock stock)
     {
-        tradingData = mTD;
-        SpreadWithSymbol = GetSpreadWithSymbol(mTD.mGrade, mTD.mSpread);
-        Spread_Color = GetColorFromPrice(mTD.mGrade);
+        Name = string.Join(" ",stock.Id, stock.Name);
+        if (stock!.TradingData.Count != 0)
+            TradingData = stock!.TradingData.Last().Value;
+        else
+            TradingData = new()
+            {
+                Volume = "--",
+                VolumeMoney = "--",
+                Start = "--",
+                Max = "--",
+                Min = "--",
+                End = "--",
+                Grade = "--",
+                Spread = "--",
+                Turnover = "--"
+            };
+        SpreadWithSymbol = GetSpreadWithSymbol(TradingData.Grade, TradingData.Spread);
+        Spread_Color = GetColorFromPrice(TradingData.Grade);
     }
     private static SolidColorBrush GetColorFromPrice(string grade)
     {
@@ -26,15 +42,15 @@ public class TitleStock
             return Color.Gray;
         }
     }
-    private static string GetSpreadWithSymbol(string grade, double spread)
+    private static string GetSpreadWithSymbol(string grade, string spread)
     {
         if (grade.Contains("red"))
         {
-            return "▲" + $"{spread}";
+            return "▲" + spread;
         }
         else if (grade.Contains("green"))
         {
-            return "▼" + $"{spread}";
+            return "▼" + spread;
         }
         else
         {

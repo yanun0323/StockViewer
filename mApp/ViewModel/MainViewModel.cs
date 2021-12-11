@@ -1,15 +1,19 @@
-﻿namespace mAPP.ViewModel;
+﻿using System.Runtime.CompilerServices;
+
+namespace mAPP.ViewModel;
 public class MainViewModel : INotifyPropertyChanged
 {
     readonly string mDataPath = @"D:\YStock\Data";
     readonly string mDefaultStockId = "2330";
 
     public HashSet<string> StockList { get; set; } = new();
-    public Stock? DisplayStock { get => _displayStock; set { _displayStock = DisplayStock; Update_TitleStock(Update); OnPropertyChanged(nameof(DisplayStock)); } }
+    public Stock? DisplayStock { get => _displayStock; set { _displayStock = value; Update_TitleStock(Update); OnPropertyChanged(nameof(DisplayStock)); } }
     private Stock? _displayStock = new();
-    public TitleStock? TitleStock { get => _titleStock; set { _titleStock = TitleStock; OnPropertyChanged(nameof(TitleStock)); } }
+    public TitleStock? TitleStock { get => _titleStock; set { _titleStock = value; OnPropertyChanged(nameof(TitleStock)); } }
     private TitleStock? _titleStock;
     public DateTime Update  { get; }
+    public string SearchWords { get => _searchWords; set { _searchWords = value; NotifyPropertyChanged(); } }
+    private string _searchWords = "Search...";
 
     public MainViewModel()
     {
@@ -22,7 +26,7 @@ public class MainViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
     public void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
+    private void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     public void Update_DisplayStock(string stockId)
     {
         Trace.WriteLine($"update DisplayStock {stockId}");
@@ -35,25 +39,7 @@ public class MainViewModel : INotifyPropertyChanged
     public void Update_TitleStock(DateTime updateTime)
     {
         Trace.WriteLine($"update TitleStock {_displayStock!.Id}");
-        TradingData newestData;
-        if(_displayStock!.TradingData.TryGetValue(updateTime, out newestData))
-            _titleStock = new(newestData);
-        else
-            _titleStock = new(new()
-            {
-                Volume = "0",
-                VolumeMoney = "0",
-                Start = "0",
-                Max = "0",
-                Min = "0",
-                End = "0",
-                Grade = "0",
-                Spread = "0",
-                Turnover = "0"
-            });
-
-
-
+        _titleStock = new(_displayStock!);
         TitleStock = _titleStock;
     }
 
