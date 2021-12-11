@@ -1,0 +1,413 @@
+﻿<Window x:Class="mAPP.MainWindow"
+        x:Name="MainWindows"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewmodel="clr-namespace:mAPP.ViewModel"
+        xmlns:local="clr-namespace:mAPP" 
+        xmlns:view="clr-namespace:mApp.View"
+        mc:Ignorable="d"
+        Height="800" Width="1280" 
+        MinHeight="800" MinWidth="1280"
+        WindowStyle="SingleBorderWindow"
+        BorderThickness="0">
+
+    <Window.DataContext>
+        <viewmodel:MainViewModel x:Name="mainViewModel"/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <Button x:Name="searchListButton" x:Key="searchListButton">
+            <Style TargetType="Button">
+                <Setter Property="FontSize" Value="20"/>
+                <Setter Property="Foreground" Value="#555555"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+            </Style>
+        </Button>
+    </Window.Resources>
+
+    <Border BorderThickness="0"
+            Background="#FFE5E5E5">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="350"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Row="0" x:Name ="SearchBoxGrid">
+                <TextBox x:Name ="SearchBox"
+                            HorizontalAlignment="Left"
+                            BorderThickness="0"
+                            Text="Search..." 
+                            TextWrapping="Wrap" 
+                            FontSize="25"
+                            Foreground="#cccccc"
+                            VerticalAlignment="Center" 
+                            Width="335"
+                            Height="45"
+                            Margin="12,0,0,0"
+                            Padding="8,5,0,0"
+                            TextChanged="SearchBox_TextChanged"
+                            GotFocus="SearchBox_GotFocus"
+                            LostFocus="SearchBox_LostFocus"
+                            KeyDown="SearchBox_KeyDown">
+                    <TextBox.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="10"/>
+                        </Style>
+                    </TextBox.Resources>
+                </TextBox>
+            </Grid>
+            <Popup x:Name="searchBoxPopup" PopupAnimation="Slide" PlacementTarget="{Binding ElementName=SearchBoxGrid}" Placement="Bottom"
+                       Width="{Binding ElementName=SearchBox, Path=Width}" IsOpen="False">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" MaxHeight="500">
+                    <StackPanel x:Name="searchBoxPopupStack" Orientation="Vertical"/>
+                </ScrollViewer>
+                <Popup.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="10"/>
+                    </Style>
+                </Popup.Resources>
+            </Popup>
+
+            <!-- Stock Information -->
+            <Grid Grid.Row="0" Grid.Column="1" Margin="10,5,10,5" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                  x:Name="DisplayStock">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.5 *"/>
+                    <ColumnDefinition Width="2.5*"/>
+                    <ColumnDefinition Width="1.4*"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.Resources>
+                    <Style x:Key="Title" TargetType="Label">
+                        <Setter Property="FontSize" Value="30"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="Foreground" Value="#252525"/>
+                    </Style>
+                    <Style x:Key="SubTitle" TargetType="Label">
+                        <Setter Property="FontSize" Value="18"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="Padding" Value="Auto"/>
+                    </Style>
+                </Grid.Resources>
+
+                <Label Grid.Column="0" Style="{StaticResource Title}"
+                            Content="{Binding DisplayStock.Id}" x:Name="displayStockId"/>
+                <Label Grid.Column="1" Style="{StaticResource Title}"
+                            Content="{Binding DisplayStock.Name}" x:Name="displayStockName"/>
+
+                <Label Grid.Column="2"  FontSize="30" FontWeight="SemiBold" Foreground="{Binding TitleStock.Spread_Color}" 
+                            Content="{Binding TitleStock.tradingData.End}" x:Name="displayStockPrice_End" Height="50" VerticalAlignment="Bottom"/>
+
+                <Label Grid.Column="3"  FontSize="20" FontWeight="SemiBold" Foreground="{Binding TitleStock.Spread_Color}" VerticalAlignment="Center"
+                            Content="{Binding TitleStock.SpreadWithSymbol}" x:Name="displayStockPrice_Spread"/>
+
+                <Grid Grid.Column="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" >
+                        <Label FontSize="18" Foreground="#585858" Padding="Auto"
+                            Content="開  "/>
+
+                        <Label Grid.Row="0"  FontSize="18" FontWeight="SemiBold" Foreground="Gray" Padding="Auto"
+                            Content="{Binding TitleStock.tradingData.Start}" x:Name="displayStockPrice_Start"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal">
+                        <Label FontSize="18" Foreground="#585858" Padding="Auto"
+                            Content="收  "/>
+
+                        <Label Grid.Row="1"  FontSize="18" FontWeight="SemiBold" Foreground="{Binding TitleStock.Spread_Color}"   Padding="Auto"
+                            Content="{Binding ElementName=displayStockPrice_End, Path=Content}"/>
+                    </StackPanel>
+
+                </Grid>
+                <Grid Grid.Column="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" >
+                        <Label FontSize="18" Foreground="#585858" Padding="Auto"
+                            Content="高  "/>
+
+                        <Label Grid.Row="0"  FontSize="18" FontWeight="SemiBold" Foreground="Gray"  Padding="Auto"
+                            Content="{Binding TitleStock.tradingData.Max}" x:Name="displayStockPrice_A"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal">
+                        <Label FontSize="18" Foreground="#585858" Padding="Auto"
+                            Content="低  "/>
+
+
+                        <Label Grid.Row="1"  FontSize="18" FontWeight="SemiBold" Foreground="Gray"   Padding="Auto"
+                            Content="{Binding TitleStock.tradingData.Min}" x:Name="displayStockPrice_B"/>
+                    </StackPanel>
+
+                </Grid>
+
+                <Grid Grid.Column="6">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" >
+                        <Label FontSize="18" Foreground="#585858" Padding="Auto"
+                            Content="成交量  "/>
+
+                        <Label FontSize="18" Foreground="#585858" Padding="Auto"
+                            Content="{Binding TitleStock.tradingData.Volume}" x:Name="displayStockPrice_Volume"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal">
+                        <Label FontSize="18" Foreground="#585858" Padding="Auto"
+                            Content="成交值  "/>
+
+                        <Label  FontSize="18" Foreground="#585858" Padding="Auto"
+                            Content="{Binding TitleStock.tradingData.VolumeMoney}" x:Name="displayStockPrice_VolumeMoney"/>
+                    </StackPanel>
+
+                </Grid>
+
+            </Grid>
+
+            <TabControl Grid.Row="2"
+                            TabStripPlacement="Left"
+                            FlowDirection="LeftToRight"
+                            BorderThickness="1"
+                            Margin="10,0,0,10"
+                            FontSize="14">
+                <TabControl.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="2,10,10,10"/>
+                    </Style>
+                </TabControl.Resources>
+
+                <!--Tab-->
+                <TabItem Height="90"
+                         Width="35">
+                    <TabItem.Header>
+                        <StackPanel>
+                            <TextBlock>
+                                <ItemsControl ItemsSource="{Binding Source='首頁'}">
+                                </ItemsControl>
+                            </TextBlock>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <TabItem.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="10,0,0,10"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                    </TabItem.Resources>
+                    <Grid>
+
+                    </Grid>
+                </TabItem>
+
+                <!--Tab-->
+                <TabItem Height="90">
+                    <TabItem.Header>
+                        <StackPanel>
+                            <TextBlock>
+                                <ItemsControl ItemsSource="{Binding Source='自選股'}">
+                                </ItemsControl>
+                            </TextBlock>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <TabItem.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="10,0,0,10"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                    </TabItem.Resources>
+                    <Grid>
+
+                    </Grid>
+                </TabItem>
+
+                <!--Tab-->
+                <TabItem Height="90">
+                    <TabItem.Header>
+                        <StackPanel>
+                            <TextBlock>
+                                <ItemsControl ItemsSource="{Binding Source='法人'}">
+                                </ItemsControl>
+                            </TextBlock>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <TabItem.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="10,0,0,10"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                    </TabItem.Resources>
+                    <Grid>
+
+                    </Grid>
+                </TabItem>
+
+                <!--Tab-->
+                <TabItem Height="90">
+                    <TabItem.Header>
+                        <StackPanel>
+                            <TextBlock>
+                                <ItemsControl ItemsSource="{Binding Source='設定'}">
+                                </ItemsControl>
+                            </TextBlock>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <TabItem.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="10,0,0,10"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                    </TabItem.Resources>
+                    <Grid>
+
+                    </Grid>
+                </TabItem>
+
+            </TabControl>
+
+            <!-- [Tree] Main Chart -->
+            <Grid Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Name="Grid1" Margin="0,0,0,10">
+                <Grid.Resources>
+                    <Style x:Key="MainChart" TargetType="RowDefinition">
+                        <Setter Property="MinHeight" Value="150"/>
+                        <Setter Property="Height" Value="3*"/>
+                    </Style>
+                    <Style x:Key="SubChart" TargetType="RowDefinition">
+                        <Setter Property="MinHeight" Value="70"/>
+                    </Style>
+                    <Style x:Key="Gap" TargetType="RowDefinition">
+                        <Setter Property="Height" Value="10"/>
+                    </Style>
+                </Grid.Resources>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Style="{StaticResource MainChart}"/>
+                    <RowDefinition Style="{StaticResource Gap}"/>
+                    <RowDefinition MinHeight="310"/>
+                </Grid.RowDefinitions>
+
+
+                <!-- Main Chart -->
+                <Grid Grid.Row="0" x:Name ="MainChartGrid">
+                    <Border CornerRadius="10" Background="white" Margin="5,0"
+                            x:Name="MainChart" Grid.ColumnSpan="2" Grid.RowSpan="3">
+                        <ScrollViewer 
+                            x:Name="MainChartScroll"  Background="white" 
+                            ScrollViewer.VerticalScrollBarVisibility="Disabled" 
+                            ScrollViewer.HorizontalScrollBarVisibility="Hidden" 
+                            PreviewMouseWheel="Scale_PreviewMouseWheel"
+                            Width="auto"
+                            MouseDown="K_Chart_MouseDown"
+                            MouseMove="K_Chart_MouseMove">
+
+                            <Canvas x:Name ="MainChartCanvas" Background="Black"/>
+                            <!--
+                            <view:MainChart MainChartStock="{Binding DisplayStock}"/>
+                            <Canvas x:Name ="MainChartCanvas" Background="Black" 
+                                            PreviewMouseWheel="Scale_PreviewMouseWheel"
+                                            Width="auto"
+                                            MouseDown="K_Chart_MouseDown"
+                                            MouseMove="K_Chart_MouseMove"/>
+                            -->
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
+                <!-- Seprate Line -->
+                <GridSplitter Grid.Row="1" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Transparent"/>
+
+
+                <!-- [Tree] Sub Chart 1 -->
+                <Grid Grid.Row="2" HorizontalAlignment="Stretch" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition MinHeight="70"/>
+                        <RowDefinition Style="{StaticResource Gap}"/>
+                        <RowDefinition MinHeight="230"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Sub Chart 1 -->
+                    <Grid Grid.Row="0">
+                        <Border CornerRadius="10" Background="white" Margin="5,0" x:Name="SubChart1">
+                            <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Visible">
+
+
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    <!-- Seprate Line -->
+                    <GridSplitter Grid.Row="1" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Transparent"/>
+
+
+                    <!-- [Tree] Sub Chart 2-->
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition MinHeight="70"/>
+                            <RowDefinition Style="{StaticResource Gap}"/>
+                            <RowDefinition MinHeight="150"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Sub Chart 2 -->
+                        <Grid Grid.Row="0">
+                            <Border CornerRadius="10" Background="white" Margin="5,0" x:Name="SubChart2">
+                                <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Visible">
+
+
+                                </Grid>
+                            </Border>
+                        </Grid>
+                        <!-- Seprate Line -->
+                        <GridSplitter Grid.Row="1" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Transparent"/>
+
+                        <!-- [Tree] Sub Chart 3-->
+                        <Grid Grid.Row="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition MinHeight="70"/>
+                                <RowDefinition Style="{StaticResource Gap}"/>
+                                <RowDefinition MinHeight="70"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Sub Chart 3 -->
+                            <Grid>
+                                <Border CornerRadius="10" Background="white" Margin="5,0" x:Name="SubChart3">
+                                    <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Visible">
+
+
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                            <!-- Seprate Line -->
+                            <GridSplitter Grid.Row="1" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Transparent"/>
+
+                            <!-- Sub Chart 4 -->
+                            <Grid Grid.Row="2">
+                                <Border CornerRadius="10" Background="white" Margin="5,0" x:Name="SubChart4">
+                                    <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Visible">
+
+
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+
+            </Grid>
+
+
+        </Grid>
+    </Border>
+</Window>
