@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
 using System.Net.Http.Json;
 
-namespace mApp.Model;
+namespace mApp.MVVM.Model;
 
 public class WebDatas
 {

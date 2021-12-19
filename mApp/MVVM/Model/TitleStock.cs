@@ -1,4 +1,4 @@
-﻿namespace mApp.Model; 
+﻿namespace mApp.MVVM.Model; 
 public class TitleStock
 {
     public string Name { get; set; }
@@ -30,32 +30,22 @@ public class TitleStock
     private static SolidColorBrush GetColorFromPrice(string grade)
     {
         if (grade.Contains("red"))
-        {
-            return Color.Red;
-        }
-        else if (grade.Contains("green"))
-        {
-            return Color.Green;
-        }
-        else
-        {
-            return Color.Gray;
-        }
+            return iColor.Red;
+
+        if (grade.Contains("green"))
+            return iColor.Green;
+
+        return iColor.Gray;
     }
     private static string GetSpreadWithSymbol(string grade, string spread)
     {
         if (grade.Contains("red"))
-        {
             return "▲" + spread;
-        }
-        else if (grade.Contains("green"))
-        {
+
+        if (grade.Contains("green"))
             return "▼" + spread;
-        }
-        else
-        {
-            return "-";
-        }
+
+        return "-";
     }
 
 }

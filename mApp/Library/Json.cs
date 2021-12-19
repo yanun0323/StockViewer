@@ -1,4 +1,4 @@
-﻿namespace mApp.Model;
+﻿namespace mApp.Library;
 public static class Json
 {
     public static T? LoadJsonData<T>(string dataPath, string filename)

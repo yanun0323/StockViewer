@@ -18,12 +18,13 @@ global using System.Collections;
 global using System.Text.Json;
 global using System.ComponentModel;
 global using System.Windows.Controls.Primitives;
-global using mApp.Model;
-global using mAPP.ViewModel;
+global using mApp.Library;
+global using mApp.Core;
+global using mApp.MVVM.Model;
+global using mApp.MVVM.View;
+global using mApp.MVVM.ViewModel;
 
-namespace mApp
+namespace mApp;
+internal class GlobalUsing
 {
-    internal class GlobalUsing
-    {
-    }
 }

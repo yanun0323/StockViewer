@@ -1,6 +1,5 @@
-﻿using mApp.View;
-using System.Windows.Shapes;
-using Color = mApp.Model.Color;
+﻿using System.Windows.Shapes;
+using Color = mApp.Library.iColor;
 
 namespace mAPP
 {
@@ -14,39 +13,6 @@ namespace mAPP
         public MainWindow()
         {
             InitializeComponent();
-            GenerateMainChart();
-            //GenerateSearchPopup();
-        }
-        private void GenerateMainChart()
-        {
-            DateTime updateTime = mainViewModel.Update;
-
-
-
-            //Trace.WriteLine($"{h} {ah} {w} {aw}");
-
-
-            /*Canvas mainChartCanvas = MainChartCanvas;
-            var tradingData = (DataContext as MainViewModel)!.DisplayStock!.TradingData;
-            int maxVolume = tradingData.Max(x => x.Value.Volume);
-            int position_X = 10;
-            int count = 0;
-            int canvasWidth = 0;
-            foreach (var entry in tradingData)
-            {
-                Rectangle volume = new();
-                volume.Style = mainChartCanvas.FindResource("Volume") as Style;
-                volume.Height = 100.0 * entry.Value.Volume / maxVolume;
-                volume.Width = Volume_Width; 
-
-                mainChartCanvas.Children.Add(volume);
-                Canvas.SetRight(volume, (Volume_Offset_X + Volume_Width) * count + position_X);
-                Canvas.SetBottom(volume, 0);
-                count++;
-            }
-            canvasWidth = (Volume_Offset_X + Volume_Width) * count + position_X;
-            mainChartCanvas.Width = canvasWidth;
-            MainChartScroll.ScrollToRightEnd();*/
         }
 
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)
@@ -67,7 +33,7 @@ namespace mAPP
             string serach = mainViewModel.SearchWords;
             if(serach.Length == 1 && !IsNumber(serach[0]))
                 OpenSearchPopup();
-            else if (serach.Length > 1 && serach != "Search...")
+            else if (serach.Length > 1)
                 OpenSearchPopup();
             else
             CloseSearchPopup();
@@ -75,19 +41,10 @@ namespace mAPP
             static bool IsNumber(char cha) => cha <= '9' && cha >= '0';
         }
 
-        private void SearchBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            SearchBox.Foreground = Brushes.DarkGray;
-            SearchBox.Text = "";
-        }
-
         private void SearchBox_LostFocus(object sender, RoutedEventArgs e)
         {
             CloseSearchPopup();
-            if (mainViewModel.SearchWords == "")
-                mainViewModel.SearchWords = "Search...";
-
-            SearchBox.Foreground = Brushes.LightGray;
+            Trace.WriteLine("SearchBox Lost Focus!");
         }
 
         private void SearchBox_KeyDown(object sender, KeyEventArgs e)
@@ -97,7 +54,7 @@ namespace mAPP
                 Button button = (Button) searchBoxPopupStack.Children[0];
                 string id = (string)button.Content;
                 mainViewModel.Update_DisplayStock(id.Split(" ")[0]);
-                mainViewModel.SearchWords = "";
+                CloseSearchPopup();
             }
         }
         private void OpenSearchPopup()
@@ -144,41 +101,6 @@ namespace mAPP
             string id = (string)button.Content;
             mainViewModel.Update_DisplayStock(id.Split(" ")[0]);
             CloseSearchPopup();
-        }
-
-
-        private double NowChartPos;
-        private double StartMouseX;
-        private void K_Chart_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                NowChartPos = MainChartScroll.HorizontalOffset;
-                StartMouseX = e.GetPosition(MainChartScroll).X;
-            }
-        }
-
-        private void K_Chart_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                var nowX = e.GetPosition(MainChartScroll).X;
-                MainChartScroll.ScrollToHorizontalOffset(NowChartPos + StartMouseX - nowX);
-            }
-        }
-
-        private void Scale_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            if (e.Delta > 0)
-            {
-                Trace.WriteLine("Zoom In");
-            }
-
-            else if (e.Delta < 0)
-            {
-                Trace.WriteLine("Zoom Out");
-            }
-
         }
     }
 }

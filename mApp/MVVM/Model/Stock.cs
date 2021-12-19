@@ -1,4 +1,4 @@
-﻿namespace mApp.Model;
+﻿namespace mApp.MVVM.Model;
 public class Stock
 {
     public string Id { get; set; } = "";
@@ -10,6 +10,7 @@ public class Stock
         Name = name;
         TradingData = new();
     }
+    public DateTime GetLastDate() => TradingData.Last().Key;
     public void AddTradingDatas(Stock? stock)
     {
         if (stock == null) {
@@ -25,16 +26,6 @@ public class Stock
                 TradingData.Add(data.Key, data.Value);
         }
     }
-    public void CheckTradingDatas()
-    {
-        List<DateTime> list = new();
-        foreach (var data in TradingData)
-        {
-            if (data.Key.Hour != UpdateTime.Beginning.Hour)
-                list.Add(data.Key);
-        }
-        list.ForEach(x => TradingData.Remove(x));
-    }
     public static Stock LoadLocalData(string dataPath, string stockId)
     {
         Stock? stock = new();
@@ -48,10 +39,7 @@ public class Stock
         }
         return stock;
     }
-    public override string ToString()
-    {
-        return $"Stock: {Id} {Name} {TradingData.Last().Key:yyyyMMdd}";
-    }
+    public override string ToString() => $"Stock: {Id} {Name} {TradingData.Last().Key:yyyyMMdd}";
 }
 public struct TradingData
 {

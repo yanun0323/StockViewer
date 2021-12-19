@@ -4,9 +4,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:viewmodel="clr-namespace:mAPP.ViewModel"
+        xmlns:viewmodel="clr-namespace:mApp.MVVM.ViewModel"
         xmlns:local="clr-namespace:mAPP" 
-        xmlns:view="clr-namespace:mApp.View"
         mc:Ignorable="d"
         Height="800" Width="1280" 
         MinHeight="800" MinWidth="1280"
@@ -16,7 +15,6 @@
     <Window.DataContext>
         <viewmodel:MainViewModel x:Name="mainViewModel"/>
     </Window.DataContext>
-
     <Border BorderThickness="0"
             Background="#FFE5E5E5">
         <Grid>
@@ -47,27 +45,18 @@
                         </Style>
                     </Popup.Resources>
                 </Popup>
-                
-                <TextBox x:Name ="SearchBox"
-                            HorizontalAlignment="Left"
-                            VerticalContentAlignment="Center"
-                            BorderThickness="0"
-                            Text= "{Binding SearchWords, UpdateSourceTrigger=PropertyChanged}" 
-                            FontSize="25"
-                            Foreground="LightGray"
-                            Width="340"
-                            Height="45"
-                            Margin="10,0,0,0"
-                            Padding="10,0,0,0"
-                            TextChanged="SearchBox_TextChanged"
-                            GotFocus="SearchBox_GotFocus"
-                            LostFocus="SearchBox_LostFocus"
-                            KeyDown="SearchBox_KeyDown">
-                    <TextBox.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="10"/>
-                        </Style>
-                    </TextBox.Resources>
+
+                <TextBox Style="{StaticResource SearchBoxTheme}"
+                         x:Name ="SearchBox"
+                         Text= "{Binding SearchWords, UpdateSourceTrigger=PropertyChanged}" 
+                         FontSize="25"
+                         Foreground="DarkGray"
+                         Width="340"
+                         Height="45"
+                         Margin="10,0,0,0"
+                         TextChanged="SearchBox_TextChanged"
+                         LostFocus="SearchBox_LostFocus"
+                         KeyDown="SearchBox_KeyDown">
                 </TextBox>
             </Grid>
 
@@ -189,11 +178,56 @@
                 <TabItem Height="90"
                          Width="35">
                     <TabItem.Header>
+                        <ItemsControl ItemsSource="{Binding Source='首頁'}"/>
+                    </TabItem.Header>
+                    <TabItem.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="10,0,0,10"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                    </TabItem.Resources>
+                    <Grid>
+
+                    </Grid>
+                </TabItem>
+
+                <!--Tab-->
+                <TabItem Height="90">
+                    <TabItem.Header>
+                        <ItemsControl ItemsSource="{Binding Source='自選股'}"/>
+                    </TabItem.Header>
+                    <TabItem.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="10,0,0,10"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                    </TabItem.Resources>
+                    <Grid>
+
+                    </Grid>
+                </TabItem>
+
+                <!--Tab-->
+                <TabItem Height="90">
+                    <TabItem.Header>
+                        <ItemsControl ItemsSource="{Binding Source='法人'}"/>
+                    </TabItem.Header>
+                    <TabItem.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="10,0,0,10"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                    </TabItem.Resources>
+                    <Grid>
+
+                    </Grid>
+                </TabItem>
+
+                <!--Tab-->
+                <TabItem Height="90">
+                    <TabItem.Header>
                         <StackPanel>
-                            <TextBlock>
-                                <ItemsControl ItemsSource="{Binding Source='首頁'}">
-                                </ItemsControl>
-                            </TextBlock>
+                            <ItemsControl ItemsSource="{Binding Source='智慧選股'}"/>
                         </StackPanel>
                     </TabItem.Header>
                     <TabItem.Resources>
@@ -211,52 +245,7 @@
                 <TabItem Height="90">
                     <TabItem.Header>
                         <StackPanel>
-                            <TextBlock>
-                                <ItemsControl ItemsSource="{Binding Source='自選股'}">
-                                </ItemsControl>
-                            </TextBlock>
-                        </StackPanel>
-                    </TabItem.Header>
-                    <TabItem.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="10,0,0,10"/>
-                            <Setter Property="BorderThickness" Value="0"/>
-                        </Style>
-                    </TabItem.Resources>
-                    <Grid>
-
-                    </Grid>
-                </TabItem>
-
-                <!--Tab-->
-                <TabItem Height="90">
-                    <TabItem.Header>
-                        <StackPanel>
-                            <TextBlock>
-                                <ItemsControl ItemsSource="{Binding Source='法人'}">
-                                </ItemsControl>
-                            </TextBlock>
-                        </StackPanel>
-                    </TabItem.Header>
-                    <TabItem.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="10,0,0,10"/>
-                            <Setter Property="BorderThickness" Value="0"/>
-                        </Style>
-                    </TabItem.Resources>
-                    <Grid>
-
-                    </Grid>
-                </TabItem>
-
-                <!--Tab-->
-                <TabItem Height="90">
-                    <TabItem.Header>
-                        <StackPanel>
-                            <TextBlock>
-                                <ItemsControl ItemsSource="{Binding Source='設定'}">
-                                </ItemsControl>
-                            </TextBlock>
+                            <ItemsControl ItemsSource="{Binding Source='設定'}"/>
                         </StackPanel>
                     </TabItem.Header>
                     <TabItem.Resources>
@@ -295,6 +284,10 @@
 
 
                 <!-- Main Chart -->
+                <ContentControl Content="{Binding MainChartVM}"
+                                x:Name="MainChart"
+                                Background="White"/>
+                <!-- 
                 <Grid Grid.Row="0" x:Name ="MainChartGrid">
                     <Border CornerRadius="10" Background="#222" Margin="5,0"
                             x:Name="MainChart" Grid.ColumnSpan="2" Grid.RowSpan="3">
@@ -302,15 +295,13 @@
                             x:Name="MainChartScroll"
                             ScrollViewer.VerticalScrollBarVisibility="Disabled" 
                             ScrollViewer.HorizontalScrollBarVisibility="Hidden" 
-                            PreviewMouseWheel="Scale_PreviewMouseWheel"
-                            Width="auto"
-                            MouseDown="K_Chart_MouseDown"
-                            MouseMove="K_Chart_MouseMove">
-
+                            Width="auto">
+                            
                             <Canvas x:Name ="MainChartCanvas"/>
                         </ScrollViewer>
                     </Border>
                 </Grid>
+                -->
                 <!-- Seprate Line -->
                 <GridSplitter Grid.Row="1" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Transparent"/>
 

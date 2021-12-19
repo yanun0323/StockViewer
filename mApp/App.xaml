@@ -1,9 +1,24 @@
 ﻿<Application x:Class="mApp.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:veiwModel="clr-namespace:mApp.MVVM.ViewModel"
+             xmlns:view="clr-namespace:mApp.MVVM.View"
              xmlns:local="clr-namespace:mApp"
-             StartupUri="MainWindow.xaml">
+             StartupUri="MVVM/View/MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/SearchBoxTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <DataTemplate DataType="{x:Type veiwModel:MainChartViewModel}">
+                <view:MainChartView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type veiwModel:CandleViewModel}">
+                <view:CandleView/>
+            </DataTemplate>
+
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
