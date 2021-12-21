@@ -1,10 +1,11 @@
 ﻿<UserControl x:Class="mApp.MVVM.View.MainChartView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:mApp.MVVM.View"
-             xmlns:viewModel="clr-namespace:mApp.MVVM.ViewModel" d:DataContext="{d:DesignInstance Type=viewModel:MainChartViewModel}"
+             xmlns:viewModel="clr-namespace:mApp.MVVM.ViewModel" xmlns:core="clr-namespace:mApp.Core" d:DataContext="{d:DesignInstance Type=viewModel:MainChartViewModel}"
              mc:Ignorable="d">
     <Border CornerRadius="20"
             Margin="5,0"
@@ -29,12 +30,25 @@
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
+            
             <Grid Grid.Row="1" Background="LightGray">
             </Grid>
+            
             <Grid Grid.Row="1" Grid.Column="1" Background="Gray">
             </Grid>
+            
             <Grid Grid.Column="1" Background="DarkGray">
             </Grid>
         </Grid>
+
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="MouseWheel">
+                <core:EventCommandAction Command="{Binding MouseWheelCommand}"/>
+            </i:EventTrigger>
+            <i:EventTrigger EventName="Loaded">
+                <i:InvokeCommandAction Command="{Binding LoadedCommand, Mode=OneTime}" 
+                                       CommandParameter="{Binding ElementName=CandleControl, Path=RenderSize}"/>
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
     </Border>
 </UserControl>

@@ -44,7 +44,6 @@ namespace mAPP
         private void SearchBox_LostFocus(object sender, RoutedEventArgs e)
         {
             CloseSearchPopup();
-            Trace.WriteLine("SearchBox Lost Focus!");
         }
 
         private void SearchBox_KeyDown(object sender, KeyEventArgs e)

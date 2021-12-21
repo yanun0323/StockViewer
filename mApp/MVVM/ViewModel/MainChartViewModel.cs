@@ -4,17 +4,21 @@ using System.Collections.ObjectModel;
 namespace mApp.MVVM.ViewModel;
 public class MainChartViewModel:ObservableObject
 {
+    public ICommand? MouseWheelCommand { get; set; }
+    public ICommand? LoadedCommand { get; set; }
+
     private double _Top;
     private double _Bottom;
     private DateTime _StartDate;
-    private int _ViewCount = 100;
+    private int? _CandleCount = 100;
     private Dictionary<DateTime, TradingData> _TradingDatas = new();
     private Stock _mStock = new();
     private ObservableCollection<CandleViewModel>? _CandleVMs;
+    private Size _ChartSize;
     public double Top { get => _Top; set { _Top = value; OnPropertyChanged(); } }
     public double Bottom { get => _Bottom; set { _Bottom = value; OnPropertyChanged(); } }
     public DateTime StartDate { get => _StartDate; set { _StartDate = value; OnPropertyChanged(); } }
-    public int ViewCount { get => _ViewCount; set { _ViewCount = value; OnPropertyChanged(); } }
+    public int? CandleCount { get => _CandleCount; set { _CandleCount = value; OnPropertyChanged(); } }
     public Dictionary<DateTime,TradingData> TradingDatas { get => _TradingDatas; set { _TradingDatas = value; OnPropertyChanged(); } }
     public ObservableCollection<CandleViewModel>? CandleVMs { get => _CandleVMs; set { _CandleVMs = value; OnPropertyChanged(); } }
 
@@ -32,6 +36,16 @@ public class MainChartViewModel:ObservableObject
     public MainChartViewModel(Stock stock)
     {
         mStock = stock;
+
+        MouseWheelCommand = new RelayCommand<MouseWheelEventArgs>(e =>
+        {
+            foreach (var candleVN in _CandleVMs!)
+            {
+                candleVN!.Zoom(e.Delta , _ChartSize, CandleCount);
+            }
+        });
+
+        LoadedCommand = new RelayCommand<Size>(size => _ChartSize = size);
     }
 
     void Update()
@@ -49,7 +63,7 @@ public class MainChartViewModel:ObservableObject
         DateTime date = StartDate;
         Dictionary<DateTime, TradingData> result = new();
         int count = mStock.TradingData.Count();
-        while (ViewCount > result.Count && count > 0 )
+        while (CandleCount > result.Count && count > 0 )
         {
             if (mStock!.TradingData.ContainsKey(date))
                 result.Add(date, mStock.TradingData[date]);

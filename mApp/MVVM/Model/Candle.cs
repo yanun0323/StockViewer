@@ -42,7 +42,7 @@ public class Candle
         mColor = (parameter.Tr.End == parameter.Tr.Start) ? iColor.Gray : (parameter.Tr.mEnd - parameter.Tr.mStart > 0) ? iColor.Red : iColor.Green;
     }
 
-    public Candle Resize(double height) {
+    public Candle Resize_Height(double height) {
         Parameter = new()
         {
             Date = Parameter.Date,
@@ -51,6 +51,21 @@ public class Candle
             Bottom = Parameter.Bottom,
             Width = Parameter.Width,
             Height = height,
+        };
+        Update(Parameter);
+        return this;
+    }
+
+    public Candle Resize_Width(double width)
+    {
+        Parameter = new()
+        {
+            Date = Parameter.Date,
+            Tr = Parameter.Tr,
+            Top = Parameter.Top,
+            Bottom = Parameter.Bottom,
+            Width = width,
+            Height = Height,
         };
         Update(Parameter);
         return this;

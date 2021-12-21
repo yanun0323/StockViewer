@@ -9,24 +9,26 @@
              mc:Ignorable="d"
              xmlns:viewModel="clr-namespace:mApp.MVVM.ViewModel" 
              d:DataContext="{d:DesignInstance Type=viewModel:CandleViewModel}">
-    <Grid>
-        <Canvas Width="{Binding Candle.Width}" 
-                Height="{Binding ElementName=CandleControl, Path=Height}"
-                Margin="2,0">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SizeChanged">
-                    <core:EventCommandAction Command="{Binding SizeChangedCommand}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-            <Rectangle Fill="{Binding Candle.mColor}" 
-                       Width="{Binding Candle.Width}"
-                       Height="{Binding Candle.BlockHeight}"
-                       Canvas.Top="{Binding Candle.BlockTop}"/>
-            <Rectangle Fill="{Binding Candle.mColor}" 
-                       Width="{Binding Candle.LineWidth}"
-                       Height="{Binding Candle.LineHeght}"
-                       Canvas.Top="{Binding Candle.LineTop}"
-                       Canvas.Left="{Binding Candle.LineLeft}"/>
-        </Canvas>
-    </Grid>
+    <Canvas Width="{Binding Candle.Width}" 
+            Height="{Binding ElementName=CandleControl, Path=Height}"
+            Margin="{Binding CandleMargin}">
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="SizeChanged">
+                <core:EventCommandAction Command="{Binding SizeChangedCommand}"/>
+            </i:EventTrigger>
+            <i:EventTrigger EventName="Loaded">
+                <i:InvokeCommandAction Command="{Binding LoadedCommand, Mode=OneTime}" 
+                                       CommandParameter="{Binding ElementName=CandleControl, Path=RenderSize}"/>
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
+        <Rectangle Fill="{Binding Candle.mColor}" 
+                   Width="{Binding Candle.Width}"
+                   Height="{Binding Candle.BlockHeight}"
+                   Canvas.Top="{Binding Candle.BlockTop}"/>
+        <Rectangle Fill="{Binding Candle.mColor}" 
+                   Width="{Binding Candle.LineWidth}"
+                   Height="{Binding Candle.LineHeght}"
+                   Canvas.Top="{Binding Candle.LineTop}"
+                   Canvas.Left="{Binding Candle.LineLeft}"/>
+    </Canvas>
 </UserControl>
