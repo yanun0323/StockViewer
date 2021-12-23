@@ -6,19 +6,21 @@ public class MainChartViewModel:ObservableObject
 {
     public ICommand? MouseWheelCommand { get; set; }
     public ICommand? LoadedCommand { get; set; }
+    public ICommand? SizeChangedCommand { get; set; }
+
 
     private double _Top;
     private double _Bottom;
     private DateTime _StartDate;
-    private int? _CandleCount = 100;
     private Dictionary<DateTime, TradingData> _TradingDatas = new();
     private Stock _mStock = new();
     private ObservableCollection<CandleViewModel>? _CandleVMs;
-    private Size _ChartSize;
+    private Size _ChartSize = new(834, 305);
+    private readonly Thickness _CandleMargin = new(2, 0, 2, 0);
+    private double _CandleWidth = 10 ;
     public double Top { get => _Top; set { _Top = value; OnPropertyChanged(); } }
     public double Bottom { get => _Bottom; set { _Bottom = value; OnPropertyChanged(); } }
     public DateTime StartDate { get => _StartDate; set { _StartDate = value; OnPropertyChanged(); } }
-    public int? CandleCount { get => _CandleCount; set { _CandleCount = value; OnPropertyChanged(); } }
     public Dictionary<DateTime,TradingData> TradingDatas { get => _TradingDatas; set { _TradingDatas = value; OnPropertyChanged(); } }
     public ObservableCollection<CandleViewModel>? CandleVMs { get => _CandleVMs; set { _CandleVMs = value; OnPropertyChanged(); } }
 
@@ -39,19 +41,30 @@ public class MainChartViewModel:ObservableObject
 
         MouseWheelCommand = new RelayCommand<MouseWheelEventArgs>(e =>
         {
-            foreach (var candleVN in _CandleVMs!)
+            double step = 1;
+            double scale = ((e.Delta > 0) ? 1 : -1) * step;
+            if (_CandleWidth + scale > 4)
+                _CandleWidth += scale;
+            Update();
+
+            /*foreach (var candleVM in _CandleVMs!)
             {
-                candleVN!.Zoom(e.Delta , _ChartSize, CandleCount);
-            }
+                candleVM!.Zoom(e.Delta, _ChartSize);
+            }*/
         });
 
-        LoadedCommand = new RelayCommand<Size>(size => _ChartSize = size);
+        LoadedCommand = new RelayCommand<Size>(size => 
+        {
+        });
+        SizeChangedCommand = new RelayCommand<SizeChangedEventArgs>(args =>
+        {
+            _ChartSize = args.NewSize;
+        });
     }
 
-    void Update()
+    void Update(DateTime? startDate = null)
     {
-
-        StartDate = mStock!.GetLastDate();
+        StartDate = startDate ?? mStock!.GetLastDate();
         TradingDatas = UpdateTradingDatas();
         Top = TradingDatas!.Max(x => x.Value.mMax);
         Bottom = TradingDatas!.Min(x => x.Value.mMin);
@@ -62,14 +75,24 @@ public class MainChartViewModel:ObservableObject
     {
         DateTime date = StartDate;
         Dictionary<DateTime, TradingData> result = new();
-        int count = mStock.TradingData.Count();
-        while (CandleCount > result.Count && count > 0 )
+
+        int tradingCount = mStock!.TradingData.Count();
+        int candleCount = GetCandleCount();
+        int maxCount = candleCount < tradingCount ? candleCount : tradingCount;
+        Trace.WriteLine($"GetCandleCount(): {GetCandleCount()}");
+        Trace.WriteLine($"maxCount: {maxCount}");
+        int count = 0;
+        while (maxCount > 0 && count < tradingCount)
         {
             if (mStock!.TradingData.ContainsKey(date))
+            {
                 result.Add(date, mStock.TradingData[date]);
+                maxCount--;
+                Trace.WriteLine($"maxCount: {maxCount}");
+            }
 
             date = date.AddDays(-1);
-            count--;
+            count++;
         }
         return result;
     }
@@ -81,16 +104,17 @@ public class MainChartViewModel:ObservableObject
             CandleParameter cp = new()
             {
                 Date = entry.Key,
-                Width = 10,
-                Height = 200,
+                Width = _CandleWidth,
+                Height = _ChartSize.Height,
                 Top = Top,
                 Bottom = Bottom,
                 Tr = entry.Value
             };
 
-            result.Add(new CandleViewModel(cp));
+            result.Add(new CandleViewModel(cp, _CandleMargin));
         }
         return result;
     }
+    private int GetCandleCount() => (int)(_ChartSize.Width / (_CandleWidth + _CandleMargin.Left + _CandleMargin.Right)) + 1;
 
 }

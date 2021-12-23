@@ -29,8 +29,17 @@
                         <StackPanel Orientation="Horizontal"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Loaded">
+                        <i:InvokeCommandAction Command="{Binding LoadedCommand, Mode=OneTime}" 
+                                       CommandParameter="{Binding ElementName=CandleControl, Path=RenderSize}"/>
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="SizeChanged">
+                        <core:EventCommandAction Command="{Binding SizeChangedCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
             </ItemsControl>
-            
+
             <Grid Grid.Row="1" Background="LightGray">
             </Grid>
             
@@ -44,10 +53,6 @@
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="MouseWheel">
                 <core:EventCommandAction Command="{Binding MouseWheelCommand}"/>
-            </i:EventTrigger>
-            <i:EventTrigger EventName="Loaded">
-                <i:InvokeCommandAction Command="{Binding LoadedCommand, Mode=OneTime}" 
-                                       CommandParameter="{Binding ElementName=CandleControl, Path=RenderSize}"/>
             </i:EventTrigger>
         </i:Interaction.Triggers>
     </Border>

@@ -35,13 +35,15 @@ public class MainViewModel : ObservableObject
         set 
         { 
             _searchWords = value;
-            Search();
+            //Search();
             OnPropertyChanged(); 
         } 
     }
 
     public MainViewModel()
     {
+        var path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        Trace.WriteLine(Path.Combine(path, Path.Combine("YStock","Data")));
         WebDatas.Update(mDataPath);
         Update = UpdateTime.GetLocalLastUpdate(mDataPath);
         Update_DisplayStock(mDefaultStockId);
@@ -57,14 +59,14 @@ public class MainViewModel : ObservableObject
         if (DisplayStock.Id == "")
             DisplayStock = Stock.LoadLocalData(mDataPath, mDefaultStockId);
 
+        Trace.WriteLine($"DisplayStock.TradingData.Count() {DisplayStock!.TradingData.Count()}");
         Update_TitleStock(Update);
         MainChartVM?.UpdateChart(DisplayStock);
     }
     public void Update_TitleStock(DateTime updateTime)
     {
         Trace.WriteLine($"update TitleStock {_displayStock!.Id}");
-        _titleStock = new(_displayStock!);
-        TitleStock = _titleStock;
+        TitleStock = new(_displayStock!);
     }
     HashSet<string> GenerateStockList(string dataPath)
     {
