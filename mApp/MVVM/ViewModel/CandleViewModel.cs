@@ -7,7 +7,9 @@ public class CandleViewModel : ObservableObject
     
 
     private Candle? _Candle;
+    private double _CandleHeightRatio = 0.7;
     private Volume? _Volume;
+    private double _VolumeHeightRatio = 0.2;
     private Thickness _CandleMargin;
 
     public Candle? Candle
@@ -15,15 +17,21 @@ public class CandleViewModel : ObservableObject
         get { return _Candle; }
         set { _Candle = value; OnPropertyChanged(); }
     }
+    public Volume? Volume
+    {
+        get { return _Volume; }
+        set { _Volume = value; OnPropertyChanged(); }
+    }
     public Thickness CandleMargin
     {
         get { return _CandleMargin; }
-        set { _CandleMargin = value; OnPropertyChanged(); }
+        set { _CandleMargin = value;}
     }
 
-    public CandleViewModel(CandleParameter parameter, Thickness candleMargin)
+    public CandleViewModel(CandleParameter parameter, Thickness candleMargin, double highestVolume)
     {
-        Candle = new(parameter);
+        Candle = new(parameter, _CandleHeightRatio);
+        Volume = new(parameter, _VolumeHeightRatio);
         _CandleMargin = candleMargin;
 
         SizeChangedCommand = new RelayCommand<SizeChangedEventArgs>(Args => 
@@ -31,5 +39,8 @@ public class CandleViewModel : ObservableObject
             Resize(height: Args.NewSize.Height);
         });
     }
-    public void Resize(double? height = null, double? width = null, double? top = null, double? bottom = null) => Candle = Candle!.Resize(height, width, top, bottom);
+    public void Resize(double? height = null, double? width = null, double? top = null, double? bottom = null, double? highestVolume = null) {
+        Candle = Candle!.Resize(height, width, top, bottom);
+        Volume = Volume!.Resize(height, highestVolume);
+    } 
 }

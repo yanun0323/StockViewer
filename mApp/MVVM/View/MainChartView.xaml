@@ -7,10 +7,11 @@
              xmlns:local="clr-namespace:mApp.MVVM.View"
              xmlns:viewModel="clr-namespace:mApp.MVVM.ViewModel" xmlns:core="clr-namespace:mApp.Core" d:DataContext="{d:DesignInstance Type=viewModel:MainChartViewModel}"
              mc:Ignorable="d">
-    <Border CornerRadius="20"
+    <Border x:Name="MainChartBorder"
+            CornerRadius="20"
             Margin="5,0"
             Background="{Binding ElementName=MainChart, Path=Background}">
-        <Grid Margin="10">
+        <Grid x:Name="MainChartGrid" Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition Width="50"/>
@@ -39,7 +40,7 @@
             <Grid Grid.Row="1" Background="LightGray">
             </Grid>
             
-            <Grid Grid.Row="1" Grid.Column="1" Background="Gray">
+            <Grid Grid.Row="1" Grid.Column="1" Background="LightCyan">
             </Grid>
             
             <Grid Grid.Column="1" Background="DarkGray">
@@ -49,6 +50,13 @@
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="MouseWheel">
                 <core:EventCommandAction Command="{Binding MouseWheelCommand}"/>
+            </i:EventTrigger>
+            <i:EventTrigger EventName="MouseMove">
+                <core:EventCommandAction Command="{Binding MouseMoveCommand}"/>
+            </i:EventTrigger>
+            <i:EventTrigger EventName="Loaded">
+                <i:InvokeCommandAction Command="{Binding LoadedCommand}"
+                                       CommandParameter="{Binding ElementName=MainChartGrid}"/>
             </i:EventTrigger>
         </i:Interaction.Triggers>
     </Border>

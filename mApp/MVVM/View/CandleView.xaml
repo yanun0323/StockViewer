@@ -17,14 +17,23 @@
                 <core:EventCommandAction Command="{Binding SizeChangedCommand}"/>
             </i:EventTrigger>
         </i:Interaction.Triggers>
-        <Rectangle Fill="{Binding Candle.mColor}" 
+        <Rectangle Panel.ZIndex="-1"
+                   Fill="{Binding Candle.mColor}" 
                    Width="{Binding Candle.Width}"
                    Height="{Binding Candle.BlockHeight}"
                    Canvas.Top="{Binding Candle.BlockTop}"/>
-        <Rectangle Fill="{Binding Candle.mColor}" 
+        <Rectangle Panel.ZIndex="-2" 
+                   Fill="{Binding Candle.mColor}" 
                    Width="{Binding Candle.LineWidth}"
                    Height="{Binding Candle.LineHeght}"
                    Canvas.Top="{Binding Candle.LineTop}"
                    Canvas.Left="{Binding Candle.LineLeft}"/>
+        <Rectangle Panel.ZIndex="-3"
+                   Fill="LightCyan"
+                   StrokeThickness="1"
+                   Stroke="LightBlue"
+                   Width="{Binding Candle.Width}"
+                   Height="{Binding Volume.BlockHeight}"
+                   Canvas.Bottom="0"/>
     </Canvas>
 </UserControl>

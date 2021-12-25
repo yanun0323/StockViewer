@@ -10,13 +10,15 @@ public class Candle
     public double LineHeght { get; private set; }
     public double BlockTop { get; private set; }
     public double BlockHeight { get; private set; }
-    public int LineWidth { get; } = 2;
+    public int LineWidth { get; } = 1;
     public double LineLeft { get; private set; }
     public CandleParameter Parameter { get; private set; }
-    
 
-    public Candle(CandleParameter parameter) 
+    private double HeightRatio;
+
+    public Candle(CandleParameter parameter, double candleHeightRatio) 
     {
+        HeightRatio = candleHeightRatio;
         Update(parameter);
     }
 
@@ -24,9 +26,10 @@ public class Candle
     {
         Parameter = parameter;
         Date = parameter.Date;
-        Height = parameter.Height;
+        Height = parameter.Height * HeightRatio;
         Width = parameter.Width;
-        Ratio = parameter.Height / (parameter.Top - parameter.Bottom);
+
+        Ratio = Height / (parameter.Top - parameter.Bottom);
         LineTop = (parameter.Top - parameter.Tr.mMax) * Ratio;
         LineHeght = Math.Abs((parameter.Top - parameter.Tr.mMin) * Ratio - LineTop);
         if (parameter.Tr.mStart < parameter.Tr.mEnd)
@@ -52,7 +55,7 @@ public class Candle
             Top = top ?? Parameter.Top,
             Bottom = bottom ?? Parameter.Bottom,
             Width = width ?? Parameter.Width,
-            Height = height ?? Parameter.Height,
+            Height = height ?? Parameter.Height
         };
         Update(Parameter);
         return this;
@@ -67,4 +70,5 @@ public struct CandleParameter {
     public double Bottom { get; set; }
     public double Width { get; set; }
     public double Height { get; set; }
+    public double HighestVolume { get; set; }
 }
