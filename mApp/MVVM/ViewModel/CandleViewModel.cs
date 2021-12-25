@@ -28,21 +28,8 @@ public class CandleViewModel : ObservableObject
 
         SizeChangedCommand = new RelayCommand<SizeChangedEventArgs>(Args => 
         {
-            ResizeCandleHeight(Args.NewSize.Height);
-        });
-
-        LoadedCommand = new RelayCommand<Size>(size =>
-        {
-            ResizeCandleHeight(size.Height);
+            Resize(height: Args.NewSize.Height);
         });
     }
-    public void Zoom(int delta, Size chartSize) {
-        double step = 1;
-        double scale = ((delta > 0) ? 1 : -1) * step;
-        double newWidth = (Candle!.Width + scale < 4) ? 4 : Candle!.Width + scale;
-        ResizeCandleWidth(newWidth);
-    }
-
-    public void ResizeCandleHeight(double height) => Candle = Candle!.Resize_Height(height);
-    public void ResizeCandleWidth(double width) => Candle = Candle!.Resize_Width(width);
+    public void Resize(double? height = null, double? width = null, double? top = null, double? bottom = null) => Candle = Candle!.Resize(height, width, top, bottom);
 }

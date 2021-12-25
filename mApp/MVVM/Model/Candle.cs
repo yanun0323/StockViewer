@@ -1,6 +1,7 @@
 ﻿namespace mApp.MVVM.Model;
 public class Candle
 {
+    public DateTime Date { get; private set; }
     public SolidColorBrush? mColor { get; private set; }
     public double Height { get; private set; }
     public double Width { get; private set; }
@@ -22,6 +23,7 @@ public class Candle
     public void Update(CandleParameter parameter)
     {
         Parameter = parameter;
+        Date = parameter.Date;
         Height = parameter.Height;
         Width = parameter.Width;
         Ratio = parameter.Height / (parameter.Top - parameter.Bottom);
@@ -42,30 +44,15 @@ public class Candle
         mColor = (parameter.Tr.End == parameter.Tr.Start) ? iColor.Gray : (parameter.Tr.mEnd - parameter.Tr.mStart > 0) ? iColor.Red : iColor.Green;
     }
 
-    public Candle Resize_Height(double height) {
+    public Candle Resize(double? height = null, double? width = null, double? top = null, double? bottom = null) {
         Parameter = new()
         {
             Date = Parameter.Date,
             Tr = Parameter.Tr,
-            Top = Parameter.Top,
-            Bottom = Parameter.Bottom,
-            Width = Parameter.Width,
-            Height = height,
-        };
-        Update(Parameter);
-        return this;
-    }
-
-    public Candle Resize_Width(double width)
-    {
-        Parameter = new()
-        {
-            Date = Parameter.Date,
-            Tr = Parameter.Tr,
-            Top = Parameter.Top,
-            Bottom = Parameter.Bottom,
-            Width = width,
-            Height = Height,
+            Top = top ?? Parameter.Top,
+            Bottom = bottom ?? Parameter.Bottom,
+            Width = width ?? Parameter.Width,
+            Height = height ?? Parameter.Height,
         };
         Update(Parameter);
         return this;

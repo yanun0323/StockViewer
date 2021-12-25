@@ -19,8 +19,8 @@
                 <RowDefinition/>
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
-            
-            <ItemsControl x:Name="CandleControl" ItemsSource="{Binding CandleVMs}" 
+
+            <ItemsControl x:Name="CandleControl" ItemsSource="{Binding CandleVMCollection}" 
                           FlowDirection="RightToLeft"
                           BorderThickness="3">
                 <ItemsControl.ItemsPanel>
@@ -30,10 +30,6 @@
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="Loaded">
-                        <i:InvokeCommandAction Command="{Binding LoadedCommand, Mode=OneTime}" 
-                                       CommandParameter="{Binding ElementName=CandleControl, Path=RenderSize}"/>
-                    </i:EventTrigger>
                     <i:EventTrigger EventName="SizeChanged">
                         <core:EventCommandAction Command="{Binding SizeChangedCommand}" />
                     </i:EventTrigger>

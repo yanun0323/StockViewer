@@ -16,10 +16,6 @@
             <i:EventTrigger EventName="SizeChanged">
                 <core:EventCommandAction Command="{Binding SizeChangedCommand}"/>
             </i:EventTrigger>
-            <i:EventTrigger EventName="Loaded">
-                <i:InvokeCommandAction Command="{Binding LoadedCommand, Mode=OneTime}" 
-                                       CommandParameter="{Binding ElementName=CandleControl, Path=RenderSize}"/>
-            </i:EventTrigger>
         </i:Interaction.Triggers>
         <Rectangle Fill="{Binding Candle.mColor}" 
                    Width="{Binding Candle.Width}"
