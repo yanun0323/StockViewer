@@ -17,23 +17,30 @@
                 <core:EventCommandAction Command="{Binding SizeChangedCommand}"/>
             </i:EventTrigger>
         </i:Interaction.Triggers>
-        <Rectangle Panel.ZIndex="-1"
+        <Rectangle x:Name="CandleBlock" Panel.ZIndex="9"
                    Fill="{Binding Candle.mColor}" 
                    Width="{Binding Candle.Width}"
                    Height="{Binding Candle.BlockHeight}"
                    Canvas.Top="{Binding Candle.BlockTop}"/>
-        <Rectangle Panel.ZIndex="-2" 
+        <Rectangle x:Name="CandleLine" Panel.ZIndex="8" 
                    Fill="{Binding Candle.mColor}" 
                    Width="{Binding Candle.LineWidth}"
                    Height="{Binding Candle.LineHeght}"
                    Canvas.Top="{Binding Candle.LineTop}"
                    Canvas.Left="{Binding Candle.LineLeft}"/>
-        <Rectangle Panel.ZIndex="-3"
+        <Rectangle x:Name="VolumeBlock" Panel.ZIndex="7"
                    Fill="LightCyan"
                    StrokeThickness="1"
-                   Stroke="LightBlue"
+                   Stroke="PowderBlue"
                    Width="{Binding Candle.Width}"
                    Height="{Binding Volume.BlockHeight}"
-                   Canvas.Bottom="0"/>
+                   Canvas.Bottom="{Binding DateLabelHeight}"/>
+        <Canvas x:Name="DateLabel" Panel.ZIndex="6" 
+                Width="{Binding Candle.Width}" 
+                Height="{Binding DateLabelHeight}"
+                Canvas.Bottom="3">
+            <Label Content="{Binding Month}" Foreground="#555555"
+                   HorizontalContentAlignment="Center"/>
+        </Canvas>
     </Canvas>
 </UserControl>

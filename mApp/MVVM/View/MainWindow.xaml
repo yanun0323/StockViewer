@@ -6,6 +6,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodel="clr-namespace:mApp.MVVM.ViewModel"
         xmlns:local="clr-namespace:mAPP" 
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:core="clr-namespace:mApp.Core"
         mc:Ignorable="d"
         Height="800" Width="1280" 
         MinHeight="800" MinWidth="1280"

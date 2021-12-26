@@ -1,7 +1,6 @@
 ﻿namespace mApp.MVVM.Model;
 public class Candle
 {
-    public DateTime Date { get; private set; }
     public SolidColorBrush? mColor { get; private set; }
     public double Height { get; private set; }
     public double Width { get; private set; }
@@ -25,7 +24,6 @@ public class Candle
     public void Update(CandleParameter parameter)
     {
         Parameter = parameter;
-        Date = parameter.Date;
         Height = parameter.Height * HeightRatio;
         Width = parameter.Width;
 
@@ -70,5 +68,5 @@ public struct CandleParameter {
     public double Bottom { get; set; }
     public double Width { get; set; }
     public double Height { get; set; }
-    public double HighestVolume { get; set; }
+    public int HighestVolume { get; set; }
 }

@@ -1,15 +1,16 @@
 ﻿
 using System.Collections.ObjectModel;
+using System.Windows.Shapes;
 
 namespace mApp.MVVM.ViewModel;
 public class MainChartViewModel:ObservableObject
 {
     public ICommand? MouseWheelCommand { get; set; }
-    public ICommand? MouseLDownCommand { get; set; }
-    public ICommand? MouseLUpCommand { get; set; }
+    public ICommand? MouseUpCommand { get; set; }
     public ICommand? MouseMoveCommand { get; set; }
     public ICommand? SizeChangedCommand { get; set; }
     public ICommand? LoadedCommand { get; set; }
+    public ICommand? CoordMouseMoveCommand { get; set; }
 
 
     private Grid? MainChartGrid;
@@ -17,21 +18,27 @@ public class MainChartViewModel:ObservableObject
 
     private double _Top;
     private double _Bottom;
-    private Stack<(DateTime, TradingData)>? _RightDateStack;
-    private Stack<(DateTime, TradingData)>? _LeftDateStack;
     private Stock? _mStock;
     private ObservableCollection<CandleViewModel>? _CandleVMCollection;
+    private Stack<CandleViewModel>? _CandleVMCollection_Right;
+    private Stack<CandleViewModel>? _CandleVMCollection_Left;
     private readonly Thickness _CandleMargin = new(1, 1, 1, 1);
     private Size _ChartSize = new(834, 305);
     private double _CandleWidth = 10;
     private double _CandleWidth_Max = 30;
     private double _CandleWidth_Min = 3;
+    private DateTime _TempLabelDate;
+    private int _HighestVolume;
+    private bool _InfoPopShow = false;
+    private CandleViewModel? _InfoVM;
+    public string _InfoDate = "";
 
-    private double _HighestVolume;
+    public bool InfoPopShow { get => _InfoPopShow; set { _InfoPopShow = value; OnPropertyChanged(); } }
     public double _CandleHeight { get => _ChartSize.Height - _CandleMargin.Top - _CandleMargin.Bottom; }
-
+    public double _CandleOutlineWidth { get => _CandleWidth + _CandleMargin.Left + _CandleMargin.Right; }
     public ObservableCollection<CandleViewModel>? CandleVMCollection { get => _CandleVMCollection; set { _CandleVMCollection = value; OnPropertyChanged(); } }
-
+    public CandleViewModel? InfoVM { get => _InfoVM; set { _InfoVM = value; OnPropertyChanged(); } }
+    public string InfoDate { get => _InfoDate; set { _InfoDate = value; OnPropertyChanged(); } }
     public Stock mStock
     {
         get => _mStock ?? new();
@@ -55,7 +62,31 @@ public class MainChartViewModel:ObservableObject
                 _CandleWidth += scale;
             CandleSizeChanged();
         });
-        
+
+        MouseUpCommand = new RelayCommand<MouseButtonEventArgs>(e => 
+        {
+            if (e.ChangedButton == MouseButton.Right)
+            {
+                if (!InfoPopShow)
+                {
+                    Point pos = e.MouseDevice.GetPosition(MainChartGrid);
+                    double distanceFromRight = _ChartSize.Width - pos.X;
+                    if (distanceFromRight > 0)
+                    {
+                        int index = (int)(distanceFromRight / _CandleOutlineWidth);
+                        InfoVM = _CandleVMCollection!.ElementAt(index);
+                        InfoDate = $"{InfoVM!.Date:yyyy/MM/dd}";
+                    }
+                    else
+                    {
+                        InfoVM = _CandleVMCollection!.ElementAt(0);
+                        InfoDate = $"{InfoVM!.Date:yyyy/MM/dd}";
+                    }
+                }
+                InfoPopShow = !InfoPopShow;
+            }
+        });
+
         MouseMoveCommand = new RelayCommand<MouseEventArgs>(e =>
         {
             if (e.LeftButton == MouseButtonState.Pressed && MouseClickPosition != null)
@@ -67,12 +98,35 @@ public class MainChartViewModel:ObservableObject
             {
                 MouseClickPosition = e.MouseDevice.GetPosition(MainChartGrid);
             }
+            
+            if (InfoPopShow)
+            {
+                Point pos = e.MouseDevice.GetPosition(MainChartGrid);
+                double distanceFromRight = _ChartSize.Width - pos.X;
+                if (distanceFromRight < 0)
+                    return;
+
+                int index = (int)(distanceFromRight / _CandleOutlineWidth);
+                if (index >= _CandleVMCollection!.Count())
+                    return;
+
+                InfoVM = _CandleVMCollection!.ElementAt(index);
+                InfoDate = $"{InfoVM!.Date:yyyy/MM/dd}";
+            }
         });
 
         SizeChangedCommand = new RelayCommand<SizeChangedEventArgs>(args =>
         {
-            _ChartSize = args.NewSize;
-            CandleSizeChanged();
+            if (_ChartSize.Width == args.NewSize.Width)
+            {
+                _ChartSize = args.NewSize;
+                ResizeCandle();
+            }
+            else
+            {
+                _ChartSize = args.NewSize;
+                CandleSizeChanged();
+            }
         });
 
         LoadedCommand = new RelayCommand<Grid>(obj =>
@@ -85,25 +139,19 @@ public class MainChartViewModel:ObservableObject
 
     private void StockUpdate(DateTime? startDate = null)
     {
-        Update_DateStack();
-        Queue<(DateTime,TradingData)> show = new();
+        Update_CandleVMCollection_Stack();
+        Queue<CandleViewModel> show = new();
         var count = GetNewCandleCount();
-        while (count > 0) {
-            var entry = _LeftDateStack!.Pop();
-            show.Enqueue(new(entry.Item1, entry.Item2));
+        while (count > 0 && _CandleVMCollection_Left!.Any()) {
+            show.Enqueue(_CandleVMCollection_Left!.Pop());
             count--;
         }
-        _Top = show.Max(x => x.Item2.mMax);
-        _Bottom = show.Min(x => x.Item2.mMin);
-        _HighestVolume = show.Max(x => x.Item2.mVolume);
-
         _CandleVMCollection = new();
         while (show.Any())
         {
-            var (date, data)= show.Dequeue();
-            _CandleVMCollection.Add(CreateCandleVM(date, data));
+            _CandleVMCollection.Add(show.Dequeue());
         }
-        CandleVMCollection = _CandleVMCollection;
+        ResizeCandle();
     }
     private CandleViewModel CreateCandleVM(DateTime date, TradingData data)
     {
@@ -117,15 +165,22 @@ public class MainChartViewModel:ObservableObject
             Tr = data,
             HighestVolume = _HighestVolume,
         };
-        return new CandleViewModel(cp, _CandleMargin, _HighestVolume);
-    }
-    private void Update_DateStack()
-    {
-        _RightDateStack = new();
-        _LeftDateStack = new();
-        foreach (var entry in mStock.TradingData.Reverse())
+
+        if (_TempLabelDate.Month != date.Month)
         {
-            _LeftDateStack!.Push(new(entry.Key,entry.Value));
+            _TempLabelDate = date;
+            return new CandleViewModel(cp, _CandleMargin, true);
+        }
+
+        return new CandleViewModel(cp, _CandleMargin);
+    }
+    private void Update_CandleVMCollection_Stack()
+    {
+        _CandleVMCollection_Right = new();
+        _CandleVMCollection_Left = new();
+        foreach (var entry in mStock.TradingData)
+        {
+            _CandleVMCollection_Left!.Push(CreateCandleVM(entry.Key,entry.Value));
         }
     }
     private int GetNewCandleCount() => (int)(_ChartSize.Width / (_CandleWidth + _CandleMargin.Left + _CandleMargin.Right)) + 1;
@@ -150,7 +205,7 @@ public class MainChartViewModel:ObservableObject
             while (reduceCount > 0)
             {
                 var candleVM = _CandleVMCollection!.Last();
-                _LeftDateStack!.Push(new(candleVM!.Candle!.Date, candleVM!.Candle.Parameter.Tr));
+                _CandleVMCollection_Left!.Push(candleVM);
                 _CandleVMCollection!.RemoveAt(_CandleVMCollection!.Count() - 1);
                 reduceCount--;
             }
@@ -159,9 +214,9 @@ public class MainChartViewModel:ObservableObject
         {
             while (addCount > 0)
             {
-                var (date, data) = _LeftDateStack!.Pop();
+                var candleVM = _CandleVMCollection_Left!.Pop();
 
-                _CandleVMCollection!.Add(CreateCandleVM(date, data));
+                _CandleVMCollection!.Add(candleVM);
                 addCount--;
             }
         }
@@ -191,28 +246,28 @@ public class MainChartViewModel:ObservableObject
         int GetCountFromCount(Point _pos) => (int)((MouseClickPosition!.Value.X - _pos.X) / (_CandleWidth + _CandleMargin.Left + _CandleMargin.Right));
         void ChartMoveLeft(int count) 
         {
-            while (count > 0 && _LeftDateStack!.Any())
+            while (count > 0 && _CandleVMCollection_Left!.Any())
             {
-                var (date, data) = _LeftDateStack!.Pop();
-                _CandleVMCollection!.Add(CreateCandleVM(date, data));
+                var candleVM = _CandleVMCollection_Left!.Pop();
+                _CandleVMCollection!.Add(candleVM);
 
-                var candleVM = _CandleVMCollection!.First();
+                candleVM = _CandleVMCollection!.First();
                 _CandleVMCollection!.RemoveAt(0);
-                _RightDateStack!.Push(new(candleVM!.Candle!.Date, candleVM!.Candle.Parameter.Tr));
+                _CandleVMCollection_Right!.Push(candleVM);
                 count--;
             }
             ResizeCandle();
         }
         void ChartMoveRight(int count)
         {
-            while (count > 0 && _RightDateStack!.Any())
+            while (count > 0 && _CandleVMCollection_Right!.Any())
             {
-                var (date, data) = _RightDateStack!.Pop();
-                _CandleVMCollection!.Insert(0, CreateCandleVM(date, data));
+                var candleVM = _CandleVMCollection_Right!.Pop();
+                _CandleVMCollection!.Insert(0, candleVM);
 
-                var candleVM = _CandleVMCollection!.Last();
+                candleVM = _CandleVMCollection!.Last();
                 _CandleVMCollection!.RemoveAt(_CandleVMCollection!.Count() - 1);
-                _LeftDateStack!.Push(new(candleVM!.Candle!.Date, candleVM!.Candle.Parameter.Tr));
+                _CandleVMCollection_Left!.Push(candleVM);
                 count--;
             }
             ResizeCandle();

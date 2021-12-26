@@ -5,7 +5,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:mApp.MVVM.View"
-             xmlns:viewModel="clr-namespace:mApp.MVVM.ViewModel" xmlns:core="clr-namespace:mApp.Core" d:DataContext="{d:DesignInstance Type=viewModel:MainChartViewModel}"
+             xmlns:viewModel="clr-namespace:mApp.MVVM.ViewModel" 
+             xmlns:core="clr-namespace:mApp.Core" 
+             d:DataContext="{d:DesignInstance Type=viewModel:MainChartViewModel}"
              mc:Ignorable="d">
     <Border x:Name="MainChartBorder"
             CornerRadius="20"
@@ -16,12 +18,62 @@
                 <ColumnDefinition/>
                 <ColumnDefinition Width="50"/>
             </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition Height="50"/>
-            </Grid.RowDefinitions>
+            <Popup x:Name="InfoPopup" IsOpen="{Binding InfoPopShow}" Placement="Relative" AllowsTransparency="True" Opacity="0">
+                <Border x:Name="InfoPopupBorder" BorderThickness="1.5" CornerRadius="10" BorderBrush="PowderBlue" Background="White" Opacity="0.95"
+                        Width="101" Height="150">
+                    <StackPanel>
+                        <Label Content="{Binding InfoDate}" Margin="0,0,0,0" HorizontalAlignment="Right"/>
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel>
+                                <Label Content="開"/>
+                                <Label Content="高"/>
+                                <Label Content="低"/>
+                                <Label Content="收"/>
+                                <Label Content="漲"/>
+                                <Label Content=""/>
+                                <Label Content="量"/>
 
-            <ItemsControl x:Name="CandleControl" ItemsSource="{Binding CandleVMCollection}" 
+                                <StackPanel.Resources>
+                                    <Style TargetType="Label">
+                                        <Setter Property="Margin" Value="0,-5.5"/>
+                                        <Setter Property="FontWeight" Value="Medium"/>
+                                        <Setter Property="FontSize" Value="13"/>
+                                        <Setter Property="Foreground" Value="#222"/>
+                                    </Style>
+                                </StackPanel.Resources>
+                            </StackPanel>
+                            <StackPanel Width="75">
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.Start}"/>
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.Max}"/>
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.Min}"/>
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.End}"/>
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.Spread}"/>
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.Spread}"/>
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.Volume}"/>
+                                <StackPanel.Resources>
+                                    <Style TargetType="Label">
+                                        <Setter Property="Margin" Value="0,-5.5"/>
+                                        <Setter Property="FontSize" Value="13"/>
+                                        <Setter Property="HorizontalAlignment" Value="Right"/>
+                                        <Setter Property="Foreground" Value="#222"/>
+                                    </Style>
+                                </StackPanel.Resources>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Popup>
+            
+            <Canvas Grid.ColumnSpan="2">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseMove">
+                        <core:EventCommandAction Command="{Binding CoordMouseMoveCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Canvas>
+
+            <ItemsControl x:Name="CandleControl" Grid.Column="0"
+                          ItemsSource="{Binding CandleVMCollection}" 
                           FlowDirection="RightToLeft"
                           BorderThickness="3">
                 <ItemsControl.ItemsPanel>
@@ -36,20 +88,17 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </ItemsControl>
-
-            <Grid Grid.Row="1" Background="LightGray">
-            </Grid>
             
-            <Grid Grid.Row="1" Grid.Column="1" Background="LightCyan">
-            </Grid>
-            
-            <Grid Grid.Column="1" Background="DarkGray">
+            <Grid Grid.Column="1" Background="#eee">
             </Grid>
         </Grid>
 
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="MouseWheel">
                 <core:EventCommandAction Command="{Binding MouseWheelCommand}"/>
+            </i:EventTrigger>
+            <i:EventTrigger EventName="MouseUp">
+                <core:EventCommandAction Command="{Binding MouseUpCommand}"/>
             </i:EventTrigger>
             <i:EventTrigger EventName="MouseMove">
                 <core:EventCommandAction Command="{Binding MouseMoveCommand}"/>

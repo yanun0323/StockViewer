@@ -5,7 +5,7 @@ public class Volume
     public double Height { get; private set; }
     public double BlockHeight { get; private set; }
 
-    private double mVolume;
+    private int mVolume;
     private double VolumeRatio;
     private double HeightRatio;
     private readonly double BlockHeight_Min = 2;
@@ -23,7 +23,7 @@ public class Volume
         CalculateBlock(parameter.Height, parameter.HighestVolume);
     }
 
-    public Volume Resize(double? height = null, double? highestVolume = null)
+    public Volume Resize(double? height = null, int? highestVolume = null)
     {
         if (height == null)
             return this;
@@ -32,10 +32,10 @@ public class Volume
         return this;
     }
 
-    private void CalculateBlock(double height, double? highestVolume = null)
+    private void CalculateBlock(double height, int? highestVolume = null)
     {
         if(highestVolume != null) 
-             VolumeRatio = mVolume / highestVolume.Value;
+             VolumeRatio = mVolume / (double)highestVolume.Value;
         Height = height * HeightRatio;
         BlockHeight = Height * VolumeRatio;
         if (BlockHeight < BlockHeight_Min)
