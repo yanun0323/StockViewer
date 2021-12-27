@@ -9,7 +9,7 @@ public class CandleViewModel : ObservableObject
     private Candle? _Candle;
     private readonly double _CandleHeightRatio = 0.9;
     private Volume? _Volume;
-    private readonly double _VolumeHeightRatio = 0.3;
+    private readonly double _VolumeHeightRatio = 0.45;
     private Thickness _CandleMargin;
     private bool ShowMonth;
 
