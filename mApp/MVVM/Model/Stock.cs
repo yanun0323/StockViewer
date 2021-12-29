@@ -22,7 +22,9 @@ public class Stock
         Name = stock.Name;
         foreach (var data in stock.TradingData)
         {
-            if(!TradingData.ContainsKey(data.Key))
+            if(TradingData.ContainsKey(data.Key))
+                TradingData[data.Key] = data.Value;
+            else
                 TradingData.Add(data.Key, data.Value);
         }
     }
@@ -53,14 +55,52 @@ public struct TradingData
     public string Spread { get; init; }
     public string Turnover { get; init; }
 
-    public int mVolume { get => int.Parse(Volume.Replace(",", "")); }
+    public int mVolume { get => int.Parse(Volume.Replace(",", "")) / 1000; }
     public long mVolumeMoney { get => long.Parse(VolumeMoney.Replace(",", "")); }
     public double mStart { get => double.Parse(Start.Replace(",", "")); }
     public double mMax { get => double.Parse(Max.Replace(",", "")); }
     public double mMin { get => double.Parse(Min.Replace(",", "")); }
     public double mEnd { get => double.Parse(End.Replace(",", "")); }
     public string mGrade { get => Grade; }
-    public double mSpread { get => double.Parse(Spread.Replace(",", "")); }
+    public double mSpread { get 
+        {
+            double num = double.Parse(Spread.Replace(",", ""));
+            if (num != 0.0 && Grade.Contains("green"))
+                return -num;
+            else
+                return num;
+        } }
     public int mTurnover { get => int.Parse(Turnover.Replace(",", "")); }
+    public string mRatio {
+        get
+        {
+            double lastEnd = mEnd + mSpread;
+            return $"{Math.Round(100 * mSpread / lastEnd, 2)} %";
+        }
+    }
+    public SolidColorBrush mColor
+    {
+        get
+        {
+            string grade = mGrade;
+            if (grade.Contains("red"))
+                return iColor.Red; 
+            if (grade.Contains("green"))
+                return iColor.Green;
+            return iColor.Gray;
+        }
+    }
+
+    public string mSpreadSymbol { get
+        {
+            string grade = mGrade;
+            if (grade.Contains("red"))
+                return $"▲ {Spread}";
+
+            if (grade.Contains("green"))
+                return $"▼ {Spread}";
+
+            return "-";
+        } }
 }
 

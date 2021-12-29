@@ -46,9 +46,13 @@ public class MainViewModel : ObservableObject
         mDataPath = Path.Combine(path, Path.Combine("YStock", "Data"));
 
         WebDatas.Update(mDataPath);
+        //WebDatas.UpdateParticularDate(mDataPath, 2018, 8, 22);
+
         Update = UpdateTime.GetLocalLastUpdate(mDataPath);
         Update_DisplayStock(mDefaultStockId);
         StockList = GenerateStockList(mDataPath);
+
+        //WebDatas.CheckCorrect(mDataPath, _displayStock);
 
         MainChartVM = new(DisplayStock!);
         Trace.WriteLine("Datas Initialize");

@@ -46,10 +46,11 @@
                                 <Label Content="{Binding InfoVM.Candle.Parameter.Tr.Start}"/>
                                 <Label Content="{Binding InfoVM.Candle.Parameter.Tr.Max}"/>
                                 <Label Content="{Binding InfoVM.Candle.Parameter.Tr.Min}"/>
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.End}"/>
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.Spread}"/>
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.Spread}"/>
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.Volume}"/>
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.End}"
+                                       Foreground="{Binding InfoVM.Candle.Parameter.Tr.mColor}" />
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.mSpread}"/>
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.mRatio}"/>
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.mVolume}"/>
                                 <StackPanel.Resources>
                                     <Style TargetType="Label">
                                         <Setter Property="Margin" Value="0,-5.5"/>
