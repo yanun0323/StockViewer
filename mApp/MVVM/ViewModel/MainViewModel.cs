@@ -43,7 +43,8 @@ public class MainViewModel : ObservableObject
     public MainViewModel()
     {
         var path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        Trace.WriteLine(Path.Combine(path, Path.Combine("YStock","Data")));
+        mDataPath = Path.Combine(path, Path.Combine("YStock", "Data"));
+
         WebDatas.Update(mDataPath);
         Update = UpdateTime.GetLocalLastUpdate(mDataPath);
         Update_DisplayStock(mDefaultStockId);
