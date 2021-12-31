@@ -11,6 +11,7 @@ global using System.Windows.Input;
 global using System.Windows.Media;
 global using System.Windows.Media.Imaging;
 global using System.Windows.Navigation;
+global using System.Windows.Shapes;
 global using System.IO;
 global using System.Diagnostics;
 global using System.Net;
@@ -23,6 +24,7 @@ global using StockViewer.Core;
 global using StockViewer.MVVM.Model;
 global using StockViewer.MVVM.View;
 global using StockViewer.MVVM.ViewModel;
+global using Path = System.IO.Path;
 
 namespace StockViewer;
 internal class GlobalUsing

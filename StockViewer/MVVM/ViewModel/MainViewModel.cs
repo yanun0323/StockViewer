@@ -43,10 +43,9 @@ public class MainViewModel : ObservableObject
     public MainViewModel()
     {
         var path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        mDataPath = Path.Combine(path, Path.Combine("StockViewer", "Data"));
+        mDataPath = Path.Combine(path, Path.Combine("StockViewer\\Data", "Price"));
 
-        WebDatas.Update(mDataPath);
-        //WebDatas.UpdateParticularDate(mDataPath, 2018, 8, 22);
+        //WebDatas.Update(mDataPath);
 
         Update = UpdateTime.GetLocalLastUpdate(mDataPath);
         Update_DisplayStock(mDefaultStockId);

@@ -16,8 +16,8 @@ public class MainChartViewModel:ObservableObject
     private Grid? MainChartGrid;
     private Point? MouseClickPosition;
 
-    private double _Top;
-    private double _Bottom;
+    private double _HighestPrice;
+    private double _LowestPrice;
     private Stock? _mStock;
     private ObservableCollection<CandleViewModel>? _CandleVMCollection;
     private Stack<CandleViewModel>? _CandleVMCollection_Right;
@@ -32,12 +32,14 @@ public class MainChartViewModel:ObservableObject
     private bool _InfoPopShow = false;
     private CandleViewModel? _InfoVM;
     public string _InfoDate = "";
+    private ObservableCollection<ChartGridViewModel>? _ChartGridVM;
 
     public bool InfoPopShow { get => _InfoPopShow; set { _InfoPopShow = value; OnPropertyChanged(); } }
     public double _CandleHeight { get => _ChartSize.Height - _CandleMargin.Top - _CandleMargin.Bottom; }
     public double _CandleOutlineWidth { get => _CandleWidth + _CandleMargin.Left + _CandleMargin.Right; }
     public ObservableCollection<CandleViewModel>? CandleVMCollection { get => _CandleVMCollection; set { _CandleVMCollection = value; OnPropertyChanged(); } }
     public CandleViewModel? InfoVM { get => _InfoVM; set { _InfoVM = value; OnPropertyChanged(); } }
+    public ObservableCollection<ChartGridViewModel>? ChartGridVM { get => _ChartGridVM; set { _ChartGridVM = value; OnPropertyChanged(); } }
     public string InfoDate { get => _InfoDate; set { _InfoDate = value; OnPropertyChanged(); } }
     public Stock mStock
     {
@@ -160,8 +162,8 @@ public class MainChartViewModel:ObservableObject
             Date = date,
             Width = _CandleWidth,
             Height = _CandleHeight,
-            Top = _Top,
-            Bottom = _Bottom,
+            Top = _HighestPrice,
+            Bottom = _LowestPrice,
             Tr = data,
             HighestVolume = _HighestVolume,
         };
@@ -229,13 +231,33 @@ public class MainChartViewModel:ObservableObject
     }
     private void ResizeCandle()
     {
-        _Top = _CandleVMCollection!.Max(x => x.Candle!.Parameter.Tr.mMax);
-        _Bottom = _CandleVMCollection!.Min(x => x.Candle!.Parameter.Tr.mMin);
+        _HighestPrice = _CandleVMCollection!.Max(x => x.Candle!.Parameter.Tr.mMax);
+        _LowestPrice = _CandleVMCollection!.Min(x => x.Candle!.Parameter.Tr.mMin);
         _HighestVolume = _CandleVMCollection!.Max(x => x.Candle!.Parameter.Tr.mVolume);
+
         foreach (var candleVm in _CandleVMCollection!)
         {
-            candleVm.Resize(_CandleHeight, _CandleWidth, _Top, _Bottom, _HighestVolume);
+            candleVm.Resize(_CandleHeight, _CandleWidth, _HighestPrice, _LowestPrice, _HighestVolume);
         }
+
+
+        int offset = 1;
+        double priceInterval = _HighestPrice - _LowestPrice;
+        while (priceInterval / offset > 10) {
+            offset *= 10;
+        }
+        double price = (int)(_LowestPrice / offset) * offset;
+
+        ChartGridVM = new();
+        _ChartGridVM!.Add(new(new(_ChartSize.Width + 50, _ChartSize.Height), _LowestPrice, _HighestPrice, _LowestPrice));
+        while (price < _HighestPrice)
+        {
+            _ChartGridVM!.Add(new(new(_ChartSize.Width + 50, _ChartSize.Height), price, _HighestPrice, _LowestPrice));
+            price += offset;
+        }
+        _ChartGridVM!.Add(new(new(_ChartSize.Width + 50, _ChartSize.Height), _HighestPrice, _HighestPrice, _LowestPrice));
+
+        ChartGridVM = _ChartGridVM;
         CandleVMCollection = _CandleVMCollection;
     }
     private void MouseDrag(Point pos)
