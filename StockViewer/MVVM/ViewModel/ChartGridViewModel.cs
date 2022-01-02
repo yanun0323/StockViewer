@@ -2,29 +2,93 @@
 
 namespace StockViewer.MVVM.ViewModel;
 
-public class ChartGridViewModel
+public class ChartGridViewModel:ObservableObject
 {
-    public double Top { get; set; }
-    public double X1 { get; set; }
-    public double Y1 { get; set; }
-    public double X2 { get; set; }
-    public double Y2 { get; set; }
+    private ObservableCollection<Line> _ChartLines = new();
+    private ObservableCollection<Label> _ChartLabels = new();
+    private Thickness _Margin;
+    private Size _ChartSize;
+    private double _Ratio;
+    private double _HighestPrice;
+    private double _LowestPrice;
+    private double HeightRatio = CandleViewModel.CandleHeightRatio;
 
-    public ChartGridViewModel(Size chart, double price, double highestPrice, double lowestPrice) 
+
+    public ObservableCollection<Line> ChartLines { get => _ChartLines; set { _ChartLines = value; OnPropertyChanged(); } }
+    public ObservableCollection<Label> ChartLabels { get => _ChartLabels; set { _ChartLabels = value; OnPropertyChanged(); } }
+    public Thickness Margin { get => _Margin; set => _Margin = value; }
+    public Size ChartSize { get => _ChartSize; set { _ChartSize = value;} }
+
+    public ChartGridViewModel(Size chart, double highestPrice, double lowestPrice, Thickness margin) 
     {
-        Draw(chart, price, highestPrice, lowestPrice);
+        Draw(chart, highestPrice, lowestPrice, margin);
     }
 
-    public void Resize(Size chart, double price, double highestPrice, double lowestPrice) => Draw(chart, price, highestPrice, lowestPrice);
+    public void Resize(Size chart, double highestPrice, double lowestPrice, Thickness margin) => Draw(chart, highestPrice, lowestPrice, margin);
 
-    private void Draw(Size chart, double price, double highestPrice, double lowestPrice)
+    private void Draw(Size chart, double highestPrice, double lowestPrice, Thickness margin)
     {
-        double ratio =  (highestPrice - lowestPrice) / chart.Height;
-        double y = (highestPrice - price) * ratio;
-        Top = (highestPrice - price) * ratio;
-        X1 = 0;
-        Y1 = 0;
-        X2 = chart.Width;
-        Y2 = 0;
+        _ChartSize = chart;
+        _Margin = margin;
+        _HighestPrice = highestPrice; 
+        _LowestPrice = lowestPrice;
+        _Ratio = (chart.Height * HeightRatio - _Margin.Top - _Margin.Bottom) / (_HighestPrice - _LowestPrice);
+
+        double priceInterval = _HighestPrice - _LowestPrice;
+        int offset = 1;
+        while (priceInterval / offset > 15)
+        {
+            offset *= 5;
+        }
+        double price = (int)(_LowestPrice / offset) * offset + offset;
+
+        _ChartLines = new();
+        _ChartLabels = new();
+        _ChartLines.Add(CreatLine(_LowestPrice));
+        _ChartLabels.Add(CreatLabel(_LowestPrice));
+        while (price < _HighestPrice)
+        {
+            _ChartLines.Add(CreatLine(price));
+            _ChartLabels.Add(CreatLabel(price));
+            price += offset;
+        }
+        _ChartLines.Add(CreatLine(_HighestPrice));
+        _ChartLabels.Add(CreatLabel(_HighestPrice));
+        ChartLines = _ChartLines;
+    }
+
+    private Line CreatLine(double price) { 
+        double top = (_HighestPrice - price) * _Ratio;
+        Line result = new Line() {
+            Stroke = Brushes.LightGray,
+            StrokeThickness = 1,
+            X1 = 0,
+            Y1 = top,
+            X2 = _ChartSize.Width,
+            Y2 = top
+        };
+        Canvas.SetTop(result, 0);
+        Canvas.SetLeft(result, 0);
+
+        return result;
+    }
+    private Label CreatLabel(double price)
+    {
+        double top = (_HighestPrice - price) * _Ratio;
+        double width = 40;
+        Label result = new Label()
+        {
+            Width = width,
+            Foreground = Brushes.LightGray,
+            Content = Math.Round(price, 2),
+            VerticalContentAlignment = VerticalAlignment.Center,
+            HorizontalContentAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top,
+            HorizontalAlignment = HorizontalAlignment.Left,
+        };
+        Canvas.SetTop(result, top);
+        Canvas.SetLeft(result, _ChartSize.Width - width);
+
+        return result;
     }
 }

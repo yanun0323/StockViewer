@@ -7,12 +7,12 @@ public class CandleViewModel : ObservableObject
 
     private DateTime _Date;
     private Candle? _Candle;
-    private readonly double _CandleHeightRatio = 0.9;
     private Volume? _Volume;
-    private readonly double _VolumeHeightRatio = 0.45;
     private Thickness _CandleMargin;
     private bool ShowMonth;
 
+    public static readonly double CandleHeightRatio = 0.9;
+    public static readonly double VolumeHeightRatio = 0.45;
     public double DateLabelHeight { get => 15; }
     public string Month { get =>  ShowMonth ? $"{_Date.Month}" : ""; }
     public Candle? Candle
@@ -41,8 +41,8 @@ public class CandleViewModel : ObservableObject
         ShowMonth = showMonth;
         _CandleMargin = candleMargin;
         _Date = parameter.Date;
-        Candle = new(parameter, _CandleHeightRatio);
-        Volume = new(parameter, _VolumeHeightRatio);
+        Candle = new(parameter, CandleHeightRatio);
+        Volume = new(parameter, VolumeHeightRatio);
 
         SizeChangedCommand = new RelayCommand<SizeChangedEventArgs>(Args => 
         {

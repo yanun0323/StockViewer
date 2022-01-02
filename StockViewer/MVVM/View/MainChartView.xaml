@@ -65,26 +65,9 @@
                 </Border>
             </Popup>
 
-            <ItemsControl Grid.Column="0" Grid.ColumnSpan="2"
-                          ItemsSource="{Binding ChartGridVM}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas Width="{Binding ElementName=MainChart,Path=Width}"
-                                Height="{Binding ElementName=MainChart,Path=Height}"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemContainerStyle>
-                    <Style TargetType="ContentPresenter">
-                        <Setter Property="Canvas.Left" Value="0"/>
-                        <Setter Property="Canvas.Top" Value="{Binding Top}"/>
-                    </Style>
-                </ItemsControl.ItemContainerStyle>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Line Stroke="PowderBlue" StrokeThickness="1" X1="{Binding X1}" Y1="{Binding Y1}" X2="{Binding X2}" Y2="{Binding Y2}"/>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <ContentControl Grid.Column="0" Grid.ColumnSpan="2"
+                            VerticalAlignment="Top"
+                            Content="{Binding ChartGridVM}"/>
 
             <ItemsControl x:Name="CandleControl" Grid.Column="0"
                           ItemsSource="{Binding CandleVMCollection}" 
@@ -103,7 +86,7 @@
                 </i:Interaction.Triggers>
             </ItemsControl>
             
-            <Grid Grid.Column="1" Background="#eee">
+            <Grid Grid.Column="1">
             </Grid>
         </Grid>
 
