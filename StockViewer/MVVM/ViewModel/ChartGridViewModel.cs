@@ -32,7 +32,7 @@ public class ChartGridViewModel:ObservableObject
         _Margin = margin;
         _HighestPrice = highestPrice; 
         _LowestPrice = lowestPrice;
-        _Ratio = (chart.Height * HeightRatio - _Margin.Top - _Margin.Bottom) / (_HighestPrice - _LowestPrice);
+        _Ratio = (chart.Height * HeightRatio) / (_HighestPrice - _LowestPrice);
 
         double priceInterval = _HighestPrice - _LowestPrice;
         int offset = 1;
@@ -63,11 +63,11 @@ public class ChartGridViewModel:ObservableObject
             Stroke = Brushes.LightGray,
             StrokeThickness = 1,
             X1 = 0,
-            Y1 = top,
+            Y1 = 0,
             X2 = _ChartSize.Width,
-            Y2 = top
+            Y2 = 0
         };
-        Canvas.SetTop(result, 0);
+        Canvas.SetTop(result, top);
         Canvas.SetLeft(result, 0);
 
         return result;
@@ -79,6 +79,7 @@ public class ChartGridViewModel:ObservableObject
         Label result = new Label()
         {
             Width = width,
+            FontSize = 11,
             Foreground = Brushes.LightGray,
             Content = Math.Round(price, 2),
             VerticalContentAlignment = VerticalAlignment.Center,
@@ -86,7 +87,7 @@ public class ChartGridViewModel:ObservableObject
             VerticalAlignment = VerticalAlignment.Top,
             HorizontalAlignment = HorizontalAlignment.Left,
         };
-        Canvas.SetTop(result, top);
+        Canvas.SetTop(result, top - 5);
         Canvas.SetLeft(result, _ChartSize.Width - width);
 
         return result;

@@ -11,12 +11,8 @@
              d:DataContext="{d:DesignInstance Type=viewModel:CandleViewModel}">
     <Canvas Width="{Binding Candle.Width}" 
             Height="{Binding ElementName=CandleControl, Path=Height}"
-            Margin="{Binding CandleMargin}">
-        <i:Interaction.Triggers>
-            <i:EventTrigger EventName="SizeChanged">
-                <core:EventCommandAction Command="{Binding SizeChangedCommand}"/>
-            </i:EventTrigger>
-        </i:Interaction.Triggers>
+            Margin="{Binding CandleMargin}"
+            VerticalAlignment="Stretch">
         <Rectangle x:Name="CandleBlock" Panel.ZIndex="9"
                    Fill="{Binding Candle.mColor}" 
                    Width="{Binding Candle.Width}"

@@ -6,7 +6,7 @@ public class Candle
     public double Width { get; private set; }
     public double Ratio { get; private set; }
     public double LineTop { get; private set; }
-    public double LineHeght { get; private set; }
+    public double LineHeight { get; private set; }
     public double BlockTop { get; private set; }
     public double BlockHeight { get; private set; }
     public int LineWidth { get; } = 1;
@@ -24,22 +24,18 @@ public class Candle
     public void Update(CandleParameter parameter)
     {
         Parameter = parameter;
-        Height = parameter.Height * HeightRatio;
+        Height = parameter.Height ;
         Width = parameter.Width;
 
-        Ratio = Height / (parameter.Top - parameter.Bottom);
+        Ratio = (Height * HeightRatio) / (parameter.Top - parameter.Bottom);
         LineTop = (parameter.Top - parameter.Tr.mMax) * Ratio;
-        LineHeght = Math.Abs((parameter.Top - parameter.Tr.mMin) * Ratio - LineTop);
+        LineHeight = Math.Abs((parameter.Top - parameter.Tr.mMin) * Ratio - LineTop);
         if (parameter.Tr.mStart < parameter.Tr.mEnd)
-        {
             BlockTop = (parameter.Top - parameter.Tr.mEnd) * Ratio;
-            BlockHeight = Math.Abs((parameter.Top - parameter.Tr.mStart) * Ratio - BlockTop);
-        }
         else
-        {
             BlockTop = (parameter.Top - parameter.Tr.mStart) * Ratio;
-            BlockHeight = Math.Abs((parameter.Top - parameter.Tr.mEnd) * Ratio - BlockTop);
-        }
+
+        BlockHeight = Math.Abs(parameter.Tr.mEnd - parameter.Tr.mStart) * Ratio;
         BlockHeight = (BlockHeight < 2) ? 2 : BlockHeight;
         LineLeft = (Width - LineWidth) / 2;
         mColor = (parameter.Tr.End == parameter.Tr.Start) ? iColor.Gray : (parameter.Tr.mEnd - parameter.Tr.mStart > 0) ? iColor.Red : iColor.Green;

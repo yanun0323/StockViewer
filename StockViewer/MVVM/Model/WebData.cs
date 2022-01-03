@@ -52,15 +52,15 @@ public class WebDatas
                         Trace.WriteLine($"   [Error] Lost Connect... Give up reconnecting !");
                     }
                     Trace.WriteLine($"   [Error] Lost Connect... Waiting For Reconnecting...3");
-                    System.Threading.Thread.Sleep(1350);
+                    System.Threading.Thread.Sleep(1000);
                     Trace.WriteLine($"   [Error] Lost Connect... Waiting For Reconnecting...2");
-                    System.Threading.Thread.Sleep(1350);
+                    System.Threading.Thread.Sleep(1000);
                     Trace.WriteLine($"   [Error] Lost Connect... Waiting For Reconnecting...1");
-                    System.Threading.Thread.Sleep(1350);
+                    System.Threading.Thread.Sleep(1000);
                     Trace.WriteLine($"   [Error] Reconnecting...");
                     goto Reconnect;
             }
-            System.Threading.Thread.Sleep(4000);
+            System.Threading.Thread.Sleep(2500);
         }
 
         stockDataGroup.SaveToLocalDatas(dataPath);

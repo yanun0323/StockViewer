@@ -1,10 +1,6 @@
 ﻿namespace StockViewer.MVVM.ViewModel;
 public class CandleViewModel : ObservableObject
 {
-
-    public ICommand? SizeChangedCommand { get; set; }
-    public ICommand? LoadedCommand { get; set; }
-
     private DateTime _Date;
     private Candle? _Candle;
     private Volume? _Volume;
@@ -43,11 +39,6 @@ public class CandleViewModel : ObservableObject
         _Date = parameter.Date;
         Candle = new(parameter, CandleHeightRatio);
         Volume = new(parameter, VolumeHeightRatio);
-
-        SizeChangedCommand = new RelayCommand<SizeChangedEventArgs>(Args => 
-        {
-            //Resize(height: Args.NewSize.Height);
-        });
     }
 
     public void Resize(double? height = null, double? width = null, double? top = null, double? bottom = null, int? highestVolume = null) {

@@ -9,7 +9,7 @@
              xmlns:viewModel="clr-namespace:StockViewer.MVVM.ViewModel"
              d:DataContext="{d:DesignInstance Type=viewModel:ChartGridViewModel}">
     <Canvas Margin="{Binding Margin}"
-            Background="#eee">
+            Height="{Binding ElementName=CandleControl, Path=Height}">
         <ItemsControl ItemsSource="{Binding ChartLines}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
