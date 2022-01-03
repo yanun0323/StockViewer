@@ -21,7 +21,7 @@
         <Rectangle x:Name="CandleLine" Panel.ZIndex="8" 
                    Fill="{Binding Candle.mColor}" 
                    Width="{Binding Candle.LineWidth}"
-                   Height="{Binding Candle.LineHeght}"
+                   Height="{Binding Candle.LineHeight}"
                    Canvas.Top="{Binding Candle.LineTop}"
                    Canvas.Left="{Binding Candle.LineLeft}"/>
         <Rectangle x:Name="VolumeBlock" Panel.ZIndex="7"

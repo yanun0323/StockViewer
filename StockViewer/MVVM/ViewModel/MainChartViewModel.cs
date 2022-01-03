@@ -189,18 +189,20 @@ public class MainChartViewModel:ObservableObject
     private void CandleSizeChanged() {
         var newCandleCount = GetNewCandleCount();
         var candleCount = _CandleVMCollection!.Count();
-        if (newCandleCount > _CandleVMCollection!.Count())
+        if (newCandleCount > candleCount)
         {
             var addCount = newCandleCount - candleCount;
-            if(AddCandleLeft(addCount))
+            if (AddCandleLeft(addCount))
                 ResizeCandle();
         }
-        else if (newCandleCount < _CandleVMCollection!.Count())
+        else if (newCandleCount < candleCount)
         {
             var reduceCount = candleCount - newCandleCount;
-            if(ReduceCandleLeft(reduceCount))
+            if (ReduceCandleLeft(reduceCount))
                 ResizeCandle();
         }
+        _ChartGridVM!.Resize(_ChartSize);
+        ChartGridVM = _ChartGridVM;
 
         bool ReduceCandleLeft(int reduceCount)
         {
@@ -247,7 +249,7 @@ public class MainChartViewModel:ObservableObject
         {
             candleVm.Resize(_CandleHeight, _CandleWidth, _HighestPrice, _LowestPrice, _HighestVolume);
         }
-        _ChartGridVM = new(new(_ChartSize.Width + 50, _ChartSize.Height), _HighestPrice, _LowestPrice, _CandleMargin);
+        _ChartGridVM = new(new(_ChartSize.Width + 50.0, _ChartSize.Height), _HighestPrice, _LowestPrice, _CandleMargin);
 
         ChartGridVM = _ChartGridVM;
         CandleVMCollection = _CandleVMCollection;

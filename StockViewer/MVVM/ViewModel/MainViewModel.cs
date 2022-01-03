@@ -7,6 +7,13 @@ public class MainViewModel : ObservableObject
     private Stock? _displayStock = new();
     private TitleStock? _titleStock;
     private string _searchWords = "";
+    private ObservableCollection<PickStockBlockViewModel> _PickStockVMCollection;
+
+    public ObservableCollection<PickStockBlockViewModel> PickStockVMCollection
+    {
+        get { return _PickStockVMCollection; }
+        set { _PickStockVMCollection = value; OnPropertyChanged(); }
+    }
 
     public DateTime Update { get; }
     public HashSet<string> StockList { get; set; } = new();
@@ -55,23 +62,24 @@ public class MainViewModel : ObservableObject
 
         MainChartVM = new(DisplayStock!);
         Trace.WriteLine("Datas Initialize");
+
+        _PickStockVMCollection = new();
+        int count = 0;
+        while (count++ < 20) {
+            _PickStockVMCollection!.Add(new(_titleStock!));
+        }
+        PickStockVMCollection = _PickStockVMCollection;
     }
     public void Update_DisplayStock(string stockId)
     {
-        Trace.WriteLine($"update DisplayStock {stockId}");
         DisplayStock = Stock.LoadLocalData(mDataPath, stockId);
         if (DisplayStock.Id == "")
             DisplayStock = Stock.LoadLocalData(mDataPath, mDefaultStockId);
 
-        Trace.WriteLine($"DisplayStock.TradingData.Count() {DisplayStock!.TradingData.Count()}");
         Update_TitleStock(Update);
         MainChartVM?.UpdateChart(DisplayStock);
     }
-    public void Update_TitleStock(DateTime updateTime)
-    {
-        Trace.WriteLine($"update TitleStock {_displayStock!.Id}");
-        TitleStock = new(_displayStock!);
-    }
+    public void Update_TitleStock(DateTime updateTime) => TitleStock = new(_displayStock!);
     HashSet<string> GenerateStockList(string dataPath)
     {
         HashSet<string> result = new();

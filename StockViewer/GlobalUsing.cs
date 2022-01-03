@@ -24,6 +24,7 @@ global using StockViewer.Core;
 global using StockViewer.MVVM.Model;
 global using StockViewer.MVVM.View;
 global using StockViewer.MVVM.ViewModel;
+global using System.Collections.ObjectModel;
 global using Path = System.IO.Path;
 
 namespace StockViewer;

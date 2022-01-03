@@ -14,17 +14,16 @@ public class ChartGridViewModel:ObservableObject
     private double HeightRatio = CandleViewModel.CandleHeightRatio;
 
 
-    public ObservableCollection<Line> ChartLines { get => _ChartLines; set { _ChartLines = value; OnPropertyChanged(); } }
-    public ObservableCollection<Label> ChartLabels { get => _ChartLabels; set { _ChartLabels = value; OnPropertyChanged(); } }
+    public ObservableCollection<Line> ChartLines { get => _ChartLines; set { _ChartLines = value; } }
+    public ObservableCollection<Label> ChartLabels { get => _ChartLabels; set { _ChartLabels = value; } }
     public Thickness Margin { get => _Margin; set => _Margin = value; }
-    public Size ChartSize { get => _ChartSize; set { _ChartSize = value;} }
 
     public ChartGridViewModel(Size chart, double highestPrice, double lowestPrice, Thickness margin) 
     {
         Draw(chart, highestPrice, lowestPrice, margin);
     }
 
-    public void Resize(Size chart, double highestPrice, double lowestPrice, Thickness margin) => Draw(chart, highestPrice, lowestPrice, margin);
+    public void Resize(Size chart, double? highestPrice = null, double? lowestPrice = null, Thickness? margin = null) => Draw(chart, highestPrice ?? _HighestPrice, lowestPrice ?? _LowestPrice, margin ?? Margin);
 
     private void Draw(Size chart, double highestPrice, double lowestPrice, Thickness margin)
     {

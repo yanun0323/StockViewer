@@ -75,13 +75,13 @@
                 </Grid.ColumnDefinitions>
                 <Grid.Resources>
                     <Style x:Key="Title" TargetType="Label">
-                        <Setter Property="FontSize" Value="30"/>
+                        <Setter Property="FontSize" Value="28"/>
                         <Setter Property="FontWeight" Value="SemiBold"/>
                         <Setter Property="VerticalAlignment" Value="Center"/>
                         <Setter Property="Foreground" Value="#252525"/>
                     </Style>
                     <Style x:Key="SubTitle" TargetType="Label">
-                        <Setter Property="FontSize" Value="18"/>
+                        <Setter Property="FontSize" Value="16"/>
                         <Setter Property="FontWeight" Value="SemiBold"/>
                         <Setter Property="Padding" Value="Auto"/>
                     </Style>
@@ -90,10 +90,10 @@
                 <Label Grid.Column="0" Style="{StaticResource Title}"
                             Content="{Binding TitleStock.Name}"/>
 
-                <Label Grid.Column="1"  FontSize="30" FontWeight="SemiBold" Foreground="{Binding TitleStock.TradingData.mColor}" 
+                <Label Grid.Column="1" Style="{StaticResource Title}" FontWeight="SemiBold" Foreground="{Binding TitleStock.TradingData.mColor}" 
                             Content="{Binding TitleStock.TradingData.End}" x:Name="displayStockPrice_End" Height="50" VerticalAlignment="Bottom"/>
 
-                <Label Grid.Column="2"  FontSize="20" FontWeight="SemiBold" Foreground="{Binding TitleStock.TradingData.mColor}" VerticalAlignment="Center"
+                <Label Grid.Column="2"  FontSize="18" FontWeight="SemiBold" Foreground="{Binding TitleStock.TradingData.mColor}" VerticalAlignment="Center"
                             Content="{Binding TitleStock.TradingData.mSpreadSymbol}" x:Name="displayStockPrice_Spread"/>
 
                 <Grid Grid.Column="3">
@@ -102,17 +102,17 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <StackPanel Orientation="Horizontal" >
-                        <Label FontSize="18" Foreground="#585858" Padding="Auto"
+                        <Label FontSize="16" Foreground="#585858" Padding="Auto"
                             Content="開  "/>
 
-                        <Label Grid.Row="0"  FontSize="18" FontWeight="SemiBold" Foreground="Gray" Padding="Auto"
+                        <Label Grid.Row="0"  FontSize="16" FontWeight="SemiBold" Foreground="Gray" Padding="Auto"
                             Content="{Binding TitleStock.TradingData.Start}" x:Name="displayStockPrice_Start"/>
                     </StackPanel>
                     <StackPanel Grid.Row="1" Orientation="Horizontal">
-                        <Label FontSize="18" Foreground="#585858" Padding="Auto"
+                        <Label FontSize="16" Foreground="#585858" Padding="Auto"
                             Content="收  "/>
 
-                        <Label Grid.Row="1"  FontSize="18" FontWeight="SemiBold" Foreground="{Binding TitleStock.TradingData.mColor}"   Padding="Auto"
+                        <Label Grid.Row="1"  FontSize="16" FontWeight="SemiBold" Foreground="{Binding TitleStock.TradingData.mColor}"   Padding="Auto"
                             Content="{Binding ElementName=displayStockPrice_End, Path=Content}"/>
                     </StackPanel>
 
@@ -123,18 +123,18 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <StackPanel Orientation="Horizontal" >
-                        <Label FontSize="18" Foreground="#585858" Padding="Auto"
+                        <Label FontSize="16" Foreground="#585858" Padding="Auto"
                             Content="高  "/>
 
-                        <Label Grid.Row="0"  FontSize="18" FontWeight="SemiBold" Foreground="Gray"  Padding="Auto"
+                        <Label Grid.Row="0"  FontSize="16" FontWeight="SemiBold" Foreground="Gray"  Padding="Auto"
                             Content="{Binding TitleStock.TradingData.Max}" x:Name="displayStockPrice_A"/>
                     </StackPanel>
                     <StackPanel Grid.Row="1" Orientation="Horizontal">
-                        <Label FontSize="18" Foreground="#585858" Padding="Auto"
+                        <Label FontSize="16" Foreground="#585858" Padding="Auto"
                             Content="低  "/>
 
 
-                        <Label Grid.Row="1"  FontSize="18" FontWeight="SemiBold" Foreground="Gray"   Padding="Auto"
+                        <Label Grid.Row="1"  FontSize="16" FontWeight="SemiBold" Foreground="Gray"   Padding="Auto"
                             Content="{Binding TitleStock.TradingData.Min}" x:Name="displayStockPrice_B"/>
                     </StackPanel>
 
@@ -146,17 +146,17 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <StackPanel Orientation="Horizontal" >
-                        <Label FontSize="18" Foreground="#585858" Padding="Auto"
+                        <Label FontSize="16" Foreground="#585858" Padding="Auto"
                             Content="成交量  "/>
 
-                        <Label FontSize="18" Foreground="#585858" Padding="Auto"
+                        <Label FontSize="16" Foreground="#585858" Padding="Auto"
                             Content="{Binding TitleStock.TradingData.Volume}" x:Name="displayStockPrice_Volume"/>
                     </StackPanel>
                     <StackPanel Grid.Row="1" Orientation="Horizontal">
-                        <Label FontSize="18" Foreground="#585858" Padding="Auto"
+                        <Label FontSize="16" Foreground="#585858" Padding="Auto"
                             Content="成交值  "/>
 
-                        <Label  FontSize="18" Foreground="#585858" Padding="Auto"
+                        <Label  FontSize="16" Foreground="#585858" Padding="Auto"
                             Content="{Binding TitleStock.TradingData.VolumeMoney}" x:Name="displayStockPrice_VolumeMoney"/>
                     </StackPanel>
 
@@ -238,9 +238,16 @@
                             <Setter Property="BorderThickness" Value="0"/>
                         </Style>
                     </TabItem.Resources>
-                    <Grid>
-
-                    </Grid>
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                                  VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding PickStockVMCollection}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </ScrollViewer>
                 </TabItem>
 
                 <!--Tab-->

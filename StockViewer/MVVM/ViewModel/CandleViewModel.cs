@@ -42,7 +42,7 @@ public class CandleViewModel : ObservableObject
     }
 
     public void Resize(double? height = null, double? width = null, double? top = null, double? bottom = null, int? highestVolume = null) {
-        Candle = Candle!.Resize(height - DateLabelHeight, width, top, bottom);
-        Volume = Volume!.Resize(height - DateLabelHeight, highestVolume);
+        Candle = Candle!.Resize(height , width, top, bottom);
+        Volume = Volume!.Resize(height , highestVolume);
     } 
 }
