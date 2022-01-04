@@ -235,13 +235,18 @@ public class MainChartViewModel:ObservableObject
     {
         _HighestPrice = _CandleVMCollection!.Max(x => x.Candle!.Parameter.Tr.mMax);
         _LowestPrice = _CandleVMCollection!.Min(x => x.Candle!.Parameter.Tr.mMin);
+        //int offset = 1;
+        //while (priceInterval > offset * 10) {
+        //    offset *= 10;
+        //}
         double priceInterval = _HighestPrice - _LowestPrice;
         int offset = 1;
-        while (priceInterval > offset * 10) {
-            offset *= 10;
+        while (priceInterval / offset > 15)
+        {
+            offset *= 5;
         }
-        _HighestPrice = (int)(_HighestPrice / offset) * offset + offset;
-        _LowestPrice = (int)(_LowestPrice / offset) * offset;
+        _HighestPrice = _HighestPrice - _HighestPrice % offset + offset;
+        _LowestPrice = _LowestPrice - _LowestPrice % offset;
 
         _HighestVolume = _CandleVMCollection!.Max(x => x.Candle!.Parameter.Tr.mVolume);
 

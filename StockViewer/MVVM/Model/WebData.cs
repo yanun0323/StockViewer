@@ -73,8 +73,11 @@ public class WebDatas
         try
         {
             Trace.WriteLine($"   - Load website {date:yyyy/MM/dd}");
-            Trace.WriteLine($"   - Send request:{"https://www.twse.com.tw/exchangeReport/MI_INDEX?response=json&date=" + $"{ date:yyyyMMdd}" + "&type=ALLBUT0999"}");
-            resDatas = HttpClientJsonExtensions.GetFromJsonAsync<WebDatas?>(client, "https://www.twse.com.tw/exchangeReport/MI_INDEX?response=json&date=" + $"{ date:yyyyMMdd}" + "&type=ALLBUT0999").Result;
+            string url = "https://www.twse.com.tw/exchangeReport/MI_INDEX?response=json&date=" + $"{ date:yyyyMMdd}" + "&type=ALLBUT0999";
+            Trace.WriteLine($"   - Send request:{url}");
+            string json = client.GetStringAsync(url).Result;
+            resDatas = JsonSerializer.Deserialize<WebDatas?>(json);
+            //resDatas = HttpClientJsonExtensions.GetFromJsonAsync<WebDatas?>(client, url).Result;
         }
         catch (Exception)
         {
@@ -201,13 +204,14 @@ public class StockDataGroup
         {
             try
             {
-                Stock? stock = Json.LoadJsonData<Stock?>(Path.Combine(dataPath, id), NowUpdateYear);
+                Stock? stock = Extention.LoadJson<Stock?>(Path.Combine(dataPath, id), NowUpdateYear);
 
                 if (stock == null)
                     stock = new(mStock.Id, mStock.Name);
 
                 stock.AddTradingDatas(mStock);
-                Json.SaveDatasAsJson(stock, Path.Combine(dataPath, id), NowUpdateYear);
+                stock.SaveJson(Path.Combine(dataPath, id), NowUpdateYear);
+                
             }
             catch (Exception e) 
             {
@@ -224,9 +228,9 @@ public static class UpdateTime
     // data8 before 2011/7/31, data9 since 2011/8/1
     public static readonly DateTime SwitchDay = new(2011, 7, 31, mHours, 0, 0);
     public static bool isBeforeSwitchDay(DateTime date) => date < SwitchDay;
-    public static void SaveToLocalDatas(DateTime date, string dataPath) => Json.SaveDatasAsJson(date, dataPath, "Update");
+    public static void SaveToLocalDatas(DateTime date, string dataPath) => date.SaveJson(dataPath, "Update");
     public static DateTime GetLocalLastUpdate(string dataPath) {
-        DateTime result = Json.LoadJsonData<DateTime>(dataPath, "Update");
+        DateTime result = Extention.LoadJson<DateTime>(dataPath, "Update");
 
         return result < Beginning ? Beginning : result;
     }

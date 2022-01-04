@@ -52,7 +52,7 @@ public class MainViewModel : ObservableObject
         var path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         mDataPath = Path.Combine(path, Path.Combine("StockViewer\\Data", "Price"));
 
-        //WebDatas.Update(mDataPath);
+        WebDatas.Update(mDataPath);
 
         Update = UpdateTime.GetLocalLastUpdate(mDataPath);
         Update_DisplayStock(mDefaultStockId);
@@ -86,7 +86,7 @@ public class MainViewModel : ObservableObject
         DirectoryInfo path = new(dataPath);
         foreach (DirectoryInfo folder in path.EnumerateDirectories("*"))
         {
-                Stock? stock = Json.LoadJsonData<Stock>(Path.Combine(dataPath, folder.Name), folder.GetFiles()[0].Name);
+                Stock? stock = Extention.LoadJson<Stock>(Path.Combine(dataPath, folder.Name), folder.GetFiles()[0].Name);
                 if (stock != null)
                 result.Add(string.Join(" ", stock.Id , stock.Name));
         }

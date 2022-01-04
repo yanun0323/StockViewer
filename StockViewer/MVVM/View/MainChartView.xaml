@@ -48,8 +48,10 @@
                                 <Label Content="{Binding InfoVM.Candle.Parameter.Tr.Min}"/>
                                 <Label Content="{Binding InfoVM.Candle.Parameter.Tr.End}"
                                        Foreground="{Binding InfoVM.Candle.Parameter.Tr.mColor}" />
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.mSpread}"/>
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.mRatio}"/>
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.mSpread}"
+                                       Foreground="{Binding InfoVM.Candle.Parameter.Tr.mColor}" />
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.mRatio}"
+                                       Foreground="{Binding InfoVM.Candle.Parameter.Tr.mColor}" />
                                 <Label Content="{Binding InfoVM.Candle.Parameter.Tr.mVolume}"/>
                                 <StackPanel.Resources>
                                     <Style TargetType="Label">

@@ -274,11 +274,11 @@
             <Grid Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Name="Grid1" Margin="0,0,0,10">
                 <Grid.Resources>
                     <Style x:Key="MainChart" TargetType="RowDefinition">
-                        <Setter Property="MinHeight" Value="150"/>
+                        <Setter Property="MinHeight" Value="200"/>
                         <Setter Property="Height" Value="3*"/>
                     </Style>
                     <Style x:Key="SubChart" TargetType="RowDefinition">
-                        <Setter Property="MinHeight" Value="70"/>
+                        <Setter Property="MinHeight" Value="90"/>
                     </Style>
                     <Style x:Key="Gap" TargetType="RowDefinition">
                         <Setter Property="Height" Value="5"/>
@@ -288,29 +288,18 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Style="{StaticResource MainChart}"/>
                     <RowDefinition Style="{StaticResource Gap}"/>
-                    <RowDefinition MinHeight="310"/>
+                    <RowDefinition MinHeight="200" Height="*"/>
+                    <RowDefinition Style="{StaticResource Gap}"/>
+                    <RowDefinition Height="100"/>
                 </Grid.RowDefinitions>
 
 
                 <!-- Main Chart -->
                 <ContentControl Content="{Binding MainChartVM}"
+                                Grid.Row="0" 
                                 x:Name="MainChart"
                                 Background="White"/>
-                <!-- 
-                <Grid Grid.Row="0" x:Name ="MainChartGrid">
-                    <Border CornerRadius="10" Background="#222" Margin="5,0"
-                            x:Name="MainChart" Grid.ColumnSpan="2" Grid.RowSpan="3">
-                        <ScrollViewer 
-                            x:Name="MainChartScroll"
-                            ScrollViewer.VerticalScrollBarVisibility="Disabled" 
-                            ScrollViewer.HorizontalScrollBarVisibility="Hidden" 
-                            Width="auto">
-                            
-                            <Canvas x:Name ="MainChartCanvas"/>
-                        </ScrollViewer>
-                    </Border>
-                </Grid>
-                -->
+
                 <!-- Seprate Line -->
                 <GridSplitter Grid.Row="1" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Transparent"/>
 
@@ -318,9 +307,9 @@
                 <!-- [Tree] Sub Chart 1 -->
                 <Grid Grid.Row="2" HorizontalAlignment="Stretch" >
                     <Grid.RowDefinitions>
-                        <RowDefinition MinHeight="70"/>
+                        <RowDefinition Style="{StaticResource SubChart}"/>
                         <RowDefinition Style="{StaticResource Gap}"/>
-                        <RowDefinition MinHeight="230"/>
+                        <RowDefinition Style="{StaticResource SubChart}"/>
                     </Grid.RowDefinitions>
 
                     <!-- Sub Chart 1 -->
@@ -336,57 +325,25 @@
                     <GridSplitter Grid.Row="1" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Transparent"/>
 
 
-                    <!-- [Tree] Sub Chart 2-->
+                    <!-- Sub Chart 2 -->
                     <Grid Grid.Row="2">
-                        <Grid.RowDefinitions>
-                            <RowDefinition MinHeight="70"/>
-                            <RowDefinition Style="{StaticResource Gap}"/>
-                            <RowDefinition MinHeight="150"/>
-                        </Grid.RowDefinitions>
-
-                        <!-- Sub Chart 2 -->
-                        <Grid Grid.Row="0">
-                            <Border CornerRadius="10" Background="{Binding ElementName=MainChart, Path=Background}" Margin="5,0" x:Name="SubChart2">
-                                <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Visible">
+                        <Border CornerRadius="10" Background="{Binding ElementName=MainChart, Path=Background}" Margin="5,0" x:Name="SubChart2">
+                            <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Visible">
 
 
-                                </Grid>
-                            </Border>
-                        </Grid>
-                        <!-- Seprate Line -->
-                        <GridSplitter Grid.Row="1" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Transparent"/>
-
-                        <!-- [Tree] Sub Chart 3-->
-                        <Grid Grid.Row="2">
-                            <Grid.RowDefinitions>
-                                <RowDefinition MinHeight="70"/>
-                                <RowDefinition Style="{StaticResource Gap}"/>
-                                <RowDefinition MinHeight="70"/>
-                            </Grid.RowDefinitions>
-
-                            <!-- Sub Chart 3 -->
-                            <Grid>
-                                <Border CornerRadius="10" Background="{Binding ElementName=MainChart, Path=Background}" Margin="5,0" x:Name="SubChart3">
-                                    <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Visible">
-
-
-                                    </Grid>
-                                </Border>
                             </Grid>
-                            <!-- Seprate Line -->
-                            <GridSplitter Grid.Row="1" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Transparent"/>
-
-                            <!-- Sub Chart 4 -->
-                            <Grid Grid.Row="2">
-                                <Border CornerRadius="10" Background="{Binding ElementName=MainChart, Path=Background}" Margin="5,0" x:Name="SubChart4">
-                                    <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Visible">
-
-
-                                    </Grid>
-                                </Border>
-                            </Grid>
-                        </Grid>
+                        </Border>
                     </Grid>
+                </Grid>
+
+                <!-- Sub Chart Bottom -->
+                <Grid Grid.Row="4" Height="100">
+                    <Border CornerRadius="10" Background="{Binding ElementName=MainChart, Path=Background}" Margin="5,0" x:Name="SubChart3">
+                        <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Visible">
+
+
+                        </Grid>
+                    </Border>
                 </Grid>
 
             </Grid>
