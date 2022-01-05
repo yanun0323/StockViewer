@@ -31,7 +31,7 @@ public class PriceCrawler
             }
             else
             {
-                string pathToSave = Path.Combine(FilePath.PathPrice, WebsiteData.date.Remove(4));
+                string pathToSave = Path.Combine(FilePath.Path_Raw_Price, WebsiteData.date.Remove(4));
                 WebsiteData.SaveJson(pathToSave, WebsiteData.date);
                 Console.WriteLine($"   - Data Saved!");
             }
@@ -40,7 +40,7 @@ public class PriceCrawler
         {
             Console.WriteLine($"   - Error!!!");
             error.Enqueue(target);
-            error.SaveJson(FilePath.PathRoot, FilePath.NamePriceError);
+            error.SaveJson(FilePath.Path_Raw_Root, FilePath.Name_Error_Price);
             Console.WriteLine($"   - Error Saved!");
             Trace.WriteLine($"   [Error] Can't catch data on {target:yyyy/MM/dd}");
         }
@@ -53,14 +53,14 @@ public class PriceCrawler
         while (target.AddHours(14) < now)
         {
             CrawlDate(target, error);
-            target.SaveJson(FilePath.PathRoot, FilePath.NamePriceUpdateTime);
+            target.SaveJson(FilePath.Path_Raw_Root, FilePath.Name_UpdateTime_Price);
 
             Thread.Sleep(2500);
             target = target.AddDays(1);
         }
         Console.WriteLine($"========== Error ==========");
         Console.WriteLine($"   - Error Count:{error.Count()}");
-        error.SaveJson(FilePath.PathRoot, FilePath.NamePriceError);
+        error.SaveJson(FilePath.Path_Raw_Root, FilePath.Name_Error_Price);
         Console.WriteLine($"   - Error Saved!");
     }
 }

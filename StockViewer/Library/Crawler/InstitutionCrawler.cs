@@ -31,7 +31,7 @@ public class InstitutionCrawler
             }
             else
             {
-                string pathToSave = Path.Combine(FilePath.PathInstitution, WebsiteData.date.Remove(4));
+                string pathToSave = Path.Combine(FilePath.Path_Raw_Institution, WebsiteData.date.Remove(4));
                 WebsiteData.SaveJson(pathToSave, WebsiteData.date);
                 Console.WriteLine($"   - Data Saved!");
             }
@@ -40,7 +40,7 @@ public class InstitutionCrawler
         {
             Console.WriteLine($"   - Error!!!");
             error.Enqueue(target);
-            error.SaveJson(FilePath.PathRoot, FilePath.NameInstitutionError);
+            error.SaveJson(FilePath.Path_Raw_Root, FilePath.Name_Error_Institution);
             Console.WriteLine($"   - Error Saved!");
             Trace.WriteLine($"[Error]{target:yyyyMMdd}");
         }
@@ -53,14 +53,14 @@ public class InstitutionCrawler
         while (target.AddHours(17) < now)
         {
             CrawlDate(target, error);
-            target.SaveJson(FilePath.PathRoot, FilePath.NameInstitutionUpdateTime);
+            target.SaveJson(FilePath.Path_Raw_Root, FilePath.Name_UpdateTimeName_Institution);
 
             Thread.Sleep(2500);
             target = target.AddDays(1);
         }
         Console.WriteLine($"========== Error ==========");
         Console.WriteLine($"   - Error Count:{error.Count()}");
-        error.SaveJson(FilePath.PathRoot, FilePath.NameInstitutionError);
+        error.SaveJson(FilePath.Path_Raw_Root, FilePath.Name_Error_Institution);
         Console.WriteLine($"   - Error Saved!");
     }
 
