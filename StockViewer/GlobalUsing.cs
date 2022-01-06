@@ -19,6 +19,10 @@ global using StockViewer.MVVM.ViewModel;
 global using System.Collections.ObjectModel;
 global using StockViewer.Library.Crawler;
 global using System.Threading;
+global using System.Text;
+global using System.Text.Json.Serialization;
+global using System.Net.Http;
+
 global using Path = System.IO.Path;
 
 namespace StockViewer;

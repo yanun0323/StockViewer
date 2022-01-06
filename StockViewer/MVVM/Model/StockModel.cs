@@ -13,8 +13,10 @@ public class StockModel
     public SortedDictionary<DateTime, Price> PriceData { get; set; } = new();
     public SortedDictionary<DateTime, Price> InstitutionData { get; set; } = new();
 
-
-
+    public SortedDictionary<DateTime, Price> InvestmentTrust { get; set; } = new();
+    public SortedDictionary<DateTime, Price> InvestmentForeign { get; set; } = new();
+    public SortedDictionary<DateTime, Price> Dealer { get; set; } = new();
+    
     public StockModel() {}
     public StockModel(string id, string name)
     {

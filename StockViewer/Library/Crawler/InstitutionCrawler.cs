@@ -1,47 +1,43 @@
-﻿using System.Net.Http;
-using System.Text.Json.Serialization;
-using System.Threading;
+﻿
 
 namespace StockViewer.Library.Crawler;
 
-public class InstitutionCrawler
+
+public static class InstitutionCrawler
 {
     [JsonIgnore]
     private static readonly HttpClient client = new();
-    public string date { get; set; } = "";
-    public List<string> fields { get; set; } = new();
-    public List<List<string>> data { get; set; } = new();
 
     public static void CrawlDate(DateTime target, Queue<DateTime> error)
     {
-        Console.OutputEncoding = System.Text.Encoding.UTF8;
-        InstitutionCrawler? WebsiteData;
         try
         {
-            Console.WriteLine($"=========={target:yyyy/MM/dd}==========");
+            Trace.WriteLine($"=========={target:yyyy/MM/dd}==========");
             string url = $"https://www.twse.com.tw/fund/T86?response=json&date=" + $"{target:yyyyMMdd}" + "&selectType=ALL";
-            Console.WriteLine($"   - Send request: " + url);
-            string json = client.GetStringAsync(url).Result;
-            WebsiteData = JsonSerializer.Deserialize<InstitutionCrawler?>(json);
+            Trace.WriteLine($"   - Send request: " + url);
 
-            if (WebsiteData == null || WebsiteData.date == "" || !WebsiteData.data.Any())
+            string? content = client.GetStringAsync(url).Result;
+
+            if (content == null)
             {
-                Console.WriteLine($"   - No Data");
-                Console.WriteLine($"   - 沒有資料: {target:yyyy/MM/dd}");
+                Trace.WriteLine($"   - Error!!!");
+                error.Enqueue(target);
+                error.SaveJson(FilePath.Path_Raw_Root, FilePath.Name_Error_Institution);
+                Trace.WriteLine($"   - Error Saved!");
+                Trace.WriteLine($"[Error]{target:yyyyMMdd}");
             }
             else
             {
-                string pathToSave = Path.Combine(FilePath.Path_Raw_Institution, WebsiteData.date.Remove(4));
-                WebsiteData.SaveJson(pathToSave, WebsiteData.date);
-                Console.WriteLine($"   - Data Saved!");
+                content.SaveText(FilePath.Path_Raw_Institution, $"{target:yyyyMMdd}");
+                Trace.WriteLine($"   - Data Saved!");
             }
         }
         catch (Exception)
         {
-            Console.WriteLine($"   - Error!!!");
+            Trace.WriteLine($"   - Error!!!");
             error.Enqueue(target);
             error.SaveJson(FilePath.Path_Raw_Root, FilePath.Name_Error_Institution);
-            Console.WriteLine($"   - Error Saved!");
+            Trace.WriteLine($"   - Error Saved!");
             Trace.WriteLine($"[Error]{target:yyyyMMdd}");
         }
     }
@@ -58,10 +54,10 @@ public class InstitutionCrawler
             Thread.Sleep(2500);
             target = target.AddDays(1);
         }
-        Console.WriteLine($"========== Error ==========");
-        Console.WriteLine($"   - Error Count:{error.Count()}");
+        Trace.WriteLine($"========== Error ==========");
+        Trace.WriteLine($"   - Error Count:{error.Count()}");
         error.SaveJson(FilePath.Path_Raw_Root, FilePath.Name_Error_Institution);
-        Console.WriteLine($"   - Error Saved!");
+        Trace.WriteLine($"   - Error Saved!");
     }
 
 

@@ -1,47 +1,42 @@
-﻿using System.Net.Http;
-using System.Text.Json.Serialization;
-using System.Threading;
-
+﻿
 namespace StockViewer.Library.Crawler;
-public class PriceCrawler
+
+
+public static class PriceCrawler
 {
     [JsonIgnore]
     private static readonly HttpClient client = new HttpClient();
-    public string date { get; set; } = "";
-    public List<List<string>> data8 { get; set; } = new();
-    public List<List<string>> data9 { get; set; } = new();
-    public List<string> fields9 { get; set; } = new();
 
     public static void CrawlDate(DateTime target, Queue<DateTime> error)
     {
-        Console.OutputEncoding = System.Text.Encoding.UTF8;
-        PriceCrawler? WebsiteData;
         try
         {
-            Console.WriteLine($"=========={target:yyyy/MM/dd}==========");
+            Trace.WriteLine($"=========={target:yyyy/MM/dd}==========");
             string url = $"https://www.twse.com.tw/exchangeReport/MI_INDEX?response=json&date=" + $"{ target:yyyyMMdd}" + "&type=ALLBUT0999";
-            Console.WriteLine($"   - Send request: " + url);
-            string json = client.GetStringAsync(url).Result;
-            WebsiteData = JsonSerializer.Deserialize<PriceCrawler?>(json);
+            Trace.WriteLine($"   - Send request: " + url);
 
-            if (WebsiteData == null || WebsiteData.date == "" || (!WebsiteData.data8.Any() && !WebsiteData.data9.Any()))
+            string? content = client.GetStringAsync(url).Result;
+
+            if (content == null)
             {
-                Console.WriteLine($"   - No Data");
-                Console.WriteLine($"   - 沒有資料: {target:yyyy/MM/dd}");
+                Trace.WriteLine($"   - Error!!!");
+                error.Enqueue(target);
+                error.SaveJson(FilePath.Path_Raw_Root, FilePath.Name_Error_Price);
+                Trace.WriteLine($"   - Error Saved!");
+                Trace.WriteLine($"   [Error] Can't catch data on {target:yyyy/MM/dd}");
             }
             else
             {
-                string pathToSave = Path.Combine(FilePath.Path_Raw_Price, WebsiteData.date.Remove(4));
-                WebsiteData.SaveJson(pathToSave, WebsiteData.date);
-                Console.WriteLine($"   - Data Saved!");
+                content.SaveText(FilePath.Path_Raw_Price, $"{target:yyyyMMdd}");
+                Trace.WriteLine($"   - Data Saved!");
             }
         }
         catch (Exception)
         {
-            Console.WriteLine($"   - Error!!!");
+            Trace.WriteLine($"   - Error!!!");
             error.Enqueue(target);
             error.SaveJson(FilePath.Path_Raw_Root, FilePath.Name_Error_Price);
-            Console.WriteLine($"   - Error Saved!");
+            Trace.WriteLine($"   - Error Saved!");
             Trace.WriteLine($"   [Error] Can't catch data on {target:yyyy/MM/dd}");
         }
     }
@@ -58,9 +53,9 @@ public class PriceCrawler
             Thread.Sleep(2500);
             target = target.AddDays(1);
         }
-        Console.WriteLine($"========== Error ==========");
-        Console.WriteLine($"   - Error Count:{error.Count()}");
+        Trace.WriteLine($"========== Error ==========");
+        Trace.WriteLine($"   - Error Count:{error.Count()}");
         error.SaveJson(FilePath.Path_Raw_Root, FilePath.Name_Error_Price);
-        Console.WriteLine($"   - Error Saved!");
+        Trace.WriteLine($"   - Error Saved!");
     }
 }
