@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace StockViewer.Library.CrawlerConverter;
 public static class MainConverter
 {
-    public static Dictionary<string, StockModel> Run() 
+    public static void Run() 
     {
         Dictionary<string, StockModel> stockModelCollection = new();
         LoadStockModelCollection();
@@ -19,7 +19,6 @@ public static class MainConverter
         Trace.WriteLine($"InstitutionData.Count(): {stockModelCollection["2330"].InstitutionData.Count()}");
 
         SaveStockModelCollection();
-        return stockModelCollection;
 
         void LoadStockModelCollection()
         {

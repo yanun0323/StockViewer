@@ -5,7 +5,6 @@ public class MainViewModel : ObservableObject
     readonly string mDataPath = "";
     readonly string mDefaultStockId = "2330";
 
-    Dictionary<string, StockModel> _StockModelCollection = new();
     private Stock? _displayStock = new();
     private TitleStock? _titleStock;
     private string _searchWords = "";
@@ -56,7 +55,7 @@ public class MainViewModel : ObservableObject
         mDataPath = Path.Combine(path, Path.Combine("StockViewer\\Data", "Price"));
 
         MainCrawler.Run();
-        //_StockModelCollection = MainConverter.Run();
+        //MainConverter.Run();
         //WebDatas.Update(mDataPath);
 
         Update = Model.Update.GetLocalLastUpdate(mDataPath);

@@ -1,4 +1,6 @@
-﻿namespace StockViewer.Library.CrawlerConverter;
+﻿using System.Threading.Tasks;
+
+namespace StockViewer.Library.CrawlerConverter;
 public class InstitutionConverter
 {
     public List<List<string>>? data { get; set; }
@@ -9,13 +11,26 @@ public class InstitutionConverter
 
         DateTime? loadTime = FileManagement.LoadJson<DateTime?>(FilePath.Path_Root, FilePath.Name_UpdateTimeName_Institution);
         DateTime target = loadTime ?? InstitutionCrawler.Begin;
-        DateTime now= DateTime.Now;
+        DateTime now = DateTime.Now;
         Trace.WriteLine($"{target}");
         Trace.WriteLine($"{target.AddHours(17) < now}");
 
+        Task task = new(() => Trace.WriteLine($"Task!"));
         while (target.AddHours(17) < now)
         {
-            string Name = $"{target:yyyyMMdd}";
+            task = Catch(target, stockModelCollection);
+            task.Wait();
+
+            target.SaveJson(FilePath.Path_Root, FilePath.Name_UpdateTimeName_Institution);
+            target = target.AddDays(1);
+        }
+    }
+    public static Task Catch(DateTime target, Dictionary<string, StockModel> stockModelCollection)
+    {
+        return Task.Run(() => {
+            DateTime copy = target;
+
+            string Name = $"{copy:yyyyMMdd}";
             Trace.WriteLine($"InstitutionConverter - {Name}");
             InstitutionConverter? source = FileManagement.LoadJson<InstitutionConverter?>(FilePath.Path_Raw_Institution, Name, true);
 
@@ -25,7 +40,7 @@ public class InstitutionConverter
 
                 foreach (var data in datalist)
                 {
-                    Institution institution = (target < _switch) ? new()
+                    Institution institution = (copy < _switch) ? new()
                     {
                         ForeignBuy = data[2],
                         ForeignSell = data[3],
@@ -59,11 +74,9 @@ public class InstitutionConverter
                     if (!stockModelCollection.ContainsKey(id))
                         stockModelCollection.Add(id, new(id, name));
 
-                    stockModelCollection[id].InstitutionData.TryAdd(target, institution);
+                    stockModelCollection[id].InstitutionData.TryAdd(copy, institution);
                 }
             }
-            target.SaveJson(FilePath.Path_Root, FilePath.Name_UpdateTimeName_Institution);
-            target = target.AddDays(1);
-        }
+        });
     }
 }

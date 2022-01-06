@@ -55,27 +55,27 @@ public struct Institution
     public string InstitutionSuper { get; init; }
 
     [JsonIgnore]
-    public long mForeignBuy { get => long.Parse(ForeignBuy.Replace(",", "")) / 1000; }
+    public int mForeignBuy { get => int.Parse(ForeignBuy.Replace(",", "")) / 1000; }
     [JsonIgnore]
-    public long mForeignSell { get => long.Parse(ForeignSell.Replace(",", "")) / 1000; }
+    public int mForeignSell { get => int.Parse(ForeignSell.Replace(",", "")) / 1000; }
     [JsonIgnore]
-    public long mForeignSuper { get => long.Parse(ForeignSuper.Replace(",", "")) / 1000; }
+    public int mForeignSuper { get => int.Parse(ForeignSuper.Replace(",", "")) / 1000; }
     [JsonIgnore]
-    public long mForeignDealerBuy { get => long.Parse(ForeignDealerBuy.Replace(",", "")) / 1000; }
+    public int mForeignDealerBuy { get => int.Parse(ForeignDealerBuy.Replace(",", "")) / 1000; }
     [JsonIgnore]
-    public long mForeignDealerSell { get => long.Parse(ForeignDealerSell.Replace(",", "")) / 1000; }
+    public int mForeignDealerSell { get => int.Parse(ForeignDealerSell.Replace(",", "")) / 1000; }
     [JsonIgnore]
-    public long mForeignDealerSuper { get => long.Parse(ForeignDealerSuper.Replace(",", "")) / 1000; }
+    public int mForeignDealerSuper { get => int.Parse(ForeignDealerSuper.Replace(",", "")) / 1000; }
     [JsonIgnore]
-    public long mTrustBuy { get => long.Parse(TrustBuy.Replace(",", "")) / 1000; }
+    public int mTrustBuy { get => int.Parse(TrustBuy.Replace(",", "")) / 1000; }
     [JsonIgnore]
-    public long mTrustSell { get => long.Parse(TrustSell.Replace(",", "")) / 1000; }
+    public int mTrustSell { get => int.Parse(TrustSell.Replace(",", "")) / 1000; }
     [JsonIgnore]
-    public long mTrustSuper { get => long.Parse(TrustSuper.Replace(",", "")) / 1000; }
+    public int mTrustSuper { get => int.Parse(TrustSuper.Replace(",", "")) / 1000; }
     [JsonIgnore]
-    public long mDealerSuper { get => long.Parse(DealerSuper.Replace(",", "")) / 1000; }
+    public int mDealerSuper { get => int.Parse(DealerSuper.Replace(",", "")) / 1000; }
     [JsonIgnore]
-    public long mInstitutionSuper { get => long.Parse(InstitutionSuper.Replace(",", "")) / 1000; }
+    public int mInstitutionSuper { get => int.Parse(InstitutionSuper.Replace(",", "")) / 1000; }
 
 
 }
