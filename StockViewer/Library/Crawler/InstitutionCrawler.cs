@@ -4,6 +4,7 @@
 public static class InstitutionCrawler
 {
     private static readonly HttpClient client = new();
+    public static DateTime Begin = new(2012, 5, 2);
 
     public static void CrawlDate(DateTime target, Queue<DateTime> error)
     {
@@ -40,7 +41,7 @@ public static class InstitutionCrawler
     }
     public static void Crawl(Queue<DateTime> error, DateTime? begin = null, DateTime? end = null)
     {
-        DateTime target = begin ?? new(2012, 5, 2);
+        DateTime target = begin ?? Begin;
         DateTime now = end ?? DateTime.Now;
 
         while (target.AddHours(17) < now)

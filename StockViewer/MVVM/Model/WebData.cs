@@ -14,7 +14,7 @@ public class WebDatas
         DateTime limitTime = DateTime.Now;
         //DateTime limitTime = new(2004,2,13,18,0,0);
 
-        DateTime updateTime = UpdateTime.GetLocalLastUpdate(dataPath);
+        DateTime updateTime = Model.Update.GetLocalLastUpdate(dataPath);
         DateTime targetTime = updateTime;
         StockDataGroup stockDataGroup = new($"{targetTime:yyyy}");
 
@@ -24,7 +24,7 @@ public class WebDatas
             {
                 Trace.WriteLine($"   Save stocksCollection in {stockDataGroup.NowUpdateYear:yyyy}");
                 stockDataGroup.SaveToLocalDatas(dataPath);
-                UpdateTime.SaveToLocalDatas(updateTime, dataPath);
+                Model.Update.SaveToLocalDatas(updateTime, dataPath);
                 stockDataGroup = new($"{targetTime.AddDays(1):yyyy}");
             }
 
@@ -64,7 +64,7 @@ public class WebDatas
         }
 
         stockDataGroup.SaveToLocalDatas(dataPath);
-        UpdateTime.SaveToLocalDatas(updateTime, dataPath);
+        Model.Update.SaveToLocalDatas(updateTime, dataPath);
 
     }
     private static UpdateOption DownloadDatas(DateTime date, string dataPath, StockDataGroup stockDataGroup)
@@ -85,7 +85,7 @@ public class WebDatas
             return UpdateOption.LostConnect;
         }
 
-        List<List<string>>? datalist = (UpdateTime.isBeforeSwitchDay(date)) ? resDatas?.data8 : resDatas?.data9;
+        List<List<string>>? datalist = (Model.Update.isBeforeSwitchDay(date)) ? resDatas?.data8 : resDatas?.data9;
 
         if (datalist != null)
         {
@@ -106,7 +106,6 @@ public class WebDatas
                         End = data[8],
                         Grade = data[9],
                         Spread = data[10],
-                        Turnover = data[3]
                     });
                     stockDataGroup.AddGroup(stock);
                 }
@@ -136,7 +135,7 @@ public class WebDatas
 
         DateTime limitTime = DateTime.Now;
 
-        DateTime targetTime = UpdateTime.CreateCatchTime(year, month, day); ;
+        DateTime targetTime = Model.Update.CreateCatchTime(year, month, day); ;
         StockDataGroup stockDataGroup = new($"{targetTime:yyyy}");
         if (targetTime > limitTime)
         {
@@ -204,7 +203,7 @@ public class StockDataGroup
         {
             try
             {
-                Stock? stock = Extention.LoadJson<Stock?>(Path.Combine(dataPath, id), NowUpdateYear);
+                Stock? stock = FileManagement.LoadJson<Stock?>(Path.Combine(dataPath, id), NowUpdateYear);
 
                 if (stock == null)
                     stock = new(mStock.Id, mStock.Name);
@@ -221,18 +220,3 @@ public class StockDataGroup
     }
 }
 
-public static class UpdateTime
-{
-    private static readonly int mHours = 14;
-    public static readonly DateTime Beginning = new(2004, 2, 11, mHours, 0, 0);
-    // data8 before 2011/7/31, data9 since 2011/8/1
-    public static readonly DateTime SwitchDay = new(2011, 7, 31, mHours, 0, 0);
-    public static bool isBeforeSwitchDay(DateTime date) => date < SwitchDay;
-    public static void SaveToLocalDatas(DateTime date, string dataPath) => date.SaveJson(dataPath, "Update");
-    public static DateTime GetLocalLastUpdate(string dataPath) {
-        DateTime result = Extention.LoadJson<DateTime>(dataPath, "Update");
-
-        return result < Beginning ? Beginning : result;
-    }
-    public static DateTime CreateCatchTime(int year, int month, int day) =>  new DateTime(year, month, day, mHours, 0, 0);
-}

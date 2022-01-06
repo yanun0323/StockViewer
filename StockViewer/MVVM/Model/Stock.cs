@@ -43,7 +43,7 @@ public class Stock
 
         foreach (FileInfo file in path.EnumerateFiles("*"))
         {
-            Stock? source = Extention.LoadJson<Stock?>(stockPath, file.Name);
+            Stock? source = FileManagement.LoadJson<Stock?>(stockPath, file.Name);
             stock.AddTradingDatas(source);
         }
         return stock;

@@ -4,9 +4,12 @@ public class MainViewModel : ObservableObject
 {
     readonly string mDataPath = "";
     readonly string mDefaultStockId = "2330";
+
+    Dictionary<string, StockModel> _StockModelCollection = new();
     private Stock? _displayStock = new();
     private TitleStock? _titleStock;
     private string _searchWords = "";
+
     private ObservableCollection<PickStockBlockViewModel> _PickStockVMCollection;
 
     public ObservableCollection<PickStockBlockViewModel> PickStockVMCollection
@@ -53,9 +56,10 @@ public class MainViewModel : ObservableObject
         mDataPath = Path.Combine(path, Path.Combine("StockViewer\\Data", "Price"));
 
         MainCrawler.Run();
+        //_StockModelCollection = MainConverter.Run();
         //WebDatas.Update(mDataPath);
 
-        Update = UpdateTime.GetLocalLastUpdate(mDataPath);
+        Update = Model.Update.GetLocalLastUpdate(mDataPath);
         Update_DisplayStock(mDefaultStockId);
         StockList = GenerateStockList(mDataPath);
 
@@ -87,7 +91,7 @@ public class MainViewModel : ObservableObject
         DirectoryInfo path = new(dataPath);
         foreach (DirectoryInfo folder in path.EnumerateDirectories("*"))
         {
-                Stock? stock = Extention.LoadJson<Stock>(Path.Combine(dataPath, folder.Name), folder.GetFiles()[0].Name);
+                Stock? stock = FileManagement.LoadJson<Stock>(Path.Combine(dataPath, folder.Name), folder.GetFiles()[0].Name);
                 if (stock != null)
                 result.Add(string.Join(" ", stock.Id , stock.Name));
         }
