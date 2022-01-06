@@ -1,11 +1,9 @@
-﻿
-namespace StockViewer.Library.Crawler;
+﻿namespace StockViewer.Library.Crawler;
 
 
 public static class PriceCrawler
 {
-    [JsonIgnore]
-    private static readonly HttpClient client = new HttpClient();
+    private static readonly HttpClient client = new();
 
     public static void CrawlDate(DateTime target, Queue<DateTime> error)
     {
@@ -19,11 +17,8 @@ public static class PriceCrawler
 
             if (content == null)
             {
-                Trace.WriteLine($"   - Error!!!");
-                error.Enqueue(target);
-                error.SaveJson(FilePath.Path_Raw_Root, FilePath.Name_Error_Price);
-                Trace.WriteLine($"   - Error Saved!");
-                Trace.WriteLine($"   [Error] Can't catch data on {target:yyyy/MM/dd}");
+                RefreshError(target, error);
+                SaveError(error);
             }
             else
             {
@@ -33,11 +28,14 @@ public static class PriceCrawler
         }
         catch (Exception)
         {
+            RefreshError(target, error);
+            SaveError(error);
+        }
+
+        static void RefreshError(DateTime target, Queue<DateTime> error)
+        {
             Trace.WriteLine($"   - Error!!!");
             error.Enqueue(target);
-            error.SaveJson(FilePath.Path_Raw_Root, FilePath.Name_Error_Price);
-            Trace.WriteLine($"   - Error Saved!");
-            Trace.WriteLine($"   [Error] Can't catch data on {target:yyyy/MM/dd}");
         }
     }
     public static void Crawl(Queue<DateTime> error, DateTime? begin = null, DateTime? end = null)
@@ -55,6 +53,12 @@ public static class PriceCrawler
         }
         Trace.WriteLine($"========== Error ==========");
         Trace.WriteLine($"   - Error Count:{error.Count()}");
+
+        SaveError(error);
+    }
+
+    private static void SaveError(Queue<DateTime> error)
+    {
         error.SaveJson(FilePath.Path_Raw_Root, FilePath.Name_Error_Price);
         Trace.WriteLine($"   - Error Saved!");
     }

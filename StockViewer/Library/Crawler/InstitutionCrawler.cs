@@ -1,11 +1,8 @@
-﻿
-
-namespace StockViewer.Library.Crawler;
+﻿namespace StockViewer.Library.Crawler;
 
 
 public static class InstitutionCrawler
 {
-    [JsonIgnore]
     private static readonly HttpClient client = new();
 
     public static void CrawlDate(DateTime target, Queue<DateTime> error)
@@ -20,11 +17,8 @@ public static class InstitutionCrawler
 
             if (content == null)
             {
-                Trace.WriteLine($"   - Error!!!");
-                error.Enqueue(target);
-                error.SaveJson(FilePath.Path_Raw_Root, FilePath.Name_Error_Institution);
-                Trace.WriteLine($"   - Error Saved!");
-                Trace.WriteLine($"[Error]{target:yyyyMMdd}");
+                RefreshError(target, error);
+                SaveError(error);
             }
             else
             {
@@ -34,11 +28,14 @@ public static class InstitutionCrawler
         }
         catch (Exception)
         {
+            RefreshError(target, error);
+            SaveError(error);
+        }
+
+        static void RefreshError(DateTime target, Queue<DateTime> error)
+        {
             Trace.WriteLine($"   - Error!!!");
             error.Enqueue(target);
-            error.SaveJson(FilePath.Path_Raw_Root, FilePath.Name_Error_Institution);
-            Trace.WriteLine($"   - Error Saved!");
-            Trace.WriteLine($"[Error]{target:yyyyMMdd}");
         }
     }
     public static void Crawl(Queue<DateTime> error, DateTime? begin = null, DateTime? end = null)
@@ -56,6 +53,12 @@ public static class InstitutionCrawler
         }
         Trace.WriteLine($"========== Error ==========");
         Trace.WriteLine($"   - Error Count:{error.Count()}");
+
+        SaveError(error);
+    }
+
+    private static void SaveError(Queue<DateTime> error)
+    {
         error.SaveJson(FilePath.Path_Raw_Root, FilePath.Name_Error_Institution);
         Trace.WriteLine($"   - Error Saved!");
     }
