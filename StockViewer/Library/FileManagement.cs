@@ -7,7 +7,6 @@ namespace StockViewer.Library;
 public static class FileManagement
 {
     private static readonly JsonSerializerOptions options = new JsonSerializerOptions() { Converters = { new LongToStringJsonConverter() } , AllowTrailingCommas = true};
-
     public static void SaveText(this string content, string filePath, string fileName)
         => SaveTextData(content, filePath, fileName);
     public static void SaveJson<T>(this T obj, string filePath, string fileName)

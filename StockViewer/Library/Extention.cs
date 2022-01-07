@@ -8,7 +8,7 @@ namespace StockViewer.Library;
 public static class Extention
 {
     private static readonly DateTime _StockBegin = new(2004, 2, 11);
-    private static readonly DateTime _Switch = new(2004, 2, 11);
+    private static readonly DateTime _Switch = new(2011, 7, 31);
     public static DateTime GetStockBegin(this DateTime dateTime) => _StockBegin;
     public static DateTime GetStockSwitch(this DateTime dateTime) => _Switch;
     // data8 before 2011/7/31, data9 since 2011/8/1

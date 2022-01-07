@@ -55,7 +55,7 @@ public class MainViewModel : ObservableObject
         mDataPath = Path.Combine(path, Path.Combine("StockViewer\\Data", "Price"));
 
         MainCrawler.Run();
-        //MainConverter.Run();
+        MainConverter.Run();
         //WebDatas.Update(mDataPath);
 
         Update = Model.Update.GetLocalLastUpdate(mDataPath);
