@@ -10,7 +10,7 @@ public class CandleViewModel : ObservableObject
     public static readonly double CandleHeightRatio = 0.9;
     public static readonly double VolumeHeightRatio = 0.45;
     public double DateLabelHeight { get => 15; }
-    public string Month { get =>  ShowMonth ? $"{_Date.Month}" : ""; }
+    public string Month { get =>  ShowMonth ? $"{_Date:yyyy/MM}" : ""; }
     public Candle? Candle
     {
         get { return _Candle; }

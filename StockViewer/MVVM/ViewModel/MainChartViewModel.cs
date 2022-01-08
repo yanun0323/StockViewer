@@ -18,7 +18,7 @@ public class MainChartViewModel:ObservableObject
 
     private double _HighestPrice;
     private double _LowestPrice;
-    private Stock? _mStock;
+    private StockModel? _mStockModel;
     private ObservableCollection<CandleViewModel>? _CandleVMCollection;
     private Stack<CandleViewModel>? _CandleVMCollection_Right;
     private Stack<CandleViewModel>? _CandleVMCollection_Left;
@@ -41,28 +41,29 @@ public class MainChartViewModel:ObservableObject
     public CandleViewModel? InfoVM { get => _InfoVM; set { _InfoVM = value; OnPropertyChanged(); } }
     public ChartGridViewModel? ChartGridVM { get => _ChartGridVM; set { _ChartGridVM = value; OnPropertyChanged(); } }
     public string InfoDate { get => _InfoDate; set { _InfoDate = value; OnPropertyChanged(); } }
-    public Stock mStock
+    public StockModel mStockModel
     {
-        get => _mStock ?? new();
+        get => _mStockModel ?? new();
         set 
         { 
-            _mStock = value;
+            _mStockModel = value;
             StockUpdate();
             OnPropertyChanged();
         }
     }
 
-    public MainChartViewModel(Stock stock)
+    public MainChartViewModel(StockModel stockModel)
     {
-        mStock = stock;
+        mStockModel = stockModel;
 
         MouseWheelCommand = new RelayCommand<MouseWheelEventArgs>(e =>
         {
-            double step = _CandleWidth / 4;
+            double step = (_CandleWidth > 20) ? 3 : 1;
             double scale = ((e.Delta > 0) ? 1 : -1) * step;
             if (_CandleWidth + scale > _CandleWidth_Min && _CandleWidth + scale < _CandleWidth_Max)
                 _CandleWidth += scale;
-            CandleSizeChanged();
+            if (!CandleSizeChanged())
+                _CandleWidth -= scale;
         });
 
         MouseUpCommand = new RelayCommand<MouseButtonEventArgs>(e => 
@@ -137,7 +138,7 @@ public class MainChartViewModel:ObservableObject
         });
     }
 
-    public void UpdateChart(Stock stock) => mStock = stock;
+    public void UpdateChart(StockModel stockModel) => mStockModel = stockModel;
 
     private void StockUpdate(DateTime? startDate = null)
     {
@@ -155,7 +156,7 @@ public class MainChartViewModel:ObservableObject
         }
         ResizeCandle();
     }
-    private CandleViewModel CreateCandleVM(DateTime date, TradingData data)
+    private CandleViewModel CreateCandleVM(DateTime date, Price data)
     {
         CandleParameter cp = new()
         {
@@ -164,7 +165,7 @@ public class MainChartViewModel:ObservableObject
             Height = _CandleHeight,
             Top = _HighestPrice,
             Bottom = _LowestPrice,
-            Tr = data,
+            Price = data,
             HighestVolume = _HighestVolume,
         };
 
@@ -180,13 +181,13 @@ public class MainChartViewModel:ObservableObject
     {
         _CandleVMCollection_Right = new();
         _CandleVMCollection_Left = new();
-        foreach (var entry in mStock.TradingData)
+        foreach (var entry in mStockModel.PriceData)
         {
             _CandleVMCollection_Left!.Push(CreateCandleVM(entry.Key,entry.Value));
         }
     }
     private int GetNewCandleCount() => (int)(_ChartSize.Width / (_CandleWidth + _CandleMargin.Left + _CandleMargin.Right)) + 1;
-    private void CandleSizeChanged() {
+    private bool CandleSizeChanged() {
         var newCandleCount = GetNewCandleCount();
         var candleCount = _CandleVMCollection!.Count();
         if (newCandleCount > candleCount)
@@ -194,19 +195,24 @@ public class MainChartViewModel:ObservableObject
             var addCount = newCandleCount - candleCount;
             if (AddCandleLeft(addCount))
                 ResizeCandle();
+            else
+                return false;
         }
         else if (newCandleCount < candleCount)
         {
             var reduceCount = candleCount - newCandleCount;
             if (ReduceCandleLeft(reduceCount))
                 ResizeCandle();
+            else
+                return false;
         }
         _ChartGridVM!.Resize(_ChartSize);
         ChartGridVM = _ChartGridVM;
+        return true;
 
         bool ReduceCandleLeft(int reduceCount)
         {
-            if (!_CandleVMCollection!.Any())
+            if (!_CandleVMCollection!.Any() || _CandleVMCollection!.Count() < reduceCount)
                 return false;
             while (reduceCount > 0)
             {
@@ -219,7 +225,7 @@ public class MainChartViewModel:ObservableObject
         }
         bool AddCandleLeft(int addCount)
         {
-            if (!_CandleVMCollection_Left!.Any())
+            if (!_CandleVMCollection_Left!.Any() || _CandleVMCollection_Left!.Count() < addCount)
                 return false;
             while (addCount > 0)
             {
@@ -233,8 +239,8 @@ public class MainChartViewModel:ObservableObject
     }
     private void ResizeCandle()
     {
-        _HighestPrice = _CandleVMCollection!.Max(x => x.Candle!.Parameter.Tr.mMax);
-        _LowestPrice = _CandleVMCollection!.Min(x => x.Candle!.Parameter.Tr.mMin);
+        _HighestPrice = _CandleVMCollection!.Max(x => x.Candle!.Parameter.Price.mMax);
+        _LowestPrice = _CandleVMCollection!.Min(x => x.Candle!.Parameter.Price.mMin);
         //int offset = 1;
         //while (priceInterval > offset * 10) {
         //    offset *= 10;
@@ -248,7 +254,7 @@ public class MainChartViewModel:ObservableObject
         _HighestPrice = _HighestPrice - _HighestPrice % offset + offset;
         _LowestPrice = _LowestPrice - _LowestPrice % offset;
 
-        _HighestVolume = _CandleVMCollection!.Max(x => x.Candle!.Parameter.Tr.mVolume);
+        _HighestVolume = _CandleVMCollection!.Max(x => x.Candle!.Parameter.Price.mVolume);
 
         foreach (var candleVm in _CandleVMCollection!)
         {

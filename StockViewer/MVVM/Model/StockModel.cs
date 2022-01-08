@@ -17,9 +17,9 @@ public class StockModel
     [JsonIgnore]
     public DateTime? LastDate { get => PriceData.Any() ? null : PriceData.Last().Key; }
     [JsonIgnore]
-    public Price LastPrice { get => PriceData.Any() ? PriceData.Last().Value : Price.Deafult() ; }
+    public KeyValuePair<DateTime, Price> LastPrice { get => PriceData.Any() ? PriceData.Last() : new(PriceCrawler.Begin , Price.Deafult()) ; }
     [JsonIgnore]
-    public Institution LastInstitution { get => InstitutionData.Any() ? InstitutionData.Last().Value : Institution.Deafult(); }
+    public KeyValuePair<DateTime, Institution> LastInstitution { get => InstitutionData.Any() ? InstitutionData.Last() : new(InstitutionCrawler.Begin, Institution.Deafult()); }
 
 
     [JsonIgnore]

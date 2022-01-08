@@ -19,7 +19,7 @@ public class Volume
     public void Update(CandleParameter parameter)
     {
         Date = parameter.Date;
-        mVolume = parameter.Tr.mVolume;
+        mVolume = parameter.Price.mVolume;
         CalculateBlock(parameter.Height, parameter.HighestVolume);
     }
 

@@ -4,10 +4,9 @@ public class MainViewModel : ObservableObject
 {
     readonly string _DefaultStockId = "2330";
 
-    private string mDataPath = "";
-    private StockModel? _mStockModel;
+    private StockModel _mStockModel = new();
 
-    public StockModel? mStockModel
+    public StockModel mStockModel
     {
         get { return _mStockModel; }
         set
@@ -17,7 +16,6 @@ public class MainViewModel : ObservableObject
         }
     }
 
-    private Stock? _displayStock = new();
     private string _searchWords = "";
 
     private ObservableCollection<PickStockBlockViewModel> _PickStockVMCollection;
@@ -28,18 +26,8 @@ public class MainViewModel : ObservableObject
         set { _PickStockVMCollection = value; OnPropertyChanged(); }
     }
 
-    public DateTime Update { get; }
-    public HashSet<string> StockList { get; set; } = new();
+    public Dictionary<char, List<string>> StockList { get; set; } = new();
     public MainChartViewModel? MainChartVM { get; set; }
-    public Stock? DisplayStock 
-    { 
-        get => _displayStock; 
-        set 
-        { 
-            _displayStock = value; 
-            OnPropertyChanged(); 
-        } 
-    }
     public string SearchWords
     { 
         get => _searchWords; 
@@ -54,23 +42,20 @@ public class MainViewModel : ObservableObject
     public MainViewModel()
     {
         var path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        mDataPath = Path.Combine(path, Path.Combine("StockViewer\\Data", "Price"));
 
         MainCrawler.Run();
         MainConverter.Run();
 
-        mStockModel = new(id:_DefaultStockId);
-        mStockModel.Refresh();
+        _mStockModel = new();
+        UpdateStock(_DefaultStockId);
 
-        WebDatas.Update(mDataPath);
+        //WebDatas.Update(mDataPath);
 
-        Update = Model.Update.GetLocalLastUpdate(mDataPath);
-        Update_DisplayStock(_DefaultStockId);
-        StockList = GenerateStockList(mDataPath);
+        StockList = GenerateStockList();
 
         //WebDatas.CheckCorrect(mDataPath, _displayStock);
 
-        MainChartVM = new(DisplayStock!);
+        MainChartVM = new(mStockModel!);
         Trace.WriteLine("Datas Initialize");
 
         _PickStockVMCollection = new();
@@ -80,25 +65,47 @@ public class MainViewModel : ObservableObject
         }
         PickStockVMCollection = _PickStockVMCollection;
     }
-    public void Update_DisplayStock(string stockId)
+    public void UpdateStock(string stockId)
     {
-        DisplayStock = Stock.LoadLocalData(mDataPath, stockId);
-        if (DisplayStock.Id == "")
-            DisplayStock = Stock.LoadLocalData(mDataPath, _DefaultStockId);
-
-        MainChartVM?.UpdateChart(DisplayStock);
+        _mStockModel!.Refresh(stockId);
+        mStockModel = _mStockModel;
+        MainChartVM?.UpdateChart(mStockModel!);
     }
-    HashSet<string> GenerateStockList(string dataPath)
+
+    static Dictionary<char, List<string>> GenerateStockList()
     {
-        HashSet<string> result = new();
-        DirectoryInfo path = new(dataPath);
-        foreach (DirectoryInfo folder in path.EnumerateDirectories("*"))
+        Dictionary<char, List<string>> result = FileManagement.LoadJson<Dictionary<char, List<string>>?>(FilePath.Path_StockList, FilePath.Name_StockList) ?? new();
+
+        var folders = new DirectoryInfo(FilePath.Path_Stock).EnumerateDirectories("*");
+
+        if (result.Count() == folders.Count())
+            return result;
+
+        result = new();
+
+        foreach (DirectoryInfo folder in folders)
         {
-                Stock? stock = FileManagement.LoadJson<Stock>(Path.Combine(dataPath, folder.Name), folder.GetFiles()[0].Name);
-                if (stock != null)
-                result.Add(string.Join(" ", stock.Id , stock.Name));
+            Trace.WriteLine($"Finding {folder.Name}...");
+            StockModel? stockModel = FileManagement.LoadJson<StockModel?>(Path.Combine(FilePath.Path_Stock, folder.Name), FirstFileName(folder));
+            if (stockModel != null) 
+            {
+                string idName = stockModel.IdName;
+                foreach (char cha in idName)
+                {
+                    if (cha == ' ')
+                        continue;
+                    if (!result.ContainsKey(cha))
+                        result.Add(cha, new());
+
+                    result[cha].Add(stockModel.IdName);
+                }
+            }
         }
+
+        result.SaveJson(FilePath.Path_StockList, FilePath.Name_StockList);
         return result;
+
+        static string FirstFileName(DirectoryInfo folder) => folder.GetFiles()[0].Name;
     }
     void Search() 
     {

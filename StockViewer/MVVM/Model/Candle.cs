@@ -28,24 +28,24 @@ public class Candle
         Width = parameter.Width;
 
         Ratio = (Height * HeightRatio) / (parameter.Top - parameter.Bottom);
-        LineTop = (parameter.Top - parameter.Tr.mMax) * Ratio;
-        LineHeight = Math.Abs((parameter.Top - parameter.Tr.mMin) * Ratio - LineTop);
-        if (parameter.Tr.mStart < parameter.Tr.mEnd)
-            BlockTop = (parameter.Top - parameter.Tr.mEnd) * Ratio;
+        LineTop = (parameter.Top - parameter.Price.mMax) * Ratio;
+        LineHeight = Math.Abs((parameter.Top - parameter.Price.mMin) * Ratio - LineTop);
+        if (parameter.Price.mStart < parameter.Price.mEnd)
+            BlockTop = (parameter.Top - parameter.Price.mEnd) * Ratio;
         else
-            BlockTop = (parameter.Top - parameter.Tr.mStart) * Ratio;
+            BlockTop = (parameter.Top - parameter.Price.mStart) * Ratio;
 
-        BlockHeight = Math.Abs(parameter.Tr.mEnd - parameter.Tr.mStart) * Ratio;
+        BlockHeight = Math.Abs(parameter.Price.mEnd - parameter.Price.mStart) * Ratio;
         BlockHeight = (BlockHeight < 2) ? 2 : BlockHeight;
         LineLeft = (Width - LineWidth) / 2;
-        mColor = (parameter.Tr.End == parameter.Tr.Start) ? iColor.Gray : (parameter.Tr.mEnd - parameter.Tr.mStart > 0) ? iColor.Red : iColor.Green;
+        mColor = (parameter.Price.End == parameter.Price.Start) ? iColor.Gray : (parameter.Price.mEnd - parameter.Price.mStart > 0) ? iColor.Red : iColor.Green;
     }
 
     public Candle Resize(double? height = null, double? width = null, double? top = null, double? bottom = null) {
         Parameter = new()
         {
             Date = Parameter.Date,
-            Tr = Parameter.Tr,
+            Price = Parameter.Price,
             Top = top ?? Parameter.Top,
             Bottom = bottom ?? Parameter.Bottom,
             Width = width ?? Parameter.Width,
@@ -59,7 +59,7 @@ public class Candle
 
 public struct CandleParameter {
     public DateTime Date { get; set; }
-    public TradingData Tr { get; set; }
+    public Price Price { get; set; }
     public double Top { get; set; }
     public double Bottom { get; set; }
     public double Width { get; set; }

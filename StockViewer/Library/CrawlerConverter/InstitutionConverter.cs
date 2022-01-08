@@ -36,6 +36,11 @@ public class InstitutionConverter
 
         foreach (var data in datalist)
         {
+            string id = data[0] == null ? "" : data[0]!.Trim();
+            string name = data[1] == null ? "" : data[1]!.Trim();
+            if (id == "" || name == "" || !stockModelCollection.ContainsKey(id))
+                continue;
+
             Institution institution = (target < _switch) ? new()
             {
                 ForeignBuy = data[2] ?? "0",
@@ -64,11 +69,6 @@ public class InstitutionConverter
                 DealerSuper = data[11] ?? "0",
                 InstitutionSuper = data.Last() ?? "0",
             };
-            string id = data[0].Trim();
-            string name = data[1].Trim();
-
-            if (!stockModelCollection.ContainsKey(id))
-                stockModelCollection.Add(id, new(id, name));
 
             stockModelCollection[id].InstitutionData.TryAdd(target, institution);
         }

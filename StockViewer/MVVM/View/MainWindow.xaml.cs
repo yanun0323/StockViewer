@@ -1,4 +1,5 @@
-﻿using System.Windows.Shapes;
+﻿using System.Threading.Tasks;
+using System.Windows.Shapes;
 using Color = StockViewer.Library.iColor;
 
 namespace mAPP
@@ -52,7 +53,7 @@ namespace mAPP
             {
                 Button button = (Button) searchBoxPopupStack.Children[0];
                 string id = (string)button.Content;
-                mainViewModel.Update_DisplayStock(id.Split(" ")[0]);
+                mainViewModel.UpdateStock(id.Split(" ")[0]);
                 CloseSearchPopup();
             }
         }
@@ -61,11 +62,26 @@ namespace mAPP
             if (searchBoxPopup == null || searchBoxPopupStack == null) 
                 return;
             searchBoxPopupStack.Children.Clear();
-            var found = mainViewModel.StockList.Where(x => x.Contains(SearchBox.Text));
-            foreach (var name in found)
+
+            string target = SearchBox.Text;
+            IEnumerable<string> found = mainViewModel.StockList.ContainsKey(target[0]) ? mainViewModel.StockList[target[0]] : new();
+            List<char> span = new();
+
+            Trace.WriteLine($"Search");
+            for (int i = 0; i < target.Length; i++)
+            {
+                span.Add(target[i]);
+                if (i == 0 || !found.Any())
+                    continue;
+                string temp = string.Join("", span);
+                found = found.Where(x => x.Contains(temp));
+            }
+            Trace.WriteLine($"Search found: {found.Count()}");
+            Trace.WriteLine("Create Button");
+            foreach (string idName in found)
             {
                 Button button = new();
-                button.Content = name!;
+                button.Content = idName;
                 button.Background = Brushes.White;
                 button.ClickMode = ClickMode.Press;
                 button.FontSize = 20;
@@ -78,6 +94,7 @@ namespace mAPP
                 button.Click += SearchResult_Selected;
                 searchBoxPopupStack.Children.Add(button);
             }
+
             if (found.Any())
                 searchBoxPopup!.IsOpen = true;
             else
@@ -98,7 +115,7 @@ namespace mAPP
         {
             Button button = (Button)sender;
             string id = (string)button.Content;
-            mainViewModel.Update_DisplayStock(id.Split(" ")[0]);
+            mainViewModel.UpdateStock(id.Split(" ")[0]);
             CloseSearchPopup();
         }
     }

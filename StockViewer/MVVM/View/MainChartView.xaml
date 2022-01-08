@@ -43,16 +43,16 @@
                                 </StackPanel.Resources>
                             </StackPanel>
                             <StackPanel Width="75">
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.Start}"/>
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.Max}"/>
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.Min}"/>
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.End}"
-                                       Foreground="{Binding InfoVM.Candle.Parameter.Tr.mColor}" />
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.mSpread}"
-                                       Foreground="{Binding InfoVM.Candle.Parameter.Tr.mColor}" />
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.mRatio}"
-                                       Foreground="{Binding InfoVM.Candle.Parameter.Tr.mColor}" />
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Tr.mVolume}"/>
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Price.Start}"/>
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Price.Max}"/>
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Price.Min}"/>
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Price.End}"
+                                       Foreground="{Binding InfoVM.Candle.Parameter.Price.mColor}" />
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Price.mSpread}"
+                                       Foreground="{Binding InfoVM.Candle.Parameter.Price.mColor}" />
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Price.mRatio}"
+                                       Foreground="{Binding InfoVM.Candle.Parameter.Price.mColor}" />
+                                <Label Content="{Binding InfoVM.Candle.Parameter.Price.mVolume}"/>
                                 <StackPanel.Resources>
                                     <Style TargetType="Label">
                                         <Setter Property="Margin" Value="0,-5.5"/>
