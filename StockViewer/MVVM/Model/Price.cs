@@ -93,4 +93,20 @@ public struct Price
             return "-";
         }
     }
+
+    public static Price Deafult() {
+        return new Price()
+        {
+            Volume = "0",
+            VolumeMoney = "0",
+            Start = "0",
+            Max = "0",
+            Min = "0",
+            End = "0",
+            Grade = "0",
+            Spread = "0",
+            Per = "0",
+
+        };
+    }
 }

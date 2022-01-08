@@ -77,5 +77,21 @@ public struct Institution
     [JsonIgnore]
     public int mInstitutionSuper { get => int.Parse(InstitutionSuper.Replace(",", "")) / 1000; }
 
-
+    public static Institution Deafult()
+    {
+        return new Institution()
+        {
+            ForeignBuy = "0",
+            ForeignSell = "0",
+            ForeignSuper = "0",
+            ForeignDealerBuy = "0",
+            ForeignDealerSell = "0",
+            ForeignDealerSuper = "0",
+            TrustBuy = "0",
+            TrustSell = "0",
+            TrustSuper = "0",
+            DealerSuper = "0",
+            InstitutionSuper = "0",
+        };
+    }
 }

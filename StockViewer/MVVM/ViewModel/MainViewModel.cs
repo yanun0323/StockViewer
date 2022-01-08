@@ -2,11 +2,22 @@
 namespace StockViewer.MVVM.ViewModel;
 public class MainViewModel : ObservableObject
 {
-    readonly string mDataPath = "";
-    readonly string mDefaultStockId = "2330";
+    readonly string _DefaultStockId = "2330";
+
+    private string mDataPath = "";
+    private StockModel? _mStockModel;
+
+    public StockModel? mStockModel
+    {
+        get { return _mStockModel; }
+        set
+        {
+            _mStockModel = value;
+            OnPropertyChanged();
+        }
+    }
 
     private Stock? _displayStock = new();
-    private TitleStock? _titleStock;
     private string _searchWords = "";
 
     private ObservableCollection<PickStockBlockViewModel> _PickStockVMCollection;
@@ -29,15 +40,6 @@ public class MainViewModel : ObservableObject
             OnPropertyChanged(); 
         } 
     }
-    public TitleStock? TitleStock 
-    { 
-        get => _titleStock; 
-        set 
-        { 
-            _titleStock = value; 
-            OnPropertyChanged(); 
-        } 
-    }
     public string SearchWords
     { 
         get => _searchWords; 
@@ -56,10 +58,14 @@ public class MainViewModel : ObservableObject
 
         MainCrawler.Run();
         MainConverter.Run();
-        //WebDatas.Update(mDataPath);
+
+        mStockModel = new(id:_DefaultStockId);
+        mStockModel.Refresh();
+
+        WebDatas.Update(mDataPath);
 
         Update = Model.Update.GetLocalLastUpdate(mDataPath);
-        Update_DisplayStock(mDefaultStockId);
+        Update_DisplayStock(_DefaultStockId);
         StockList = GenerateStockList(mDataPath);
 
         //WebDatas.CheckCorrect(mDataPath, _displayStock);
@@ -70,7 +76,7 @@ public class MainViewModel : ObservableObject
         _PickStockVMCollection = new();
         int count = 0;
         while (count++ < 20) {
-            _PickStockVMCollection!.Add(new(_titleStock!));
+            _PickStockVMCollection!.Add(new(mStockModel));
         }
         PickStockVMCollection = _PickStockVMCollection;
     }
@@ -78,12 +84,10 @@ public class MainViewModel : ObservableObject
     {
         DisplayStock = Stock.LoadLocalData(mDataPath, stockId);
         if (DisplayStock.Id == "")
-            DisplayStock = Stock.LoadLocalData(mDataPath, mDefaultStockId);
+            DisplayStock = Stock.LoadLocalData(mDataPath, _DefaultStockId);
 
-        Update_TitleStock(Update);
         MainChartVM?.UpdateChart(DisplayStock);
     }
-    public void Update_TitleStock(DateTime updateTime) => TitleStock = new(_displayStock!);
     HashSet<string> GenerateStockList(string dataPath)
     {
         HashSet<string> result = new();

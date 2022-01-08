@@ -13,7 +13,7 @@
             Margin="2,2"
             Background="#fff"
             HorizontalContentAlignment="Left">
-        <Border Background="{Binding mStock.TradingData.mColor}" 
+        <Border Background="{Binding mStockModel.LastPrice.mColor}" 
                 CornerRadius="10"
                 BorderThickness="0"
                 Width="80"
@@ -21,7 +21,7 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
                 Margin="5">
-            <Label Content="{Binding mStock.TradingData.End}"
+            <Label Content="{Binding mStockModel.LastPrice.End}"
                     Background="Transparent"
                     Foreground="White"
                     FontSize="18"

@@ -2,16 +2,10 @@
 namespace StockViewer.MVVM.ViewModel;
 public class PickStockBlockViewModel : ObservableObject
 {
-    private TitleStock? _mStock;
+    public StockModel mStockModel { get; set; }
 
-    public TitleStock? mStock
+    public PickStockBlockViewModel(StockModel stockModel)
     {
-        get { return _mStock; }
-        set { _mStock = value;}
-    }
-
-    public PickStockBlockViewModel(TitleStock stock)
-    {
-        mStock = stock;
+        mStockModel = stockModel;
     }
 }

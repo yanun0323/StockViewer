@@ -25,12 +25,12 @@ public static class MainConverter
                 if (stockModelCollection["2330"].PriceData.Count() == 0 ||
                     stockModelCollection["2330"].InstitutionData.Count() == 0)
                 {
-                    Trace.WriteLine($" -------------------");
+                    Trace.WriteLine($" -------------------1");
                 }
             }
             else
             {
-                Trace.WriteLine($" -------------------");
+                Trace.WriteLine($" -------------------2");
             }
             if (stockModelCollection.Any())
             {
