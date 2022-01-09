@@ -13,28 +13,31 @@ public class MainChartViewModel:ObservableObject
     public ICommand? CoordMouseMoveCommand { get; set; }
 
 
+    private readonly Thickness _CandleMargin = new(1, 0, 1, 0);
+    private readonly double _CandleWidth_Max = 30;
+    private readonly double _CandleWidth_Min = 3;
+
     private Grid? MainChartGrid;
     private Point? MouseClickPosition;
 
     private double _HighestPrice;
     private double _LowestPrice;
     private StockModel? _mStockModel;
+
     private ObservableCollection<CandleViewModel>? _CandleVMCollection;
     private Stack<CandleViewModel>? _CandleVMCollection_Right;
     private Stack<CandleViewModel>? _CandleVMCollection_Left;
-    private readonly Thickness _CandleMargin = new(1, 0, 1, 0);
+
     private Size _ChartSize = new(834, 305);
     private double _CandleWidth = 10;
-    private double _CandleWidth_Max = 30;
-    private double _CandleWidth_Min = 3;
     private DateTime _TempLabelDate;
     private int _HighestVolume;
-    private bool _InfoPopShow = false;
+    private Visibility _InfoPopShow = Visibility.Hidden;
     private CandleViewModel? _InfoVM;
     public string _InfoDate = "";
     private ChartGridViewModel? _ChartGridVM;
 
-    public bool InfoPopShow { get => _InfoPopShow; set { _InfoPopShow = value; OnPropertyChanged(); } }
+    public Visibility InfoPopShow { get => _InfoPopShow; set { _InfoPopShow = value; OnPropertyChanged(); } }
     public double _CandleHeight { get => _ChartSize.Height; }
     public double _CandleOutlineWidth { get => _CandleWidth + _CandleMargin.Left + _CandleMargin.Right; }
     public ObservableCollection<CandleViewModel>? CandleVMCollection { get => _CandleVMCollection; set { _CandleVMCollection = value; OnPropertyChanged(); } }
@@ -70,7 +73,7 @@ public class MainChartViewModel:ObservableObject
         {
             if (e.ChangedButton == MouseButton.Right)
             {
-                if (!InfoPopShow)
+                if (InfoPopShow != Visibility.Visible)
                 {
                     Point pos = e.MouseDevice.GetPosition(MainChartGrid);
                     double distanceFromRight = _ChartSize.Width - pos.X;
@@ -86,7 +89,7 @@ public class MainChartViewModel:ObservableObject
                         InfoDate = $"{InfoVM!.Date:yyyy/MM/dd}";
                     }
                 }
-                InfoPopShow = !InfoPopShow;
+                InfoPopShow = (InfoPopShow == Visibility.Visible) ? Visibility.Hidden : Visibility.Visible;
             }
         });
 
@@ -102,7 +105,7 @@ public class MainChartViewModel:ObservableObject
                 MouseClickPosition = e.MouseDevice.GetPosition(MainChartGrid);
             }
             
-            if (InfoPopShow)
+            if (InfoPopShow == Visibility.Visible)
             {
                 Point pos = e.MouseDevice.GetPosition(MainChartGrid);
                 double distanceFromRight = _ChartSize.Width - pos.X;

@@ -118,5 +118,10 @@ namespace mAPP
             mainViewModel.UpdateStock(id.Split(" ")[0]);
             CloseSearchPopup();
         }
+
+        private void SearchBoxGrid_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+
+        }
     }
 }

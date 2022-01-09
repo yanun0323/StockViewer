@@ -4,7 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:StockViewer.MVVM.View"
+             xmlns:view="clr-namespace:StockViewer.MVVM.View"
              xmlns:viewModel="clr-namespace:StockViewer.MVVM.ViewModel" 
              xmlns:core="clr-namespace:StockViewer.Core" 
              d:DataContext="{d:DesignInstance Type=viewModel:MainChartViewModel}"
@@ -18,9 +18,12 @@
                 <ColumnDefinition/>
                 <ColumnDefinition Width="50"/>
             </Grid.ColumnDefinitions>
-            <Popup x:Name="InfoPopup" IsOpen="{Binding InfoPopShow}" Placement="Relative" AllowsTransparency="True" Opacity="0">
-                <Border x:Name="InfoPopupBorder" BorderThickness="1.5" CornerRadius="10" BorderBrush="PowderBlue" Background="White" Opacity="0.95"
-                        Width="101" Height="150">
+            <Grid x:Name="MainChartInnerGrid" Background="AliceBlue">
+                <Border Grid.Column="0" x:Name="InfoPopupBorder" BorderThickness="1.5" CornerRadius="10" BorderBrush="PowderBlue" Background="White" Opacity="0.95"
+                        Width="101" Height="150" Visibility="{Binding InfoPopShow}"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Left"
+                        Panel.ZIndex="15">
                     <StackPanel>
                         <Label Content="{Binding InfoDate}" Margin="0,0,0,0" HorizontalAlignment="Right"/>
                         <StackPanel Orientation="Horizontal">
@@ -65,30 +68,31 @@
                         </StackPanel>
                     </StackPanel>
                 </Border>
-            </Popup>
 
-            <ContentControl Grid.Column="0" Grid.ColumnSpan="2"
-                            VerticalAlignment="Stretch"
-                            Content="{Binding ChartGridVM}"/>
+                <ContentControl Grid.Column="0" Grid.ColumnSpan="2"
+                                VerticalAlignment="Stretch"
+                                Content="{Binding ChartGridVM}"/>
 
-            <ItemsControl x:Name="CandleControl" Grid.Column="0"
-                          ItemsSource="{Binding CandleVMCollection}" 
-                          FlowDirection="RightToLeft">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <!-- The default for an ItemsControl is a StackPanel with a vertical orientation -->
-                        <StackPanel Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SizeChanged">
-                        <core:EventCommandAction Command="{Binding SizeChangedCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </ItemsControl>
-            
+                <ItemsControl x:Name="CandleControl" Grid.Column="0"
+                              ItemsSource="{Binding CandleVMCollection}" 
+                              FlowDirection="RightToLeft">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <!-- The default for an ItemsControl is a StackPanel with a vertical orientation -->
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SizeChanged">
+                            <core:EventCommandAction Command="{Binding SizeChangedCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ItemsControl>
+
+            </Grid>
             <Grid Grid.Column="1">
             </Grid>
+            
         </Grid>
 
         <i:Interaction.Triggers>

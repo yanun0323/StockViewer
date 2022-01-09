@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodel="clr-namespace:StockViewer.MVVM.ViewModel"
+        xmlns:view="clr-namespace:StockViewer.MVVM.View"
         xmlns:local="clr-namespace:mAPP" 
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:core="clr-namespace:StockViewer.Core"
@@ -29,11 +30,12 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <Grid Grid.Row="0" x:Name ="SearchBoxGrid">
-                <Popup IsOpen="False" x:Name="searchBoxPopup" PopupAnimation="Slide" AllowsTransparency="True"
-                            PlacementTarget="{Binding ElementName=SearchBoxGrid}" Placement="Bottom"
-                            Width="{Binding ElementName=SearchBox, Path=Width}"  Panel.ZIndex="99" 
-                            MaxHeight="500" HorizontalOffset="{Binding ElementName=SearchBox, Path=Margin.Left}" >
+            <Grid Grid.Row="0" x:Name ="SearchBoxGrid" >
+                <Popup IsOpen="False" x:Name="searchBoxPopup" PopupAnimation="Slide" 
+                       AllowsTransparency="True" Placement="Bottom"
+                       Width="{Binding ElementName=SearchBox, Path=Width}"
+                       view:PopupLocator.Locator="{Binding ElementName=SearchBoxGrid}"
+                       MaxHeight="500" HorizontalOffset="{Binding ElementName=SearchBox, Path=Margin.Left}">
                     <Border x:Name="searchBoxPopupBorder" BorderThickness="1" CornerRadius="10" BorderBrush="Gray" Background="White">
                         <ScrollViewer x:Name="searchBoxPopupScroll" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
                             <StackPanel x:Name="searchBoxPopupStack" Orientation="Vertical">
