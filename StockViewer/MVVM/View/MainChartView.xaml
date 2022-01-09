@@ -18,78 +18,76 @@
                 <ColumnDefinition/>
                 <ColumnDefinition Width="{Binding mGridWidth}"/>
             </Grid.ColumnDefinitions>
-            <Grid x:Name="MainChartInnerGrid">
-                <Border Grid.Column="0" x:Name="InfoPopupBorder" BorderThickness="1.5" CornerRadius="10" BorderBrush="PowderBlue" Background="White" Opacity="0.95"
-                        Width="101" Height="150" Visibility="{Binding InfoPopShow}"
-                        VerticalAlignment="Top"
-                        HorizontalAlignment="Left"
-                        Panel.ZIndex="15">
-                    <StackPanel>
-                        <Label Content="{Binding InfoDate}" Margin="0,0,0,0" HorizontalAlignment="Right"/>
-                        <StackPanel Orientation="Horizontal">
-                            <StackPanel>
-                                <Label Content="開"/>
-                                <Label Content="高"/>
-                                <Label Content="低"/>
-                                <Label Content="收"/>
-                                <Label Content="漲"/>
-                                <Label Content=""/>
-                                <Label Content="量"/>
+            <Border Grid.Column="0" x:Name="InfoPopupBorder" BorderThickness="1.5" CornerRadius="10" BorderBrush="PowderBlue" Background="White" Opacity="0.95"
+                    Width="101" Height="150" Visibility="{Binding InfoPopShow}"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Left"
+                    Panel.ZIndex="15">
+                <StackPanel>
+                    <Label Content="{Binding InfoDate}" Margin="0,0,0,0" HorizontalAlignment="Right"/>
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel>
+                            <Label Content="開"/>
+                            <Label Content="高"/>
+                            <Label Content="低"/>
+                            <Label Content="收"/>
+                            <Label Content="漲"/>
+                            <Label Content=""/>
+                            <Label Content="量"/>
 
-                                <StackPanel.Resources>
-                                    <Style TargetType="Label">
-                                        <Setter Property="Margin" Value="0,-5.5"/>
-                                        <Setter Property="FontWeight" Value="Medium"/>
-                                        <Setter Property="FontSize" Value="13"/>
-                                        <Setter Property="Foreground" Value="#222"/>
-                                    </Style>
-                                </StackPanel.Resources>
-                            </StackPanel>
-                            <StackPanel Width="75">
-                                <Label Content="{Binding InfoVM.Candle.mPrice.Start}"/>
-                                <Label Content="{Binding InfoVM.Candle.mPrice.Max}"/>
-                                <Label Content="{Binding InfoVM.Candle.mPrice.Min}"/>
-                                <Label Content="{Binding InfoVM.Candle.mPrice.End}"
-                                       Foreground="{Binding InfoVM.Candle.mPrice.mColor}"/>
-                                <Label Content="{Binding InfoVM.Candle.mPrice.mSpread}"
-                                       Foreground="{Binding InfoVM.Candle.mPrice.mColor}"/>
-                                <Label Content="{Binding InfoVM.Candle.mPrice.mRatio}"
-                                       Foreground="{Binding InfoVM.Candle.mPrice.mColor}"/>
-                                <Label Content="{Binding InfoVM.Candle.mPrice.mVolume}"/>
-                                <StackPanel.Resources>
-                                    <Style TargetType="Label">
-                                        <Setter Property="Margin" Value="0,-5.5"/>
-                                        <Setter Property="FontSize" Value="13"/>
-                                        <Setter Property="HorizontalAlignment" Value="Right"/>
-                                        <Setter Property="Foreground" Value="#222"/>
-                                    </Style>
-                                </StackPanel.Resources>
-                            </StackPanel>
+                            <StackPanel.Resources>
+                                <Style TargetType="Label">
+                                    <Setter Property="Margin" Value="0,-5.5"/>
+                                    <Setter Property="FontWeight" Value="Medium"/>
+                                    <Setter Property="FontSize" Value="13"/>
+                                    <Setter Property="Foreground" Value="#222"/>
+                                </Style>
+                            </StackPanel.Resources>
+                        </StackPanel>
+                        <StackPanel Width="75">
+                            <Label Content="{Binding InfoVM.Candle.mPrice.Start}"/>
+                            <Label Content="{Binding InfoVM.Candle.mPrice.Max}"/>
+                            <Label Content="{Binding InfoVM.Candle.mPrice.Min}"/>
+                            <Label Content="{Binding InfoVM.Candle.mPrice.End}"
+                                    Foreground="{Binding InfoVM.Candle.mPrice.mColor}"/>
+                            <Label Content="{Binding InfoVM.Candle.mPrice.mSpread}"
+                                    Foreground="{Binding InfoVM.Candle.mPrice.mColor}"/>
+                            <Label Content="{Binding InfoVM.Candle.mPrice.mRatio}"
+                                    Foreground="{Binding InfoVM.Candle.mPrice.mColor}"/>
+                            <Label Content="{Binding InfoVM.Candle.mPrice.mVolume}"/>
+                            <StackPanel.Resources>
+                                <Style TargetType="Label">
+                                    <Setter Property="Margin" Value="0,-5.5"/>
+                                    <Setter Property="FontSize" Value="13"/>
+                                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                                    <Setter Property="Foreground" Value="#222"/>
+                                </Style>
+                            </StackPanel.Resources>
                         </StackPanel>
                     </StackPanel>
-                </Border>
+                </StackPanel>
+            </Border>
 
-                <ContentControl Grid.Column="0" Grid.ColumnSpan="2"
-                                VerticalAlignment="Stretch"
-                                Content="{Binding ChartGridVM}"/>
+            <ContentControl Grid.Column="0" Grid.ColumnSpan="2"
+                            VerticalAlignment="Stretch"
+                            Content="{Binding ChartGridVM}"/>
 
-                <ItemsControl x:Name="CandleControl" Grid.Column="0"
-                              ItemsSource="{Binding CandleVMCollection}" 
-                              FlowDirection="RightToLeft">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <!-- The default for an ItemsControl is a StackPanel with a vertical orientation -->
-                            <StackPanel Orientation="Horizontal"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="SizeChanged">
-                            <core:EventCommandAction Command="{Binding SizeChangedCommand}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </ItemsControl>
+            <ItemsControl x:Name="CandleControl" Grid.Column="0"
+                            ItemsSource="{Binding CandleVMCollection}" 
+                            FlowDirection="RightToLeft">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <!-- The default for an ItemsControl is a StackPanel with a vertical orientation -->
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SizeChanged">
+                        <core:EventCommandAction Command="{Binding SizeChangedCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ItemsControl>
 
-            </Grid>
             <Grid Grid.Column="1">
             </Grid>
             

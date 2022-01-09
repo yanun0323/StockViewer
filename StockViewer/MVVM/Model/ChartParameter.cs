@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace StockViewer.MVVM.Model; 
 
-public struct CandleParameter
+public struct ChartParameter
 {
-    public double Top { get; set; }
-    public double Bottom { get; set; }
+    public double Highest { get; set; }
+    public double Lowest { get; set; }
     public double Width { get; set; }
     public double Height { get; set; }
 }

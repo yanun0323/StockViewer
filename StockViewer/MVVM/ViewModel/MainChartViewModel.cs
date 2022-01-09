@@ -14,6 +14,7 @@ public class MainChartViewModel:ObservableObject
 
 
     public static readonly Thickness CandleMargin = new(1, 0, 1, 0);
+    public static readonly int ChartLineQuantityRatio = 30;
     private static readonly double _CandleWidth_Max = 30;
     private static readonly double _CandleWidth_Min = 3;
 
@@ -28,7 +29,7 @@ public class MainChartViewModel:ObservableObject
     private Stack<CandleViewModel>? _CandleVMCollection_Right;
     private Stack<CandleViewModel>? _CandleVMCollection_Left;
 
-    private Size _ChartSize = new(834, 305);
+    private Size _ChartSize = new(854, 361);
     private double _CandleWidth = 10;
     private DateTime _TempLabelDate;
     private int _HighestVolume;
@@ -125,6 +126,7 @@ public class MainChartViewModel:ObservableObject
 
         SizeChangedCommand = new RelayCommand<SizeChangedEventArgs>(args =>
         {
+            Trace.WriteLine($"New Size: {args.NewSize.Width} {args.NewSize.Height}");
             if (_ChartSize.Width == args.NewSize.Width)
             {
                 _ChartSize = args.NewSize;
@@ -163,12 +165,12 @@ public class MainChartViewModel:ObservableObject
     }
     private CandleViewModel CreateCandleVM(DateTime date, Price price)
     {
-        CandleParameter cp = new()
+        ChartParameter cp = new()
         {
             Width = _CandleWidth,
             Height = _CandleHeight,
-            Top = _HighestPrice,
-            Bottom = _LowestPrice,
+            Highest = _HighestPrice,
+            Lowest = _LowestPrice,
         };
 
         if (_TempLabelDate.Month != date.Month)
@@ -198,7 +200,10 @@ public class MainChartViewModel:ObservableObject
             if (AddCandleLeft(addCount))
                 ResizeCandle();
             else
+            {
+                _ChartGridVM!.Resize(_ChartSize);
                 return false;
+            }
         }
         else if (newCandleCount < candleCount)
         {
@@ -206,7 +211,10 @@ public class MainChartViewModel:ObservableObject
             if (ReduceCandleLeft(reduceCount))
                 ResizeCandle();
             else
+            {
+                _ChartGridVM!.Resize(_ChartSize);
                 return false;
+            }
         }
         _ChartGridVM!.Resize(_ChartSize);
         ChartGridVM = _ChartGridVM;
@@ -239,29 +247,38 @@ public class MainChartViewModel:ObservableObject
             return true;
         }
     }
-    private void ResizeCandle()
+    private void ResizeChartGrid(double chartHeight)
     {
         _HighestPrice = _CandleVMCollection!.Max(x => x.Candle!.mPrice.mMax);
         _LowestPrice = _CandleVMCollection!.Min(x => x.Candle!.mPrice.mMin);
+        int limitQuantity = (int)(chartHeight / ChartLineQuantityRatio);
 
         double priceInterval = _HighestPrice - _LowestPrice;
         int offset = 1;
-        while (priceInterval / offset > 15)
+        while (priceInterval / offset > limitQuantity)
         {
             offset *= 5;
         }
         _HighestPrice = _HighestPrice - _HighestPrice % offset + offset;
         _LowestPrice = _LowestPrice - _LowestPrice % offset;
 
-        _HighestVolume = _CandleVMCollection!.Max(x => x.Candle!.mPrice.mVolume);
+        _ChartGridVM = new ChartGridViewModel(new ChartParameter() {
+            Highest = _HighestPrice,
+            Lowest = _LowestPrice,
+            Width = _ChartSize.Width + GridWidth,
+            Height = _ChartSize.Height,
+        });
+        ChartGridVM = _ChartGridVM;
 
+    }
+    private void ResizeCandle()
+    {
+        ResizeChartGrid(_ChartSize.Height);
+        _HighestVolume = _CandleVMCollection!.Max(x => x.Candle!.mPrice.mVolume);
         foreach (var candleVm in _CandleVMCollection!)
         {
             candleVm.Resize(_CandleHeight, _CandleWidth, _HighestPrice, _LowestPrice, _HighestVolume);
         }
-        _ChartGridVM = new(new(_ChartSize.Width + 50.0, _ChartSize.Height), _HighestPrice, _LowestPrice);
-
-        ChartGridVM = _ChartGridVM;
         CandleVMCollection = _CandleVMCollection;
     }
     private void MouseDrag(Point pos)

@@ -9,12 +9,12 @@ public class Volume
     private double VolumeRatio;
     private readonly double BlockHeight_Min = 2;
 
-    public Volume(DateTime dateTime, Price price, CandleParameter parameter, int highestVolume)
+    public Volume(DateTime dateTime, Price price, ChartParameter parameter, int highestVolume)
     {
         Update(dateTime, price, parameter, highestVolume);
     }
 
-    public void Update(DateTime dateTime, Price price, CandleParameter parameter, int highestVolume)
+    public void Update(DateTime dateTime, Price price, ChartParameter parameter, int highestVolume)
     {
         Date = dateTime;
         mVolume = price.mVolume;
