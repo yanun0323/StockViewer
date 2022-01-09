@@ -26,7 +26,7 @@ public class MainViewModel : ObservableObject
         set { _PickStockVMCollection = value; OnPropertyChanged(); }
     }
 
-    public Dictionary<char, List<string>> StockList { get; set; } = new();
+    public Dictionary<char, HashSet<string>> StockList { get; set; } = new();
     public MainChartViewModel? MainChartVM { get; set; }
     public string SearchWords
     { 
@@ -72,36 +72,36 @@ public class MainViewModel : ObservableObject
         MainChartVM?.UpdateChart(mStockModel!);
     }
 
-    static Dictionary<char, List<string>> GenerateStockList()
+    static Dictionary<char, HashSet<string>> GenerateStockList()
     {
-        Dictionary<char, List<string>> result = FileManagement.LoadJson<Dictionary<char, List<string>>?>(FilePath.Path_StockList, FilePath.Name_StockList) ?? new();
+        Dictionary<char, HashSet<string>> result = FileManagement.LoadJson<Dictionary<char, HashSet<string>>?>(FilePath.Path_StockList, FilePath.Name_StockList) ?? new();
 
         var folders = new DirectoryInfo(FilePath.Path_Stock).EnumerateDirectories("*");
 
-        if (result.Count() == folders.Count())
+        Trace.WriteLine($"result.Count() {result[' '].Count()}");
+        Trace.WriteLine($"folders.Count() {folders.Count()}");
+        if (result.ContainsKey(' ') && result[' '].Count() == folders.Count())
             return result;
 
         result = new();
-
+        Trace.WriteLine($"Finding ...");
         foreach (DirectoryInfo folder in folders)
         {
-            Trace.WriteLine($"Finding {folder.Name}...");
             StockModel? stockModel = FileManagement.LoadJson<StockModel?>(Path.Combine(FilePath.Path_Stock, folder.Name), FirstFileName(folder));
             if (stockModel != null) 
             {
                 string idName = stockModel.IdName;
                 foreach (char cha in idName)
                 {
-                    if (cha == ' ')
-                        continue;
                     if (!result.ContainsKey(cha))
                         result.Add(cha, new());
 
-                    result[cha].Add(stockModel.IdName);
+                    if (!result[cha].Contains(stockModel.IdName))
+                        result[cha].Add(stockModel.IdName);
                 }
             }
         }
-
+        Trace.WriteLine($"result.Count() {result[' '].Count()}");
         result.SaveJson(FilePath.Path_StockList, FilePath.Name_StockList);
         return result;
 
