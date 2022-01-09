@@ -10,7 +10,7 @@
              d:DataContext="{d:DesignInstance Type=viewModel:MainChartViewModel}"
              mc:Ignorable="d">
     <Border x:Name="MainChartBorder"
-            CornerRadius="20"
+            CornerRadius="10"
             Margin="5,0"
             Background="{Binding ElementName=MainChart, Path=Background}">
         <Grid x:Name="MainChartGrid" Margin="10">
@@ -94,9 +94,6 @@
         </Grid>
 
         <i:Interaction.Triggers>
-            <i:EventTrigger EventName="MouseWheel">
-                <core:EventCommandAction Command="{Binding MouseWheelCommand}"/>
-            </i:EventTrigger>
             <i:EventTrigger EventName="MouseUp">
                 <core:EventCommandAction Command="{Binding MouseUpCommand}"/>
             </i:EventTrigger>

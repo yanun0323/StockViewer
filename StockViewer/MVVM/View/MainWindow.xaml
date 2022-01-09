@@ -30,6 +30,8 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
+
+            <!-- SearchBox Information -->
             <Grid Grid.Row="0" x:Name ="SearchBoxGrid" >
                 <Popup IsOpen="False" x:Name="searchBoxPopup" PopupAnimation="Slide" 
                        AllowsTransparency="True" Placement="Bottom"
@@ -166,6 +168,7 @@
 
             </Grid>
 
+            <!-- Dock Information -->
             <TabControl Grid.Row="2"
                             TabStripPlacement="Left"
                             FlowDirection="LeftToRight"
@@ -242,7 +245,7 @@
                     </TabItem.Resources>
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                                   VerticalScrollBarVisibility="Auto">
-                        <ItemsControl ItemsSource="{Binding PickStockVMCollection}">
+                        <ItemsControl ItemsSource="{Binding SmartPickVMCollection}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel/>
@@ -273,7 +276,7 @@
             </TabControl>
 
             <!-- [Tree] Main Chart -->
-            <Grid Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Name="Grid1" Margin="0,0,0,10">
+            <Grid x:Name="ChartGridRoot" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,10">
                 <Grid.Resources>
                     <Style x:Key="MainChart" TargetType="RowDefinition">
                         <Setter Property="MinHeight" Value="200"/>
@@ -286,6 +289,14 @@
                         <Setter Property="Height" Value="5"/>
                     </Style>
                 </Grid.Resources>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseWheel">
+                        <core:EventCommandAction Command="{Binding MouseWheelCommand}"/>
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseMove">
+                        <core:EventCommandAction Command="{Binding MouseMoveCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
 
                 <Grid.RowDefinitions>
                     <RowDefinition Style="{StaticResource MainChart}"/>
@@ -315,27 +326,19 @@
                     </Grid.RowDefinitions>
 
                     <!-- Sub Chart 1 -->
-                    <Grid Grid.Row="0">
-                        <Border CornerRadius="10" Background="{Binding ElementName=MainChart, Path=Background}" Margin="5,0" x:Name="SubChart1">
-                            <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Visible">
-
-
-                            </Grid>
-                        </Border>
-                    </Grid>
+                    <ContentControl Content="{Binding SubChartVM1}"
+                                Grid.Row="0" 
+                                x:Name="SubChart1"
+                                Background="White"/>
+                    
                     <!-- Seprate Line -->
                     <GridSplitter Grid.Row="1" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Transparent"/>
 
-
                     <!-- Sub Chart 2 -->
-                    <Grid Grid.Row="2">
-                        <Border CornerRadius="10" Background="{Binding ElementName=MainChart, Path=Background}" Margin="5,0" x:Name="SubChart2">
-                            <Grid ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Visible">
-
-
-                            </Grid>
-                        </Border>
-                    </Grid>
+                    <ContentControl Content="{Binding SubChartVM2}"
+                                Grid.Row="2" 
+                                x:Name="SubChart2"
+                                Background="White"/>
                 </Grid>
 
                 <!-- Sub Chart Bottom -->

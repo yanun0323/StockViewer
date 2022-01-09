@@ -27,6 +27,13 @@
                 <view:PickStockBlockView/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type veiwModel:SubChartViewModel}">
+                <view:SubChartView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type veiwModel:BarViewModel}">
+                <view:BarView/>
+            </DataTemplate>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

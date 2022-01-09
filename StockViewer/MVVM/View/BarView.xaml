@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="StockViewer.MVVM.View.BarView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:view="clr-namespace:StockViewer.MVVM.View"
+             xmlns:viewModel="clr-namespace:StockViewer.MVVM.ViewModel" 
+             xmlns:core="clr-namespace:StockViewer.Core"
+             d:DataContext="{d:DesignInstance Type=viewModel:BarViewModel}"
+             mc:Ignorable="d">
+    <Canvas Width="{Binding RectWidth}"
+            Height="{Binding Parameter.Height}"
+            Margin="{Binding Margin}"
+            VerticalAlignment="Top">
+        <Rectangle x:Name="VolumeBlock" Panel.ZIndex="7"
+                   StrokeThickness="0"
+                   Fill="{Binding mColor}"
+                   Width="{Binding RectWidth}"
+                   Height="{Binding RectHeight}"
+                   Canvas.Top="{Binding RectTop}"/>
+        <!--<Canvas x:Name="DateLabel" Panel.ZIndex="6" 
+                Width="{Binding RectWidth}" 
+                Height="{Binding DateLabelHeight}"
+                Canvas.Bottom="3">
+            <Label Content="{Binding Month}" Foreground="#555555"
+                   HorizontalContentAlignment="Center"/>
+        </Canvas>-->
+            
+    </Canvas>
+</UserControl>

@@ -15,7 +15,7 @@ public class StockModel
     [JsonIgnore]
     public string IdName { get => string.Join(" ", Id, Name); }
     [JsonIgnore]
-    public DateTime? LastDate { get => PriceData.Any() ? null : PriceData.Last().Key; }
+    public DateTime? LastDate { get => PriceData.Any() ? PriceData.Last().Key : null; }
     [JsonIgnore]
     public KeyValuePair<DateTime, Price> LastPrice { get => PriceData.Any() ? PriceData.Last() : new(PriceCrawler.Begin , Price.Deafult()) ; }
     [JsonIgnore]

@@ -1,10 +1,12 @@
 ﻿<UserControl x:Class="StockViewer.MVVM.View.PickStockBlockView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:StockViewer.MVVM.View"
              xmlns:viewModel="clr-namespace:StockViewer.MVVM.ViewModel"
+             xmlns:core="clr-namespace:StockViewer.Core" 
              d:DataContext="{d:DesignInstance Type=viewModel:PickStockBlockViewModel}"
              mc:Ignorable="d">
     <Button BorderThickness="0"
@@ -13,7 +15,8 @@
             Margin="2,2"
             Background="#fff"
             HorizontalContentAlignment="Left">
-        <Border Background="{Binding mStockModel.LastPrice.mColor}" 
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+            <Border Background="{Binding mStockModel.LastPrice.Value.mColor}" 
                 CornerRadius="10"
                 BorderThickness="0"
                 Width="80"
@@ -21,7 +24,7 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
                 Margin="5">
-            <Label Content="{Binding mStockModel.LastPrice.End}"
+                <Label Content="{Binding mStockModel.LastPrice.Value.End}"
                     Background="Transparent"
                     Foreground="White"
                     FontSize="18"
@@ -29,11 +32,37 @@
                     VerticalAlignment="Center"
                     HorizontalContentAlignment="Center"
                     VerticalContentAlignment="Center"/>
-        </Border>
+            </Border>
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                <Label Content="{Binding mStockModel.Id}"
+                    Background="Transparent"
+                    Foreground="Black"
+                    FontSize="15"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"/>
+                <Label Content="{Binding mStockModel.Name}"
+                    Background="Transparent"
+                    Foreground="Black"
+                    FontSize="15"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"/>
+            </StackPanel>
+        </StackPanel>
+
         <Button.Resources>
             <Style TargetType="Border">
                 <Setter Property="CornerRadius" Value="10"/>
             </Style>
         </Button.Resources>
+
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="Click">
+                <core:EventCommandAction Command="{Binding ClickCommand}"/>
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
     </Button>
 </UserControl>

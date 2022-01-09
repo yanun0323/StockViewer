@@ -14,9 +14,9 @@ public class ChartGridViewModel:ObservableObject
     public ObservableCollection<Label> ChartLabels { get => _ChartLabels; set { _ChartLabels = value; } }
     public Thickness Margin { get => MainChartViewModel.CandleMargin; }
 
-    public ChartGridViewModel(ChartParameter parameter)
+    public ChartGridViewModel(ChartParameter parameter, bool custom = false, params double[] prices)
     {
-        Draw(parameter);
+        Draw(parameter, custom, prices);
     }
 
     public void Resize(Size chart)
@@ -26,12 +26,23 @@ public class ChartGridViewModel:ObservableObject
         Draw(_Parameter);
     }
 
-    private void Draw(ChartParameter parameter)
+    private void Draw(ChartParameter parameter, bool custom = false, params double[] prices)
     {
         _Parameter = parameter;
-
         double priceInterval = _Parameter.Highest - _Parameter.Lowest;
         _Ratio = (_Parameter.Height * CandleViewModel.CandleHeightRatio) / priceInterval;
+
+        if (custom && prices != null)
+        {
+            foreach (double p in prices)
+            {
+                _ChartLines.Add(CreatLine(p));
+                _ChartLabels.Add(CreatLabel(p));
+            }
+            ChartLines = _ChartLines;
+            return;
+        }
+
 
         int limitQuantity = (int)(_Parameter.Height / MainChartViewModel.ChartLineQuantityRatio);
         int offset = 1;
@@ -74,10 +85,11 @@ public class ChartGridViewModel:ObservableObject
     private Label CreatLabel(double price)
     {
         double top = (_Parameter.Highest - price) * _Ratio;
-        double width =  40;
+        int height = 30;
         Label result = new Label()
         {
-            Width = width,
+            Width = MainChartViewModel.GridWidth,
+            Height = height,
             FontSize = 11,
             Foreground = Brushes.LightGray,
             Content = Math.Round(price, 2),
@@ -86,8 +98,8 @@ public class ChartGridViewModel:ObservableObject
             VerticalAlignment = VerticalAlignment.Top,
             HorizontalAlignment = HorizontalAlignment.Left,
         };
-        Canvas.SetTop(result, top - 5);
-        Canvas.SetLeft(result, _Parameter.Width - MainChartViewModel.GridWidth);
+        Canvas.SetTop(result, top - height/2);
+        Canvas.SetLeft(result, _Parameter.Width + 1);
 
         return result;
     }

@@ -1,12 +1,63 @@
 ﻿<UserControl x:Class="StockViewer.MVVM.View.SubChartView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:StockViewer.MVVM.View"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+             xmlns:view="clr-namespace:StockViewer.MVVM.View"
+             xmlns:viewModel="clr-namespace:StockViewer.MVVM.ViewModel" 
+             xmlns:core="clr-namespace:StockViewer.Core" 
+             d:DataContext="{d:DesignInstance Type=viewModel:SubChartViewModel}"
+             mc:Ignorable="d" >
+
+    <Border CornerRadius="10"
+            Margin="5,0"
+            Background="{Binding ElementName=MainChart, Path=Background}">
+        <Grid x:Name="SubChartGrid" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="{Binding mGridWidth}"/>
+            </Grid.ColumnDefinitions>
+            <ContentControl Grid.Column="0" Grid.ColumnSpan="2"
+                            VerticalAlignment="Stretch"
+                            Content="{Binding BarGridVM}"/>
+
+            <ItemsControl x:Name="CandleControl" Grid.Column="0"
+                            ItemsSource="{Binding BarVMCollection}" 
+                            FlowDirection="RightToLeft">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <!-- The default for an ItemsControl is a StackPanel with a vertical orientation -->
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SizeChanged">
+                        <core:EventCommandAction Command="{Binding SizeChangedCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ItemsControl>
             
-    </Grid>
+            <Grid Grid.Column="1">
+            </Grid>
+
+        </Grid>
+
+
+        <i:Interaction.Triggers>
+            <!--<i:EventTrigger EventName="MouseWheel">
+                <core:EventCommandAction Command="{Binding MouseWheelCommand}"/>
+            </i:EventTrigger>-->
+            <!--<i:EventTrigger EventName="MouseUp">
+                    <core:EventCommandAction Command="{Binding MouseUpCommand}"/>
+                </i:EventTrigger>-->
+            <!--<i:EventTrigger EventName="MouseMove">
+                    <core:EventCommandAction Command="{Binding MouseMoveCommand}"/>
+                </i:EventTrigger>-->
+            <i:EventTrigger EventName="Loaded">
+                <i:InvokeCommandAction Command="{Binding LoadedCommand}"
+                                       CommandParameter="{Binding ElementName=SubChartGrid}"/>
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
+    </Border>
 </UserControl>
