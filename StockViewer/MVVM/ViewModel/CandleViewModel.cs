@@ -27,7 +27,7 @@ public class CandleViewModel : ObservableObject
         set { _Date = value; }
     }
 
-    public CandleViewModel(DateTime dateTime, Price price, CandleParameter parameter, int highestVolume, bool showMonth = false)
+    public CandleViewModel(DateTime dateTime, Price price, ChartParameter parameter, int highestVolume, bool showMonth = false)
     {
         ShowMonth = showMonth;
         _Date = dateTime;

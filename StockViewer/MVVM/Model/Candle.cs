@@ -13,14 +13,14 @@ public class Candle
     public double BlockHeight { get; private set; }
     public int LineWidth { get; } = 1;
     public double LineLeft { get; private set; }
-    public CandleParameter Parameter { get; private set; }
+    public ChartParameter Parameter { get; private set; }
 
-    public Candle(DateTime dateTime, Price price, CandleParameter parameter) 
+    public Candle(DateTime dateTime, Price price, ChartParameter parameter) 
     {
         Update(dateTime, price, parameter);
     }
 
-    public void Update(DateTime dateTime, Price price, CandleParameter parameter)
+    public void Update(DateTime dateTime, Price price, ChartParameter parameter)
     {
         mDate = dateTime;
         mPrice = price;
@@ -28,13 +28,13 @@ public class Candle
         Height = parameter.Height ;
         Width = parameter.Width;
 
-        Ratio = (Height * CandleViewModel.CandleHeightRatio) / (parameter.Top - parameter.Bottom);
-        LineTop = (parameter.Top - mPrice.mMax) * Ratio;
-        LineHeight = Math.Abs((parameter.Top - mPrice.mMin) * Ratio - LineTop);
+        Ratio = (Height * CandleViewModel.CandleHeightRatio) / (parameter.Highest - parameter.Lowest);
+        LineTop = (parameter.Highest - mPrice.mMax) * Ratio;
+        LineHeight = Math.Abs((parameter.Highest - mPrice.mMin) * Ratio - LineTop);
         if (mPrice.mStart < mPrice.mEnd)
-            BlockTop = (parameter.Top - mPrice.mEnd) * Ratio;
+            BlockTop = (parameter.Highest - mPrice.mEnd) * Ratio;
         else
-            BlockTop = (parameter.Top - mPrice.mStart) * Ratio;
+            BlockTop = (parameter.Highest - mPrice.mStart) * Ratio;
 
         BlockHeight = Math.Abs(mPrice.mEnd - mPrice.mStart) * Ratio;
         BlockHeight = (BlockHeight < 1) ? 1 : BlockHeight;
@@ -45,8 +45,8 @@ public class Candle
     public Candle Resize(double? height = null, double? width = null, double? top = null, double? bottom = null) {
         Parameter = new()
         {
-            Top = top ?? Parameter.Top,
-            Bottom = bottom ?? Parameter.Bottom,
+            Highest = top ?? Parameter.Highest,
+            Lowest = bottom ?? Parameter.Lowest,
             Width = width ?? Parameter.Width,
             Height = height ?? Parameter.Height
         };
