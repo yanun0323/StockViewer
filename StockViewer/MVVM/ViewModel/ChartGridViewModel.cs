@@ -18,9 +18,9 @@ public class ChartGridViewModel:ObservableObject
     public ObservableCollection<Label> ChartLabels { get => _ChartLabels; set { _ChartLabels = value; } }
     public Thickness Margin { get => _Margin; set => _Margin = value; }
 
-    public ChartGridViewModel(Size chart, double highestPrice, double lowestPrice, Thickness margin) 
+    public ChartGridViewModel(Size chart, double highestPrice, double lowestPrice) 
     {
-        Draw(chart, highestPrice, lowestPrice, margin);
+        Draw(chart, highestPrice, lowestPrice,MainChartViewModel.CandleMargin);
     }
 
     public void Resize(Size chart, double? highestPrice = null, double? lowestPrice = null, Thickness? margin = null) => Draw(chart, highestPrice ?? _HighestPrice, lowestPrice ?? _LowestPrice, margin ?? Margin);
@@ -74,7 +74,7 @@ public class ChartGridViewModel:ObservableObject
     private Label CreatLabel(double price)
     {
         double top = (_HighestPrice - price) * _Ratio;
-        double width = 40;
+        double width =  40;
         Label result = new Label()
         {
             Width = width,
@@ -87,7 +87,7 @@ public class ChartGridViewModel:ObservableObject
             HorizontalAlignment = HorizontalAlignment.Left,
         };
         Canvas.SetTop(result, top - 5);
-        Canvas.SetLeft(result, _ChartSize.Width - width);
+        Canvas.SetLeft(result, _ChartSize.Width - MainChartViewModel.GridWidth);
 
         return result;
     }

@@ -4,7 +4,6 @@ public class CandleViewModel : ObservableObject
     private DateTime _Date;
     private Candle? _Candle;
     private Volume? _Volume;
-    private Thickness _CandleMargin;
     private bool ShowMonth;
 
     public static readonly double CandleHeightRatio = 0.9;
@@ -21,24 +20,19 @@ public class CandleViewModel : ObservableObject
         get { return _Volume; }
         set { _Volume = value; OnPropertyChanged(); }
     }
-    public Thickness CandleMargin
-    {
-        get { return _CandleMargin; }
-        set { _CandleMargin = value;}
-    }
+    public Thickness CandleMargin { get => MainChartViewModel.CandleMargin; }
     public DateTime Date
     {
         get { return _Date; }
         set { _Date = value; }
     }
 
-    public CandleViewModel(CandleParameter parameter, Thickness candleMargin, bool showMonth = false)
+    public CandleViewModel(DateTime dateTime, Price price, CandleParameter parameter, int highestVolume, bool showMonth = false)
     {
         ShowMonth = showMonth;
-        _CandleMargin = candleMargin;
-        _Date = parameter.Date;
-        Candle = new(parameter, CandleHeightRatio);
-        Volume = new(parameter, VolumeHeightRatio);
+        _Date = dateTime;
+        Candle = new(dateTime, price, parameter);
+        Volume = new(dateTime, price, parameter, highestVolume);
     }
 
     public void Resize(double? height = null, double? width = null, double? top = null, double? bottom = null, int? highestVolume = null) {

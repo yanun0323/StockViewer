@@ -16,9 +16,9 @@
         <Grid x:Name="MainChartGrid" Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="{Binding mGridWidth}"/>
             </Grid.ColumnDefinitions>
-            <Grid x:Name="MainChartInnerGrid" Background="AliceBlue">
+            <Grid x:Name="MainChartInnerGrid">
                 <Border Grid.Column="0" x:Name="InfoPopupBorder" BorderThickness="1.5" CornerRadius="10" BorderBrush="PowderBlue" Background="White" Opacity="0.95"
                         Width="101" Height="150" Visibility="{Binding InfoPopShow}"
                         VerticalAlignment="Top"
@@ -46,16 +46,16 @@
                                 </StackPanel.Resources>
                             </StackPanel>
                             <StackPanel Width="75">
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Price.Start}"/>
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Price.Max}"/>
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Price.Min}"/>
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Price.End}"
-                                       Foreground="{Binding InfoVM.Candle.Parameter.Price.mColor}" />
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Price.mSpread}"
-                                       Foreground="{Binding InfoVM.Candle.Parameter.Price.mColor}" />
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Price.mRatio}"
-                                       Foreground="{Binding InfoVM.Candle.Parameter.Price.mColor}" />
-                                <Label Content="{Binding InfoVM.Candle.Parameter.Price.mVolume}"/>
+                                <Label Content="{Binding InfoVM.Candle.mPrice.Start}"/>
+                                <Label Content="{Binding InfoVM.Candle.mPrice.Max}"/>
+                                <Label Content="{Binding InfoVM.Candle.mPrice.Min}"/>
+                                <Label Content="{Binding InfoVM.Candle.mPrice.End}"
+                                       Foreground="{Binding InfoVM.Candle.mPrice.mColor}"/>
+                                <Label Content="{Binding InfoVM.Candle.mPrice.mSpread}"
+                                       Foreground="{Binding InfoVM.Candle.mPrice.mColor}"/>
+                                <Label Content="{Binding InfoVM.Candle.mPrice.mRatio}"
+                                       Foreground="{Binding InfoVM.Candle.mPrice.mColor}"/>
+                                <Label Content="{Binding InfoVM.Candle.mPrice.mVolume}"/>
                                 <StackPanel.Resources>
                                     <Style TargetType="Label">
                                         <Setter Property="Margin" Value="0,-5.5"/>

@@ -35,13 +35,15 @@ public class PopupLocator
                 w.LocationChanged += delegate
                 {
                     var mi = typeof(Popup).GetMethod("UpdatePosition", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                    mi.Invoke(pop, null);
+                    if(pop.IsOpen)
+                        mi!.Invoke(pop, null);
                 };
                 //让Popup随着窗体的Size改变而移动位置
                 w.SizeChanged += delegate
                 {
                     var mi = typeof(Popup).GetMethod("UpdatePosition", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                    mi.Invoke(pop, null);
+                    if (pop.IsOpen)
+                        mi!.Invoke(pop, null);
                 };
             }
         }

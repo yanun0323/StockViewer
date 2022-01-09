@@ -18,7 +18,7 @@ public struct Price
     // [13] "最後揭示賣價"
     // [14] "最後揭示賣量"
     // [15] "本益比"
-
+    
     public string Volume { get; init; }
     public string VolumeMoney { get; init; }
     public string Start { get; init; }
@@ -41,19 +41,7 @@ public struct Price
     [JsonIgnore]
     public double mEnd { get => double.Parse(End.Replace(",", "")); }
     [JsonIgnore]
-    public string mGrade { get => Grade; }
-    [JsonIgnore]
-    public double mSpread
-    {
-        get
-        {
-            double num = double.Parse(Spread.Replace(",", ""));
-            if (num != 0.0 && Grade.Contains("green"))
-                return -num;
-            else
-                return num;
-        }
-    }
+    public double mSpread { get => double.Parse(Spread.Replace(",", "")); }
     [JsonIgnore]
     public double mPer { get => double.Parse(Per.Replace(",", "")); }
     [JsonIgnore]
@@ -70,27 +58,11 @@ public struct Price
     {
         get
         {
-            string grade = mGrade;
-            if (grade.Contains("red"))
+            if (mSpread > 0)
                 return iColor.Red;
-            if (grade.Contains("green"))
+            if (mSpread < 0)
                 return iColor.Green;
             return iColor.Gray;
-        }
-    }
-    [JsonIgnore]
-    public string mSpreadSymbol
-    {
-        get
-        {
-            string grade = mGrade;
-            if (grade.Contains("red"))
-                return $"▲ {Spread}";
-
-            if (grade.Contains("green"))
-                return $"▼ {Spread}";
-
-            return "-";
         }
     }
 
@@ -106,7 +78,6 @@ public struct Price
             Grade = "0",
             Spread = "0",
             Per = "0",
-
         };
     }
 }

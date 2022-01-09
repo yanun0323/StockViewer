@@ -64,7 +64,13 @@ public class StockModel
         Trace.WriteLine($"StockModel PriceData: {PriceData.Count()}");
         Trace.WriteLine($"StockModel InstitutionData: {InstitutionData.Count()}");
     }
+    public void CorrectPriceData() 
+    {
+        foreach ( (DateTime date, Price price) in PriceData)
+        {
 
+        }
+    }
     public override string ToString() => $"Stock: {Id} {Name} {LastDate:yyyyMMdd}";
 }
 

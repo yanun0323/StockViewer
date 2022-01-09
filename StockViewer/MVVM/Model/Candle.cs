@@ -1,6 +1,8 @@
 ﻿namespace StockViewer.MVVM.Model;
 public class Candle
 {
+    public DateTime mDate { get; private set; }
+    public Price mPrice { get; private set; }
     public SolidColorBrush? mColor { get; private set; }
     public double Height { get; private set; }
     public double Width { get; private set; }
@@ -13,56 +15,43 @@ public class Candle
     public double LineLeft { get; private set; }
     public CandleParameter Parameter { get; private set; }
 
-    private double HeightRatio;
-
-    public Candle(CandleParameter parameter, double candleHeightRatio) 
+    public Candle(DateTime dateTime, Price price, CandleParameter parameter) 
     {
-        HeightRatio = candleHeightRatio;
-        Update(parameter);
+        Update(dateTime, price, parameter);
     }
 
-    public void Update(CandleParameter parameter)
+    public void Update(DateTime dateTime, Price price, CandleParameter parameter)
     {
+        mDate = dateTime;
+        mPrice = price;
         Parameter = parameter;
         Height = parameter.Height ;
         Width = parameter.Width;
 
-        Ratio = (Height * HeightRatio) / (parameter.Top - parameter.Bottom);
-        LineTop = (parameter.Top - parameter.Price.mMax) * Ratio;
-        LineHeight = Math.Abs((parameter.Top - parameter.Price.mMin) * Ratio - LineTop);
-        if (parameter.Price.mStart < parameter.Price.mEnd)
-            BlockTop = (parameter.Top - parameter.Price.mEnd) * Ratio;
+        Ratio = (Height * CandleViewModel.CandleHeightRatio) / (parameter.Top - parameter.Bottom);
+        LineTop = (parameter.Top - mPrice.mMax) * Ratio;
+        LineHeight = Math.Abs((parameter.Top - mPrice.mMin) * Ratio - LineTop);
+        if (mPrice.mStart < mPrice.mEnd)
+            BlockTop = (parameter.Top - mPrice.mEnd) * Ratio;
         else
-            BlockTop = (parameter.Top - parameter.Price.mStart) * Ratio;
+            BlockTop = (parameter.Top - mPrice.mStart) * Ratio;
 
-        BlockHeight = Math.Abs(parameter.Price.mEnd - parameter.Price.mStart) * Ratio;
-        BlockHeight = (BlockHeight < 2) ? 2 : BlockHeight;
+        BlockHeight = Math.Abs(mPrice.mEnd - mPrice.mStart) * Ratio;
+        BlockHeight = (BlockHeight < 1) ? 1 : BlockHeight;
         LineLeft = (Width - LineWidth) / 2;
-        mColor = (parameter.Price.End == parameter.Price.Start) ? iColor.Gray : (parameter.Price.mEnd - parameter.Price.mStart > 0) ? iColor.Red : iColor.Green;
+        mColor = (mPrice.End == mPrice.Start) ? iColor.Gray : (mPrice.mEnd - mPrice.mStart > 0) ? iColor.Red : iColor.Green;
     }
 
     public Candle Resize(double? height = null, double? width = null, double? top = null, double? bottom = null) {
         Parameter = new()
         {
-            Date = Parameter.Date,
-            Price = Parameter.Price,
             Top = top ?? Parameter.Top,
             Bottom = bottom ?? Parameter.Bottom,
             Width = width ?? Parameter.Width,
             Height = height ?? Parameter.Height
         };
-        Update(Parameter);
+        Update(mDate, mPrice, Parameter);
         return this;
     }
 
-}
-
-public struct CandleParameter {
-    public DateTime Date { get; set; }
-    public Price Price { get; set; }
-    public double Top { get; set; }
-    public double Bottom { get; set; }
-    public double Width { get; set; }
-    public double Height { get; set; }
-    public int HighestVolume { get; set; }
 }

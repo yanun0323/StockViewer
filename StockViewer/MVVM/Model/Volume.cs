@@ -7,20 +7,18 @@ public class Volume
 
     private int mVolume;
     private double VolumeRatio;
-    private double HeightRatio;
     private readonly double BlockHeight_Min = 2;
 
-    public Volume(CandleParameter parameter, double candleHeightRatio)
+    public Volume(DateTime dateTime, Price price, CandleParameter parameter, int highestVolume)
     {
-        HeightRatio = candleHeightRatio;
-        Update(parameter);
+        Update(dateTime, price, parameter, highestVolume);
     }
 
-    public void Update(CandleParameter parameter)
+    public void Update(DateTime dateTime, Price price, CandleParameter parameter, int highestVolume)
     {
-        Date = parameter.Date;
-        mVolume = parameter.Price.mVolume;
-        CalculateBlock(parameter.Height, parameter.HighestVolume);
+        Date = dateTime;
+        mVolume = price.mVolume;
+        CalculateBlock(parameter.Height, highestVolume);
     }
 
     public Volume Resize(double? height = null, int? highestVolume = null)
@@ -36,7 +34,7 @@ public class Volume
     {
         if(highestVolume != null) 
              VolumeRatio = mVolume / (double)highestVolume.Value;
-        Height = height * HeightRatio;
+        Height = height * CandleViewModel.VolumeHeightRatio;
         BlockHeight = Height * VolumeRatio;
         if (BlockHeight < BlockHeight_Min)
             BlockHeight = BlockHeight_Min;

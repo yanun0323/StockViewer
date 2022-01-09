@@ -17,6 +17,7 @@ public class InstitutionConverter
         if (target.AddHours(17) > DateTime.Now)
             return;
 
+        Trace.WriteLine($"Strat InstitutionConverter:{year}");
         while (target.AddHours(17) < DateTime.Now && target.Year == year)
         {
             Catch(target, stockModelCollection);
@@ -26,7 +27,6 @@ public class InstitutionConverter
     public static void Catch(DateTime target, Dictionary<string, StockModel> stockModelCollection)
     {
         string Name = $"{target:yyyyMMdd}";
-        Trace.WriteLine($"InstitutionConverter - {Name}");
         InstitutionConverter? source = FileManagement.LoadJson<InstitutionConverter?>(FilePath.Path_Raw_Institution, Name, true);
 
         if (source == null || source.data == null)

@@ -78,8 +78,6 @@ public class MainViewModel : ObservableObject
 
         var folders = new DirectoryInfo(FilePath.Path_Stock).EnumerateDirectories("*");
 
-        Trace.WriteLine($"result.Count() {result[' '].Count()}");
-        Trace.WriteLine($"folders.Count() {folders.Count()}");
         if (result.ContainsKey(' ') && result[' '].Count() == folders.Count())
             return result;
 

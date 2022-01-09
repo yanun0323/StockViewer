@@ -13,6 +13,7 @@ public class PriceConverter
         if (target.AddHours(14) > DateTime.Now)
             return;
 
+        Trace.WriteLine($"Strat PriceConverter:{year}");
         while (target.AddHours(14) < DateTime.Now && target.Year == year) 
         {
             Catch(target, stockModelCollection);
@@ -24,7 +25,6 @@ public class PriceConverter
     public static void Catch(DateTime target,Dictionary<string, StockModel> stockModelCollection)
     {
         string Name = $"{target:yyyyMMdd}";
-        Trace.WriteLine($"PriceConverter - {Name}");
         PriceConverter? source = FileManagement.LoadJson<PriceConverter?>(FilePath.Path_Raw_Price, Name);
 
         List<List<string>>? datalist = source == null ? null : target.IsBeforeSwitchDay() ? source.data8 :  source.data9;
@@ -37,6 +37,7 @@ public class PriceConverter
             if (data[5].Trim() == "--")
                 continue;
 
+            string grade = data[9].Trim();
             Price price = new()
             {
                 Volume = data[2].Trim(),
@@ -45,8 +46,7 @@ public class PriceConverter
                 Max = data[6].Trim(),
                 Min = data[7].Trim(),
                 End = data[8].Trim(),
-                Grade = data[9].Trim(),
-                Spread = data[10].Trim(),
+                Spread = grade.Contains("green") ? string.Join("","-", data[10].Trim()) : data[10].Trim(),
                 Per = data[15].Trim(),
             };
 

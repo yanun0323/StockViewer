@@ -7,6 +7,7 @@ namespace StockViewer.Library;
 public static class FileManagement
 {
     private static readonly JsonSerializerOptions options = new JsonSerializerOptions() { Converters = { new LongToStringJsonConverter() } , AllowTrailingCommas = true};
+    public static object Key = new();
     public static void SaveText(this string content, string filePath, string fileName)
         => SaveTextData(content, filePath, fileName);
     public static void SaveJson<T>(this T obj, string filePath, string fileName)
@@ -44,16 +45,19 @@ public static class FileManagement
     }
     private static void SaveJsonData<T>(T obj, string path, string filename)
     {
-        if (obj == null || path.Length == 0 || filename.Length == 0)
-            return;
+        lock (Key)
+        {
+            if (obj == null || path.Length == 0 || filename.Length == 0)
+                return;
 
-        if (!Directory.Exists(path))
-            _ = Directory.CreateDirectory(path);
+            if (!Directory.Exists(path))
+                _ = Directory.CreateDirectory(path);
 
-        using StreamWriter streamWriter = new(Path.Combine(path, filename), false, Encoding.Default);
-        streamWriter.WriteLine(JsonSerializer.Serialize(obj));
-        streamWriter.Flush();
-        streamWriter.Close();
+            using StreamWriter streamWriter = new(Path.Combine(path, filename), false, Encoding.Default);
+            streamWriter.WriteLine(JsonSerializer.Serialize(obj));
+            streamWriter.Flush();
+            streamWriter.Close();
+        }
     }
     private static string? LoadTextData(string path, string filename)
     {

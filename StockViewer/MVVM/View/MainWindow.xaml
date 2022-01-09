@@ -96,7 +96,7 @@
                             Content="{Binding mStockModel.LastPrice.Value.End}" x:Name="displayStockPrice_End" Height="50" VerticalAlignment="Bottom"/>
 
                 <Label Grid.Column="2"  FontSize="18" FontWeight="SemiBold" Foreground="{Binding mStockModel.LastPrice.Value.mColor}" VerticalAlignment="Center"
-                            Content="{Binding mStockModel.LastPrice.Value.mSpreadSymbol}" x:Name="displayStockPrice_Spread"/>
+                            Content="{Binding mStockModel.LastPrice.Value.Spread}" x:Name="displayStockPrice_Spread"/>
 
                 <Grid Grid.Column="3">
                     <Grid.RowDefinitions>

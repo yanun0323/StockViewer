@@ -5,52 +5,41 @@ public static class MainConverter
 {
     public static void Run() 
     {
-        //Dictionary<string, StockModel> stockModelCollection = new();
-        //LoadStockModelCollection();
         DateTime? load = FileManagement.LoadJson<DateTime?>(FilePath.Path_Root, FilePath.Name_UpdateTime);
         DateTime start = (load != null) ? load.Value.AddDays(1) : PriceCrawler.Begin;
         DateTime now = DateTime.Now;
         List<Task> tasks = new();
         while (start < now)
         {
-            var stockModelCollection = LoadStockModelCollection(start);
-            PriceConverter.Run(start, stockModelCollection);
-            InstitutionConverter.Run(start, stockModelCollection);
-            Trace.WriteLine($"{start} {stockModelCollection.Count()}");
-
-            if (stockModelCollection.ContainsKey("2330"))
+            DateTime copy = start.AddDays(0);
+            Task task = new(()=>
             {
-                Trace.WriteLine($" - PriceData: {stockModelCollection["2330"].PriceData.Count()}");
-                Trace.WriteLine($" - InstitutionData: {stockModelCollection["2330"].InstitutionData.Count()}");
-                if (stockModelCollection["2330"].PriceData.Count() == 0 ||
-                    stockModelCollection["2330"].InstitutionData.Count() == 0)
-                {
-                    Trace.WriteLine($" -------------------1");
-                }
+                var stockModelCollection = LoadStockModelCollection(copy);
+                PriceConverter.Run(copy, stockModelCollection);
+                InstitutionConverter.Run(copy, stockModelCollection);
+                if (stockModelCollection.Any())
+                    SaveStockModelCollection(copy, stockModelCollection);
             }
-            else
-            {
-                Trace.WriteLine($" -------------------2");
-            }
-            if (stockModelCollection.Any())
-            {
-                DateTime last = (start.Year == now.Year) ? now : new DateTime(start.Year + 1, 1, 1).AddDays(-1);
-                last.SaveJson(FilePath.Path_Root, FilePath.Name_UpdateTime);
-                SaveStockModelCollection(start, stockModelCollection);
-            }
+            );
+            task.Start();
+            tasks.Add(task);
             start = new(start.Year + 1, 1, 1);
         }
-        //Task.WaitAll(tasks.ToArray());
-        //SaveStockModelCollection();
-
-
+        Task.WhenAll(tasks).Wait();
+        SaveUpdateTime(start, now);
     }
-    private static void SaveStockModelCollection(DateTime date, Dictionary<string, StockModel> stockModelCollection) 
+    private static void SaveUpdateTime(DateTime start, DateTime now)
     {
+        DateTime last = (start.Year == now.Year) ? now : new DateTime(start.Year + 1, 1, 1).AddDays(-1);
+        last.SaveJson(FilePath.Path_Root, FilePath.Name_UpdateTime);
+    }
+    private static void SaveStockModelCollection(DateTime date, Dictionary<string, StockModel> stockModelCollection)
+    {
+        string fileName = $"{date:yyyy}";
+        Trace.WriteLine($"Saving... {fileName}");
         foreach ((string id, StockModel stockModel) in stockModelCollection)
         {
             string stockPath = Path.Combine(FilePath.Path_Stock, id);
-            string fileName = $"{date:yyyy}";
             stockModel.SaveJson(stockPath, fileName);
         }
 
