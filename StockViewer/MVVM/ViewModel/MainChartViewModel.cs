@@ -217,17 +217,13 @@ public class MainChartViewModel:ObservableObject
 
         var count = GetCountFromCount(pos);
         if (count > 0)
-        {
             CandleVMStruct.PanRight(count);
-            ResizeCandle();
-        }
         else if (count < 0)
-        {
             CandleVMStruct.PanLeft(-count);
-            ResizeCandle();
-        }
 
-        if(count != 0)
+        ResizeCandle();
+
+        if (count != 0)
             _MouseClickPosition = pos;
 
         int GetCountFromCount(Point _pos) => (int)((_MouseClickPosition!.Value.X - _pos.X) / _CandleWidth);

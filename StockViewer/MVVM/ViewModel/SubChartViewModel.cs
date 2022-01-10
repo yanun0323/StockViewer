@@ -85,15 +85,12 @@ public class SubChartViewModel : ObservableObject
 
         var count = GetCountFromCount(pos);
         if (count > 0)
-        {
             BarVMStruct.PanRight(count);
-            ResizeBar();
-        }
         else if (count < 0)
-        {
             BarVMStruct.PanLeft(-count);
-            ResizeBar();
-        }
+
+        ResizeBar();
+
         if (count != 0)
             _MouseClickPosition = pos;
 
