@@ -14,7 +14,7 @@ public class PriceConverter
             return;
 
         Trace.WriteLine($"Strat PriceConverter:{year}");
-        while (target.AddHours(14) < DateTime.Now && target.Year == year) 
+        while (target.AddHours(17) < DateTime.Now && target.Year == year) 
         {
             Catch(target, stockModelCollection);
             target = target.AddDays(1);
