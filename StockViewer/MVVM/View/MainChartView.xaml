@@ -73,7 +73,7 @@
                             Content="{Binding ChartGridVM}"/>
 
             <ItemsControl x:Name="CandleControl" Grid.Column="0"
-                            ItemsSource="{Binding CandleVMCollection}" 
+                            ItemsSource="{Binding CandleVMStruct.Middle}" 
                             FlowDirection="RightToLeft">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>

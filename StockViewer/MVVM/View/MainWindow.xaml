@@ -326,19 +326,21 @@
                     </Grid.RowDefinitions>
 
                     <!-- Sub Chart 1 -->
-                    <ContentControl Content="{Binding SubChartVM1}"
+                    <Grid Grid.Row="0"/>
+                    <!--<ContentControl Content="{Binding SubChartVM1}"
                                 Grid.Row="0" 
                                 x:Name="SubChart1"
-                                Background="White"/>
+                                Background="White"/>-->
                     
                     <!-- Seprate Line -->
                     <GridSplitter Grid.Row="1" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Transparent"/>
 
                     <!-- Sub Chart 2 -->
-                    <ContentControl Content="{Binding SubChartVM2}"
+                    <Grid Grid.Row="2" />
+                    <!--<ContentControl Content="{Binding SubChartVM2}"
                                 Grid.Row="2" 
                                 x:Name="SubChart2"
-                                Background="White"/>
+                                Background="White"/>-->
                 </Grid>
 
                 <!-- Sub Chart Bottom -->

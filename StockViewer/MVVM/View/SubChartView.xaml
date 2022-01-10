@@ -23,7 +23,7 @@
                             Content="{Binding BarGridVM}"/>
 
             <ItemsControl x:Name="CandleControl" Grid.Column="0"
-                            ItemsSource="{Binding BarVMCollection}" 
+                            ItemsSource="{Binding BarVMStruct.Middle}" 
                             FlowDirection="RightToLeft">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>

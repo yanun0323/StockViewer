@@ -8,9 +8,6 @@ public class SubChartViewModel : ObservableObject
     private Grid? _SubChartGrid;
     private Point? _MouseClickPosition;
     private StockModel? _mStockModel;
-    private ObservableCollection<BarViewModel> _BarVMCollection = new();
-    private Stack<BarViewModel> _BarVMCollection_Left = new();
-    private Stack<BarViewModel> _BarVMCollection_Right = new();
     private ChartGridViewModel? _BarGridVM;
     private double _HighestPrice;
     private double _LowestPrice;
@@ -18,8 +15,10 @@ public class SubChartViewModel : ObservableObject
     public ICommand? LoadedCommand { get; set; }
     public ICommand? SizeChangedCommand { get; set; }
     public double mGridWidth { get => MainChartViewModel.GridWidth; }
-    public ObservableCollection<BarViewModel> BarVMCollection { get => _BarVMCollection; set { _BarVMCollection = value; OnPropertyChanged(); } }
+    public ChartStructure<BarViewModel> BarVMStruct { get; set; }
+        = new(new((BarViewModel b) => (b.Insti.mTrustSuper, b.Insti.mTrustSuper, b.mDate)));
     public ChartGridViewModel? BarGridVM { get => _BarGridVM; set { _BarGridVM = value; OnPropertyChanged(); } }
+    
     public StockModel mStockModel
     {
         get => _mStockModel ?? new();
@@ -61,103 +60,45 @@ public class SubChartViewModel : ObservableObject
     public bool BarSizeChanged()
     {
         var newCandleCount = GetNewBarCount();
-        var candleCount = _BarVMCollection!.Count();
+        var candleCount = BarVMStruct!.Count();
         if (newCandleCount > candleCount)
         {
             var addCount = newCandleCount - candleCount;
-            if (AddCandleLeft(addCount))
-                ResizeBar();
-            else
-            {
-                _BarGridVM!.Resize(_ChartSize);
-                return false;
-            }
+            BarVMStruct.PanLeft(addCount);
+            ResizeBar();
+            _BarGridVM!.Resize(_ChartSize);
         }
         else if (newCandleCount < candleCount)
         {
             var reduceCount = candleCount - newCandleCount;
-            if (ReduceCandleLeft(reduceCount))
-                ResizeBar();
-            else
-            {
-                _BarGridVM!.Resize(_ChartSize);
-                return false;
-            }
+            BarVMStruct.PanRight(reduceCount);
+            _BarGridVM!.Resize(_ChartSize);
         }
         _BarGridVM!.Resize(_ChartSize);
         BarGridVM = _BarGridVM;
         return true;
-
-        bool ReduceCandleLeft(int reduceCount)
-        {
-            if (!_BarVMCollection!.Any() || _BarVMCollection!.Count() < reduceCount)
-                return false;
-            while (reduceCount > 0)
-            {
-                var candleVM = _BarVMCollection!.Last();
-                _BarVMCollection_Left!.Push(candleVM);
-                _BarVMCollection!.RemoveAt(_BarVMCollection!.Count() - 1);
-                reduceCount--;
-            }
-            return true;
-        }
-        bool AddCandleLeft(int addCount)
-        {
-            if (!_BarVMCollection_Left!.Any() || _BarVMCollection_Left!.Count() < addCount)
-                return false;
-            while (addCount > 0)
-            {
-                var candleVM = _BarVMCollection_Left!.Pop();
-
-                _BarVMCollection!.Add(candleVM);
-                addCount--;
-            }
-            return true;
-        }
     }
     public void MouseDrag(Point pos)
     {
-        if (!_BarVMCollection_Left!.Any() && !_BarVMCollection_Right!.Any())
+        if (BarVMStruct.AllShow)
             return;
 
         var count = GetCountFromCount(pos);
         if (count > 0)
-            ChartMoveRight(count);
+        {
+            BarVMStruct.PanRight(count);
+            ResizeBar();
+        }
         else if (count < 0)
-            ChartMoveLeft(-count);
-
+        {
+            BarVMStruct.PanLeft(-count);
+            ResizeBar();
+        }
         if (count != 0)
             _MouseClickPosition = pos;
 
         int GetCountFromCount(Point _pos) => (int)((_MouseClickPosition!.Value.X - _pos.X) / _BarWidth);
-        void ChartMoveLeft(int count)
-        {
-            while (count > 0 && _BarVMCollection_Left!.Any())
-            {
-                var candleVM = _BarVMCollection_Left!.Pop();
-                _BarVMCollection!.Add(candleVM);
-
-                candleVM = _BarVMCollection!.First();
-                _BarVMCollection!.RemoveAt(0);
-                _BarVMCollection_Right!.Push(candleVM);
-                count--;
-                ResizeBar();
-            }
-        }
-        void ChartMoveRight(int count)
-        {
-            while (count > 0 && _BarVMCollection_Right!.Any())
-            {
-                var candleVM = _BarVMCollection_Right!.Pop();
-                _BarVMCollection!.Insert(0, candleVM);
-
-                candleVM = _BarVMCollection!.Last();
-                _BarVMCollection!.RemoveAt(_BarVMCollection!.Count() - 1);
-                _BarVMCollection_Left!.Push(candleVM);
-                count--;
-            }
-            ResizeBar();
-        }
+        
     }
 
     private void Update()
@@ -165,28 +106,21 @@ public class SubChartViewModel : ObservableObject
         Update_BarVMCollection_Stack();
         Queue<BarViewModel> show = new();
         var count = GetNewBarCount();
-        while (count > 0 && _BarVMCollection_Left!.Any())
+        while (count > 0)
         {
-            show.Enqueue(_BarVMCollection_Left!.Pop());
+            BarVMStruct.Generate(count);
             count--;
-        }
-        _BarVMCollection = new();
-        while (show.Any())
-        {
-            _BarVMCollection.Add(show.Dequeue());
         }
         ResizeBar();
     }
     private void Update_BarVMCollection_Stack()
     {
-        _BarVMCollection_Right = new();
-        _BarVMCollection_Left = new();
         foreach ((DateTime date, Price price) in mStockModel.PriceData)
         {
             if(mStockModel.InstitutionData.ContainsKey(date))
-                _BarVMCollection_Left!.Push(CreateBarVM(date, mStockModel.InstitutionData[date]));
+                BarVMStruct.Push(CreateBarVM(date, mStockModel.InstitutionData[date]));
             else
-                _BarVMCollection_Left!.Push(CreateBarVM(date));
+                BarVMStruct.Push(CreateBarVM(date));
         }
     }
     private int GetNewBarCount() => (int)(_ChartSize.Width / _BarWidth) + 1;
@@ -206,16 +140,16 @@ public class SubChartViewModel : ObservableObject
     {
         ResizeChartGrid(_ChartSize.Height);
 
-        foreach (BarViewModel barVm in _BarVMCollection!)
+        foreach (BarViewModel barVm in BarVMStruct.Middle!)
         {
             barVm.Resize(_ChartSize.Height, _BarWidth, _HighestPrice, _LowestPrice);
         }
-        BarVMCollection = _BarVMCollection;
+        BarVMStruct.Refresh();
     }
     private void ResizeChartGrid(double chartHeight)
     {
-        _HighestPrice = _BarVMCollection!.Max(x => x.Insti.mTrustSuper);
-        _LowestPrice = _BarVMCollection!.Min(x => x.Insti.mTrustSuper);
+        _HighestPrice = BarVMStruct.Max;
+        _LowestPrice = BarVMStruct.Min;
         if (Math.Abs(_HighestPrice) > Math.Abs(_LowestPrice))
             _LowestPrice = -_HighestPrice;
         else

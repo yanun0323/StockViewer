@@ -22,10 +22,6 @@ public class MainChartViewModel:ObservableObject
     private double _LowestPrice;
     private StockModel? _mStockModel;
 
-    private ObservableCollection<CandleViewModel>? _CandleVMCollection;
-    private Stack<CandleViewModel>? _CandleVMCollection_Right;
-    private Stack<CandleViewModel>? _CandleVMCollection_Left;
-
     private Size _ChartSize = new(854, 361);
     private double _CandleWidth = 10;
     private DateTime _TempLabelDate;
@@ -40,7 +36,8 @@ public class MainChartViewModel:ObservableObject
     public double CandleHeight { get => _ChartSize.Height; }
     public double CandleWidth { get => _CandleWidth; }
     public double _CandleOutlineWidth { get => _CandleWidth + CandleMargin.Left + CandleMargin.Right; }
-    public ObservableCollection<CandleViewModel>? CandleVMCollection { get => _CandleVMCollection; set { _CandleVMCollection = value; OnPropertyChanged(); } }
+    public ChartStructure<CandleViewModel> CandleVMStruct { get ; set; } 
+        = new(new((CandleViewModel c) => (c.mPrice.mMax, c.mPrice.mMin, c.Date)));
     public CandleViewModel? InfoVM { get => _InfoVM; set { _InfoVM = value; OnPropertyChanged(); } }
     public ChartGridViewModel? ChartGridVM { get => _ChartGridVM; set { _ChartGridVM = value; OnPropertyChanged(); } }
     public double mGridWidth { get => GridWidth; }
@@ -71,12 +68,12 @@ public class MainChartViewModel:ObservableObject
                     if (distanceFromRight > 0)
                     {
                         int index = (int)(distanceFromRight / _CandleOutlineWidth);
-                        InfoVM = _CandleVMCollection!.ElementAt(index);
+                        InfoVM = CandleVMStruct.ElementAt(index);
                         InfoDate = $"{InfoVM!.Date:yyyy/MM/dd}";
                     }
                     else
                     {
-                        InfoVM = _CandleVMCollection!.ElementAt(0);
+                        InfoVM = CandleVMStruct.ElementAt(0);
                         InfoDate = $"{InfoVM!.Date:yyyy/MM/dd}";
                     }
                 }
@@ -94,10 +91,10 @@ public class MainChartViewModel:ObservableObject
                     return;
 
                 int index = (int)(distanceFromRight / _CandleOutlineWidth);
-                if (index >= _CandleVMCollection!.Count())
+                if (index >= CandleVMStruct.Count())
                     return;
 
-                InfoVM = _CandleVMCollection!.ElementAt(index);
+                InfoVM = CandleVMStruct.ElementAt(index);
                 InfoDate = $"{InfoVM!.Date:yyyy/MM/dd}";
             }
         });
@@ -128,18 +125,14 @@ public class MainChartViewModel:ObservableObject
 
     private void StockUpdate(DateTime? startDate = null)
     {
-        Update_CandleVMCollection_Stack();
-        Queue<CandleViewModel> show = new();
-        var count = GetNewCandleCount();
-        while (count > 0 && _CandleVMCollection_Left!.Any()) {
-            show.Enqueue(_CandleVMCollection_Left!.Pop());
-            count--;
-        }
-        _CandleVMCollection = new();
-        while (show.Any())
+        CandleVMStruct.Clear();
+        foreach (var entry in mStockModel.PriceData)
         {
-            _CandleVMCollection.Add(show.Dequeue());
+            CandleVMStruct.Push(CreateCandleVM(entry.Key, entry.Value));
         }
+        Queue<CandleViewModel> show = new();
+        int count = GetNewCandleCount();
+        CandleVMStruct.Generate(count);
         ResizeCandle();
     }
     private CandleViewModel CreateCandleVM(DateTime date, Price price)
@@ -160,80 +153,37 @@ public class MainChartViewModel:ObservableObject
 
         return new CandleViewModel(date, price, cp, _HighestVolume);
     }
-    private void Update_CandleVMCollection_Stack()
-    {
-        _CandleVMCollection_Right = new();
-        _CandleVMCollection_Left = new();
-        foreach (var entry in mStockModel.PriceData)
-        {
-            _CandleVMCollection_Left!.Push(CreateCandleVM(entry.Key,entry.Value));
-        }
-    }
     private int GetNewCandleCount() => (int)(_ChartSize.Width / (_CandleWidth + CandleMargin.Left + CandleMargin.Right)) + 1;
     public bool CandleSizeChanged() {
         var newCandleCount = GetNewCandleCount();
-        var candleCount = _CandleVMCollection!.Count();
+        var candleCount = CandleVMStruct!.Count();
         if (newCandleCount > candleCount)
         {
             var addCount = newCandleCount - candleCount;
-            if (AddCandleLeft(addCount))
-                ResizeCandle();
-            else
-            {
-                _ChartGridVM!.Resize(_ChartSize);
-                return false;
-            }
+            CandleVMStruct.ZoomOut(addCount);
+            ResizeCandle();
+            _ChartGridVM!.Resize(_ChartSize);
         }
         else if (newCandleCount < candleCount)
         {
             var reduceCount = candleCount - newCandleCount;
-            if (ReduceCandleLeft(reduceCount))
-                ResizeCandle();
-            else
-            {
-                _ChartGridVM!.Resize(_ChartSize);
-                return false;
-            }
+            CandleVMStruct.ZoomIn(reduceCount);
+            ResizeCandle();
+            _ChartGridVM!.Resize(_ChartSize);
+            return false;
         }
         _ChartGridVM!.Resize(_ChartSize);
         ChartGridVM = _ChartGridVM;
         return true;
-
-        bool ReduceCandleLeft(int reduceCount)
-        {
-            if (!_CandleVMCollection!.Any() || _CandleVMCollection!.Count() < reduceCount)
-                return false;
-            while (reduceCount > 0)
-            {
-                var candleVM = _CandleVMCollection!.Last();
-                _CandleVMCollection_Left!.Push(candleVM);
-                _CandleVMCollection!.RemoveAt(_CandleVMCollection!.Count() - 1);
-                reduceCount--;
-            }
-            return true;
-        }
-        bool AddCandleLeft(int addCount)
-        {
-            if (!_CandleVMCollection_Left!.Any() || _CandleVMCollection_Left!.Count() < addCount)
-                return false;
-            while (addCount > 0)
-            {
-                var candleVM = _CandleVMCollection_Left!.Pop();
-
-                _CandleVMCollection!.Add(candleVM);
-                addCount--;
-            }
-            return true;
-        }
     }
     private void ResizeChartGrid(double chartHeight)
     {
-        _HighestPrice = _CandleVMCollection!.Max(x => x.Candle!.mPrice.mMax);
-        _LowestPrice = _CandleVMCollection!.Min(x => x.Candle!.mPrice.mMin);
+        _HighestPrice = CandleVMStruct.Max;
+        _LowestPrice = CandleVMStruct.Min;
         int limitQuantity = (int)(chartHeight / ChartLineQuantityRatio);
 
         double priceInterval = _HighestPrice - _LowestPrice;
-        int offset = 1;
+        double offset = 0.1;
         while (priceInterval / offset > limitQuantity)
         {
             offset *= 5;
@@ -253,56 +203,33 @@ public class MainChartViewModel:ObservableObject
     private void ResizeCandle()
     {
         ResizeChartGrid(_ChartSize.Height);
-        _HighestVolume = _CandleVMCollection!.Max(x => x.Candle!.mPrice.mVolume);
-        foreach (var candleVm in _CandleVMCollection!)
+        _HighestVolume = CandleVMStruct.GetMaxVolume(new((c) => c.mPrice.mVolume));
+        foreach (var candleVm in CandleVMStruct.Middle)
         {
             candleVm.Resize(CandleHeight, _CandleWidth, _HighestPrice, _LowestPrice, _HighestVolume);
         }
-        CandleVMCollection = _CandleVMCollection;
+        CandleVMStruct.Refresh();
     }
     public void MouseDrag(Point pos)
     {
-        if (!_CandleVMCollection_Left!.Any() && !_CandleVMCollection_Right!.Any())
+        if (CandleVMStruct.AllShow)
             return;
 
         var count = GetCountFromCount(pos);
         if (count > 0)
-            ChartMoveRight(count);
+        {
+            CandleVMStruct.PanRight(count);
+            ResizeCandle();
+        }
         else if (count < 0)
-            ChartMoveLeft(-count);
+        {
+            CandleVMStruct.PanLeft(-count);
+            ResizeCandle();
+        }
 
         if(count != 0)
             _MouseClickPosition = pos;
 
         int GetCountFromCount(Point _pos) => (int)((_MouseClickPosition!.Value.X - _pos.X) / _CandleWidth);
-        void ChartMoveLeft(int count) 
-        {
-            while (count > 0 && _CandleVMCollection_Left!.Any())
-            {
-                var candleVM = _CandleVMCollection_Left!.Pop();
-                _CandleVMCollection!.Add(candleVM);
-
-                candleVM = _CandleVMCollection!.First();
-                _CandleVMCollection!.RemoveAt(0);
-                _CandleVMCollection_Right!.Push(candleVM);
-                count--;
-            }
-            ResizeCandle();
-        }
-        void ChartMoveRight(int count)
-        {
-            while (count > 0 && _CandleVMCollection_Right!.Any())
-            {
-                var candleVM = _CandleVMCollection_Right!.Pop();
-                _CandleVMCollection!.Insert(0, candleVM);
-
-                candleVM = _CandleVMCollection!.Last();
-                _CandleVMCollection!.RemoveAt(_CandleVMCollection!.Count() - 1);
-                _CandleVMCollection_Left!.Push(candleVM);
-                count--;
-            }
-            ResizeCandle();
-        }
     }
-
 }
