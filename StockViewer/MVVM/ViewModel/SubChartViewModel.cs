@@ -64,16 +64,14 @@ public class SubChartViewModel : ObservableObject
         if (newCandleCount > candleCount)
         {
             var addCount = newCandleCount - candleCount;
-            BarVMStruct.PanLeft(addCount);
-            ResizeBar();
-            _BarGridVM!.Resize(_ChartSize);
+            BarVMStruct.ZoomOut(addCount);
         }
         else if (newCandleCount < candleCount)
         {
             var reduceCount = candleCount - newCandleCount;
-            BarVMStruct.PanRight(reduceCount);
-            _BarGridVM!.Resize(_ChartSize);
+            BarVMStruct.ZoomIn(reduceCount);
         }
+        ResizeBar();
         _BarGridVM!.Resize(_ChartSize);
         BarGridVM = _BarGridVM;
         return true;
@@ -137,10 +135,18 @@ public class SubChartViewModel : ObservableObject
     {
         ResizeChartGrid(_ChartSize.Height);
 
+        List<Task> tasks = new();
         foreach (BarViewModel barVm in BarVMStruct.Middle!)
         {
-            barVm.Resize(_ChartSize.Height, _BarWidth, _HighestPrice, _LowestPrice);
+            var copy = barVm;
+            Task task = new(() =>
+            {
+                copy.Resize(_ChartSize.Height, _BarWidth, _HighestPrice, _LowestPrice);
+            });
+            task.Start();
+            tasks.Add(task);
         }
+        Task.WhenAll(tasks).Wait();
         BarVMStruct.Refresh();
     }
     private void ResizeChartGrid(double chartHeight)

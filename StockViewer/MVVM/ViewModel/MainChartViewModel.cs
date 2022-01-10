@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.ObjectModel;
+
 using System.Windows.Shapes;
 
 namespace StockViewer.MVVM.ViewModel;
@@ -161,17 +162,14 @@ public class MainChartViewModel:ObservableObject
         {
             var addCount = newCandleCount - candleCount;
             CandleVMStruct.ZoomOut(addCount);
-            ResizeCandle();
-            _ChartGridVM!.Resize(_ChartSize);
         }
         else if (newCandleCount < candleCount)
         {
             var reduceCount = candleCount - newCandleCount;
             CandleVMStruct.ZoomIn(reduceCount);
-            ResizeCandle();
-            _ChartGridVM!.Resize(_ChartSize);
-            return false;
         }
+
+        ResizeCandle();
         _ChartGridVM!.Resize(_ChartSize);
         ChartGridVM = _ChartGridVM;
         return true;
@@ -183,7 +181,7 @@ public class MainChartViewModel:ObservableObject
         int limitQuantity = (int)(chartHeight / ChartLineQuantityRatio);
 
         double priceInterval = _HighestPrice - _LowestPrice;
-        double offset = 0.1;
+        double offset = 0.2;
         while (priceInterval / offset > limitQuantity)
         {
             offset *= 5;
@@ -204,10 +202,19 @@ public class MainChartViewModel:ObservableObject
     {
         ResizeChartGrid(_ChartSize.Height);
         _HighestVolume = CandleVMStruct.GetMaxVolume(new((c) => c.mPrice.mVolume));
+
+        List<Task> tasks = new();
         foreach (var candleVm in CandleVMStruct.Middle)
         {
-            candleVm.Resize(CandleHeight, _CandleWidth, _HighestPrice, _LowestPrice, _HighestVolume);
+            var copy = candleVm;
+            Task task = new(() =>
+            {
+                copy.Resize(CandleHeight, _CandleWidth, _HighestPrice, _LowestPrice, _HighestVolume);
+            });
+            task.Start();
+            tasks.Add(task);
         }
+        Task.WhenAll(tasks).Wait();
         CandleVMStruct.Refresh();
     }
     public void MouseDrag(Point pos)

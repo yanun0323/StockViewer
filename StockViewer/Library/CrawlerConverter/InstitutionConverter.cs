@@ -43,28 +43,16 @@ public class InstitutionConverter
 
             Institution institution = (target < _switch) ? new()
             {
-                ForeignBuy = data[2] ?? "0",
-                ForeignSell = data[3] ?? "0",
                 ForeignSuper = data[4] ?? "0",
-                ForeignDealerBuy = data[2] ?? "0",
-                ForeignDealerSell = data[3] ?? "0",
                 ForeignDealerSuper = data[4] ?? "0",
-                TrustBuy = data[5] ?? "0",
-                TrustSell = data[6] ?? "0",
                 TrustSuper = data[7] ?? "0",
                 DealerSuper = data[8] ?? "0",
                 InstitutionSuper = data.Last() ?? "0",
             }
             : new()
             {
-                ForeignBuy = data[2] ?? "0",
-                ForeignSell = data[3] ?? "0",
                 ForeignSuper = data[4] ?? "0",
-                ForeignDealerBuy = data[5] ?? "0",
-                ForeignDealerSell = data[6] ?? "0",
                 ForeignDealerSuper = data[7] ?? "0",
-                TrustBuy = data[8] ?? "0",
-                TrustSell = data[9] ?? "0",
                 TrustSuper = data[10] ?? "0",
                 DealerSuper = data[11] ?? "0",
                 InstitutionSuper = data.Last() ?? "0",

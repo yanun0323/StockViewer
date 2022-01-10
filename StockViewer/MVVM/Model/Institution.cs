@@ -42,34 +42,16 @@ public struct Institution
     // [17] "自營商買賣超股數(避險)"                    
     // [last] "三大法人買賣超股數"                       
 
-    public string ForeignBuy { get; init; }
-    public string ForeignSell { get; init; }
     public string ForeignSuper { get; init; }
-    public string ForeignDealerBuy { get; init; }
-    public string ForeignDealerSell { get; init; }
     public string ForeignDealerSuper { get; init; }
-    public string TrustBuy { get; init; }
-    public string TrustSell { get; init; }
     public string TrustSuper { get; init; }
     public string DealerSuper { get; init; }
     public string InstitutionSuper { get; init; }
 
     [JsonIgnore]
-    public int mForeignBuy { get => int.Parse(ForeignBuy.Replace(",", "")) / 1000; }
-    [JsonIgnore]
-    public int mForeignSell { get => int.Parse(ForeignSell.Replace(",", "")) / 1000; }
-    [JsonIgnore]
     public int mForeignSuper { get => int.Parse(ForeignSuper.Replace(",", "")) / 1000; }
     [JsonIgnore]
-    public int mForeignDealerBuy { get => int.Parse(ForeignDealerBuy.Replace(",", "")) / 1000; }
-    [JsonIgnore]
-    public int mForeignDealerSell { get => int.Parse(ForeignDealerSell.Replace(",", "")) / 1000; }
-    [JsonIgnore]
     public int mForeignDealerSuper { get => int.Parse(ForeignDealerSuper.Replace(",", "")) / 1000; }
-    [JsonIgnore]
-    public int mTrustBuy { get => int.Parse(TrustBuy.Replace(",", "")) / 1000; }
-    [JsonIgnore]
-    public int mTrustSell { get => int.Parse(TrustSell.Replace(",", "")) / 1000; }
     [JsonIgnore]
     public int mTrustSuper { get => int.Parse(TrustSuper.Replace(",", "")) / 1000; }
     [JsonIgnore]
@@ -81,14 +63,8 @@ public struct Institution
     {
         return new Institution()
         {
-            ForeignBuy = "0",
-            ForeignSell = "0",
             ForeignSuper = "0",
-            ForeignDealerBuy = "0",
-            ForeignDealerSell = "0",
             ForeignDealerSuper = "0",
-            TrustBuy = "0",
-            TrustSell = "0",
             TrustSuper = "0",
             DealerSuper = "0",
             InstitutionSuper = "0",
