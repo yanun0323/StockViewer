@@ -12,7 +12,7 @@
     <Canvas Width="{Binding RectWidth}"
             Height="{Binding Parameter.Height}"
             Margin="{Binding Margin}"
-            VerticalAlignment="Top">
+            VerticalAlignment="Stretch">
         <Rectangle x:Name="VolumeBlock" Panel.ZIndex="7"
                    StrokeThickness="0"
                    Fill="{Binding mColor}"

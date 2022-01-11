@@ -13,9 +13,9 @@ public class PickStockBlockViewModel : ObservableObject
 
         ClickCommand = new RelayCommand<RoutedEventArgs>(arg =>
         {
-            Trace.WriteLine($"SmartPick Click A!");
+            if (_Func.Invoke().mStockModel.Id == mStockModel.Id)
+                return;
             _Func.Invoke().UpdateStock(mStockModel.Id);
-            Trace.WriteLine($"SmartPick Click B!");
         });
     }
 }

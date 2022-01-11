@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-
+﻿
 namespace StockViewer.MVVM.Model;
 public class StockModel
 {
@@ -39,8 +33,8 @@ public class StockModel
         if (Id == "")
             return;
         Trace.WriteLine($"StockModel Refresh: {Id}");
-        PriceData.Clear();
-        InstitutionData.Clear();
+        PriceData = new();
+        InstitutionData = new();
         DirectoryInfo path = new(mPath);
         foreach (FileInfo file in path.EnumerateFiles("*"))
         {

@@ -72,16 +72,16 @@ public class MainViewModel : ObservableObject
             if (_ChartBarWidth + scale > _ChartBarWidth_Min && _ChartBarWidth + scale < _ChartBarWidth_Max)
             {
                 _ChartBarWidth += scale;
-                MainChartVM.SetCandleWidth(_ChartBarWidth);
+                MainChartVM.SetBarWidth(_ChartBarWidth);
                 SubChartVM1.SetBarWidth(_ChartBarWidth);
                 SubChartVM2.SetBarWidth(_ChartBarWidth);
 
             }
 
-            if (!MainChartVM.CandleSizeChanged())
+            if (!MainChartVM.BarSizeChanged())
             {
                 _ChartBarWidth -= scale;
-                MainChartVM.SetCandleWidth(_ChartBarWidth);
+                MainChartVM.SetBarWidth(_ChartBarWidth);
                 SubChartVM1.SetBarWidth(_ChartBarWidth);
                 SubChartVM2.SetBarWidth(_ChartBarWidth);
             }

@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 namespace StockViewer.MVVM.Model;
 public class QuantityHash
 {
-    private SortedDictionary<double, HashSet<DateTime>> MaxHash = new();
-    private SortedDictionary<double, HashSet<DateTime>> MinHash= new();
+    private SortedDictionary<double, HashSet<DateTime>>? MaxHash = new();
+    private SortedDictionary<double, HashSet<DateTime>>? MinHash= new();
 
     public void Clear() 
     {
-        MaxHash.Clear();
-        MinHash.Clear();
+        MaxHash = new();
+        MinHash = new();
     }
     public double GetMax() => MaxHash.Any() ? MaxHash.Last().Key : 0;
     public double GetMin() => MinHash.Any() ? MinHash.First().Key : 0;
@@ -26,7 +26,8 @@ public class QuantityHash
     }
     public void RemoveMax(double value, DateTime dateTime)
     {
-        MaxHash[value].Remove(dateTime);
+        if(MaxHash.ContainsKey(value))
+            MaxHash[value].Remove(dateTime);
         if (MaxHash[value].Any())
             return;
         MaxHash.Remove(value);
@@ -39,7 +40,8 @@ public class QuantityHash
     }
     public void RemoveMin(double value, DateTime dateTime)
     {
-        MinHash[value].Remove(dateTime);
+        if (MinHash.ContainsKey(value))
+            MinHash[value].Remove(dateTime);
         if (MinHash[value].Any())
             return;
         MinHash.Remove(value);

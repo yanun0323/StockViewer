@@ -25,10 +25,13 @@ public class SubChartViewModel : ObservableObject
         set
         {
             _mStockModel = value;
-            Update();
+            Refresh();
             OnPropertyChanged();
         }
     }
+
+
+
 
     public SubChartViewModel(StockModel stockModel, InstitutionOption option)
     {
@@ -65,13 +68,15 @@ public class SubChartViewModel : ObservableObject
         {
             var addCount = newCandleCount - candleCount;
             BarVMStruct.ZoomOut(addCount);
+            ResizeBar();
         }
         else if (newCandleCount < candleCount)
         {
             var reduceCount = candleCount - newCandleCount;
             BarVMStruct.ZoomIn(reduceCount);
+            ResizeBar();
         }
-        ResizeBar();
+        //ResizeBar();
         _BarGridVM!.Resize(_ChartSize);
         BarGridVM = _BarGridVM;
         return true;
@@ -82,12 +87,16 @@ public class SubChartViewModel : ObservableObject
             return;
 
         var count = GetCountFromCount(pos);
-        if (count > 0)
+        if (count > 0) { 
             BarVMStruct.PanRight(count);
-        else if (count < 0)
+            ResizeBar();
+        }
+        else if (count < 0) { 
             BarVMStruct.PanLeft(-count);
+            ResizeBar();
+        }
 
-        ResizeBar();
+        //ResizeBar();
 
         if (count != 0)
             _MouseClickPosition = pos;
@@ -96,7 +105,11 @@ public class SubChartViewModel : ObservableObject
         
     }
 
-    private void Update()
+
+
+
+    private int GetNewBarCount() => (int)(_ChartSize.Width / _BarWidth) + 1;
+    private void Refresh()
     {
         Update_BarVMCollection_Stack();
         Queue<BarViewModel> show = new();
@@ -107,18 +120,19 @@ public class SubChartViewModel : ObservableObject
             count--;
         }
         ResizeBar();
-    }
-    private void Update_BarVMCollection_Stack()
-    {
-        foreach ((DateTime date, Price price) in mStockModel.PriceData)
+
+        void Update_BarVMCollection_Stack()
         {
-            if(mStockModel.InstitutionData.ContainsKey(date))
-                BarVMStruct.Push(CreateBarVM(date, mStockModel.InstitutionData[date]));
-            else
-                BarVMStruct.Push(CreateBarVM(date));
+            BarVMStruct.Clear();
+            foreach ((DateTime date, Price price) in mStockModel.PriceData)
+            {
+                if (mStockModel.InstitutionData.ContainsKey(date))
+                    BarVMStruct.Push(CreateBarVM(date, mStockModel.InstitutionData[date]));
+                else
+                    BarVMStruct.Push(CreateBarVM(date));
+            }
         }
     }
-    private int GetNewBarCount() => (int)(_ChartSize.Width / _BarWidth) + 1;
     private BarViewModel CreateBarVM(DateTime date, Institution? institution = null)
     {
         Institution insti = institution ?? Institution.Deafult();
@@ -134,6 +148,16 @@ public class SubChartViewModel : ObservableObject
     private void ResizeBar()
     {
         ResizeChartGrid(_ChartSize.Height);
+
+        //Task task = new(() =>
+        //{
+        //    foreach (BarViewModel barVm in BarVMStruct.Middle!)
+        //    {
+        //        barVm.Resize(_ChartSize.Height, _BarWidth, _HighestPrice, _LowestPrice);
+        //    }
+        //});
+        //task.Start();
+        //task.Wait();
 
         List<Task> tasks = new();
         foreach (BarViewModel barVm in BarVMStruct.Middle!)

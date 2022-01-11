@@ -31,7 +31,7 @@ public class BarViewModel : ObservableObject
         {
             Highest = Param.Highest,
             Lowest = Param.Lowest,
-            Width = Param.Width - Margin.Left - Margin.Right,
+            Width = Param.Width,
             Height = Param.Height
         };
         Option = option;
@@ -39,7 +39,7 @@ public class BarViewModel : ObservableObject
 
         RectTop = Insti.mTrustSuper > 0 ? (Parameter.Highest - Insti.mTrustSuper) * Ratio : Parameter.Highest * Ratio;
         RectHeight = Insti.mTrustSuper > 0 ? Insti.mTrustSuper * Ratio : -Insti.mTrustSuper * Ratio;
-        RectWidth = Param.Width - Margin.Left - Margin.Right;
+        RectWidth = Param.Width;
         mColor = Insti.mTrustSuper > 0 ? iColor.Red : Insti.mTrustSuper < 0 ? iColor.Green : iColor.Transparent;
     }
     public void Resize(double? height = null, double? width = null, double? top = null, double? bottom = null, InstitutionOption? option = null)

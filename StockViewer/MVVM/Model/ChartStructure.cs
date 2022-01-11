@@ -2,14 +2,13 @@
 namespace StockViewer.MVVM.Model;
 public class ChartStructure<T> : ObservableObject
 {
-    private enum Option { Left, Right }
-    private ObservableCollection<T> _Middle = new();
-    private Stack<T> _Left = new();
-    private Stack<T> _Right = new();
-    private QuantityHash _QuantityHash = new();
-    private Func<T, (double, double , DateTime)> _Func;
+    protected enum Option { Left, Right }
+    protected ObservableCollection<T> _Middle = new();
+    protected Stack<T> _Left = new();
+    protected Stack<T> _Right = new();
+    protected QuantityHash _QuantityHash = new();
+    protected Func<T, (double, double , DateTime)> _Func;
 
-    public ChartStructure(Func<T, (double, double, DateTime)> func) => _Func = func;
     public ObservableCollection<T> Middle { get => _Middle;  set { _Middle = value; OnPropertyChanged(); }}
     public double Max => _QuantityHash.GetMax();
     public double Min => _QuantityHash.GetMin();
@@ -17,12 +16,16 @@ public class ChartStructure<T> : ObservableObject
 
 
 
+    public ChartStructure(Func<T, (double, double, DateTime)> func) => _Func = func;
+
+
+
     public void Clear() 
     {
-        _Middle.Clear();
-        _Right.Clear();
-        _Left.Clear();
-        _QuantityHash.Clear();
+        _Middle = new();
+        _Right = new();
+        _Left = new();
+        _QuantityHash = new();
     }
     public int Count() => _Middle.Count();
     public void Refresh() => Middle = _Middle;
@@ -31,19 +34,18 @@ public class ChartStructure<T> : ObservableObject
     public int GetMaxVolume(Func<T, int> func) => _Middle.Max(x => func.Invoke(x));
     public void Generate(int count)
     {
-        while (count > 0) 
+        while (count-- >= 0) 
         {
             if(!_Left.Any())
                 return;
 
             T obj = _Left.Pop();
             AddMiddle(obj, Option.Left);
-            count--;
         }
     }
     public void ZoomOut(int count)
     {
-        while (count > 0)
+        while (count-- >= 0)
         {
             if (_Left.Any())
             {
@@ -57,52 +59,45 @@ public class ChartStructure<T> : ObservableObject
             }
             else
                 return;
-
-            count--;
         }
     }
     public bool ZoomIn(int count)
     {
         if (!_Middle.Any() || _Middle.Count() < count + 1)
             return false;
-        while (count > 0)
+        while (count-- >= 0)
         {
             T obj = ReduceMiddle(Option.Left);
             _Left.Push(obj);
-            count--;
         }
         return true;
     }
     public void PanLeft(int count)
     {
-        while (count > 0 && _Left.Any())
+        while (count-- >= 0 && _Left.Any())
         {
             T left = _Left.Pop();
             AddMiddle(left, Option.Left);
 
             T right = ReduceMiddle(Option.Right);
             _Right.Push(right);
-
-            count--;
         }
     }
     public void PanRight(int count)
     {
-        while (count > 0 && _Right.Any())
+        while (count-- >= 0 && _Right.Any())
         {
             T right = _Right.Pop();
             AddMiddle(right, Option.Right);
 
             T left = ReduceMiddle(Option.Left);
             _Left.Push(left);
-
-            count--;
         }
     }
 
 
 
-    private void AddMiddle(T obj, Option option) 
+    protected void AddMiddle(T obj, Option option) 
     {
         (double max, double min, DateTime dateTime) = _Func.Invoke(obj);
 
@@ -116,7 +111,7 @@ public class ChartStructure<T> : ObservableObject
 
         Refresh();
     }
-    private T ReduceMiddle(Option option)
+    protected T ReduceMiddle(Option option)
     {
         int index = option == Option.Right ? 0 : _Middle.Count() - 1;
 
