@@ -1,6 +1,6 @@
 ﻿
 namespace StockViewer.MVVM.Model;
-public class StockModel
+public class StockModel : IStockModel
 {
     public string Id { get; set; }
     public string Name { get; set; }

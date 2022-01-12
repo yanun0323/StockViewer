@@ -73,24 +73,24 @@ public class MainViewModel : ObservableObject
             if (_ChartBarWidth + scale > _ChartBarWidth_Min && _ChartBarWidth + scale < _ChartBarWidth_Max)
             {
                 _ChartBarWidth += scale;
-                MainChartVM.SetBarWidth(_ChartBarWidth);
+                //MainChartVM.SetBarWidth(_ChartBarWidth);
                 SubChartVM1.SetBarWidth(_ChartBarWidth);
                 SubChartVM2.SetBarWidth(_ChartBarWidth);
 
             }
 
-            if (!MainChartVM.BarSizeChanged())
-            {
-                _ChartBarWidth -= scale;
-                MainChartVM.SetBarWidth(_ChartBarWidth);
-                SubChartVM1.SetBarWidth(_ChartBarWidth);
-                SubChartVM2.SetBarWidth(_ChartBarWidth);
-            }
-            else
-            {
-                SubChartVM1.BarSizeChanged();
-                SubChartVM2.BarSizeChanged();
-            }
+            //if (!MainChartVM.BarSizeChanged())
+            //{
+            //    _ChartBarWidth -= scale;
+            //    //MainChartVM.SetBarWidth(_ChartBarWidth);
+            //    SubChartVM1.SetBarWidth(_ChartBarWidth);
+            //    SubChartVM2.SetBarWidth(_ChartBarWidth);
+            //}
+            //else
+            //{
+            //    SubChartVM1.BarSizeChanged();
+            //    SubChartVM2.BarSizeChanged();
+            //}
         });
 
         MouseMoveCommand = new RelayCommand<MouseEventArgs>(e =>
@@ -98,14 +98,14 @@ public class MainViewModel : ObservableObject
             if (e.LeftButton == MouseButtonState.Pressed && MouseClickPosition != null)
             {
                 Point pos = e.MouseDevice.GetPosition(MainChartGrid);
-                MainChartVM.MouseDrag(pos);
+                //MainChartVM.MouseDrag(pos);
                 SubChartVM1.MouseDrag(pos);
                 SubChartVM2.MouseDrag(pos);
             }
             else
             {
                 MouseClickPosition = e.MouseDevice.GetPosition(MainChartGrid);
-                MainChartVM.SetMouseClickPosition(MouseClickPosition!.Value);
+                //MainChartVM.SetMouseClickPosition(MouseClickPosition!.Value);
                 SubChartVM1.SetMouseClickPosition(MouseClickPosition!.Value);
                 SubChartVM2.SetMouseClickPosition(MouseClickPosition!.Value);
             }
@@ -146,7 +146,7 @@ public class MainViewModel : ObservableObject
     {
         _mStockModel!.Refresh(stockId);
         mStockModel = _mStockModel;
-        MainChartVM?.UpdateChart(mStockModel!);
+        //MainChartVM?.UpdateChart(mStockModel!);
         SubChartVM1?.UpdateChart(mStockModel!);
         SubChartVM2?.UpdateChart(mStockModel!);
     }

@@ -22,7 +22,7 @@
                     BorderThickness="0" 
                     CornerRadius="10, 10 ,0 ,0"/>
 
-            <Border Grid.Row="1" x:Name="InfoPopupBorder" BorderThickness="1.5" CornerRadius="10" BorderBrush="PowderBlue" Background="White" Opacity="0.95"
+            <!--<Border Grid.Row="1" x:Name="InfoPopupBorder" BorderThickness="1.5" CornerRadius="10" BorderBrush="PowderBlue" Background="White" Opacity="0.95"
                     Width="101" Height="150" Visibility="{Binding InfoPopShow}"
                     VerticalAlignment="Top"
                     HorizontalAlignment="Left"
@@ -70,17 +70,17 @@
                         </StackPanel>
                     </StackPanel>
                 </StackPanel>
-            </Border>
+            </Border>-->
 
-            <ContentControl Grid.Row="1"
-                            VerticalAlignment="Stretch"
-                            Content="HI">
+            <Canvas Grid.Row="1" 
+                    Width="{Binding Canvas.Width}"
+                    Height="{Binding Canvas.Height}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SizeChanged">
                         <core:EventCommandAction Command="{Binding SizeChangedCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-            </ContentControl>
+            </Canvas>
         </Grid>
 
         <i:Interaction.Triggers>
