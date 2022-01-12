@@ -3,9 +3,7 @@ public class SubChartViewModel : ObservableObject
 {
     private Size _ChartSize = new(854, 77.5);
     private double _BarWidth = 10;
-    private int ChartLineQuantityRatio = MainChartViewModel.ChartLineQuantityRatio;
 
-    private Grid? _SubChartGrid;
     private Point? _MouseClickPosition;
     private StockModel? _mStockModel;
     private ChartGridViewModel? _BarGridVM;
@@ -49,11 +47,6 @@ public class SubChartViewModel : ObservableObject
                 _ChartSize = args.NewSize;
                 BarSizeChanged();
             }
-        });
-
-        LoadedCommand = new RelayCommand<Grid>(obj =>
-        {
-            _SubChartGrid = obj;
         });
     }
 
@@ -148,16 +141,6 @@ public class SubChartViewModel : ObservableObject
     private void ResizeBar()
     {
         ResizeChartGrid(_ChartSize.Height);
-
-        //Task task = new(() =>
-        //{
-        //    foreach (BarViewModel barVm in BarVMStruct.Middle!)
-        //    {
-        //        barVm.Resize(_ChartSize.Height, _BarWidth, _HighestPrice, _LowestPrice);
-        //    }
-        //});
-        //task.Start();
-        //task.Wait();
 
         List<Task> tasks = new();
         foreach (BarViewModel barVm in BarVMStruct.Middle!)

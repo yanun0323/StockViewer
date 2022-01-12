@@ -54,6 +54,7 @@ public class MainViewModel : ObservableObject
 
         MainCrawler.Run();
         MainConverter.Run();
+        Server.Connect();
 
         _mStockModel = new();
         UpdateStock(_DefaultStockId);

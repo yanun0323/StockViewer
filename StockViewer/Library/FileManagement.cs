@@ -8,15 +8,15 @@ public static class FileManagement
 {
     private static readonly JsonSerializerOptions options = new JsonSerializerOptions() { Converters = { new LongToStringJsonConverter() } , AllowTrailingCommas = true};
     public static object Key = new();
-    public static void SaveText(this string content, string filePath, string fileName)
-        => SaveTextData(content, filePath, fileName);
-    public static void SaveJson<T>(this T obj, string filePath, string fileName)
-        => SaveJsonData(obj, filePath, fileName);
+    public static void SaveText(this string content, string path, string name)
+        => SaveTextData(content, path, name);
+    public static void SaveJson<T>(this T obj, string path, string name)
+        => SaveJsonData(obj, path, name);
 
-    public static string? LoadText(string filePath, string filename)
-        => LoadTextData(filePath, filename);
-    public static T? LoadJson<T>(string filePath, string fileName, bool convert = true)
-        => LoadJsonData<T>(filePath, fileName , convert);
+    public static string? LoadText(string path, string name)
+        => LoadTextData(path, name);
+    public static T? LoadJson<T>(string path, string name, bool convert = true)
+        => LoadJsonData<T>(path, name, convert);
 
     private static T? LoadJsonData<T>(string path, string filename, bool convert)
     {

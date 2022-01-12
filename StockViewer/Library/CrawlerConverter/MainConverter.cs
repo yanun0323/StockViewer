@@ -5,7 +5,7 @@ public static class MainConverter
 {
     public static void Run() 
     {
-        DateTime? load = FileManagement.LoadJson<DateTime?>(FilePath.Path_Root, FilePath.Name_UpdateTime);
+        DateTime? load = FileManagement.LoadJson<DateTime?>(FilePath.Path_Data, FilePath.Name_UpdateTime);
         DateTime start = (load != null) ? load.Value.AddDays(1) : PriceCrawler.Begin;
         DateTime now = DateTime.Now;
         List<Task> tasks = new();
@@ -31,7 +31,7 @@ public static class MainConverter
     private static void SaveUpdateTime(DateTime start, DateTime now)
     {
         DateTime last = (start.Year == now.Year) ? now : new DateTime(start.Year + 1, 1, 1).AddDays(-1);
-        last.SaveJson(FilePath.Path_Root, FilePath.Name_UpdateTime);
+        last.SaveJson(FilePath.Path_Data, FilePath.Name_UpdateTime);
     }
     private static void SaveStockModelCollection(DateTime date, Dictionary<string, StockModel> stockModelCollection)
     {
