@@ -44,7 +44,7 @@ public class ChartGridViewModel:ObservableObject
         }
 
 
-        int limitQuantity = (int)(_Parameter.Height / MainChartViewModel.ChartLineQuantityRatio);
+        int limitQuantity = 100; //(int)(_Parameter.Height / MainChartViewModel.ChartLineQuantityRatio);
         int offset = 1;
         while (priceInterval / offset > limitQuantity)
         {

@@ -72,15 +72,22 @@
                 </StackPanel>
             </Border>-->
 
-            <Canvas Grid.Row="1" 
-                    Width="{Binding Canvas.Width}"
-                    Height="{Binding Canvas.Height}">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SizeChanged">
-                        <core:EventCommandAction Command="{Binding SizeChangedCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </Canvas>
+            <Border Grid.Row="1">
+                <Canvas Grid.Row="1">
+                    <ItemsControl ItemsSource="{Binding Rectangles}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SizeChanged">
+                            <core:EventCommandAction Command="{Binding SizeChangedCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </Canvas>
+            </Border>
         </Grid>
 
         <i:Interaction.Triggers>

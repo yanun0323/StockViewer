@@ -32,7 +32,6 @@ public class StockModel : IStockModel
 
         if (Id == "")
             return;
-        Trace.WriteLine($"StockModel Refresh: {Id}");
         PriceData = new();
         InstitutionData = new();
         DirectoryInfo path = new(mPath);
@@ -55,8 +54,6 @@ public class StockModel : IStockModel
                 InstitutionData.TryAdd(item.Key, item.Value);
             }
         }
-        Trace.WriteLine($"StockModel PriceData: {PriceData.Count()}");
-        Trace.WriteLine($"StockModel InstitutionData: {InstitutionData.Count()}");
     }
     public void CorrectPriceData() 
     {

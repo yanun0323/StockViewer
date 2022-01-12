@@ -146,7 +146,7 @@ public class MainViewModel : ObservableObject
     {
         _mStockModel!.Refresh(stockId);
         mStockModel = _mStockModel;
-        //MainChartVM?.UpdateChart(mStockModel!);
+        MainChartVM?.Update(mStockModel!);
         SubChartVM1?.UpdateChart(mStockModel!);
         SubChartVM2?.UpdateChart(mStockModel!);
     }

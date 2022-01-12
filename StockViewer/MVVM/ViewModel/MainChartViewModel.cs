@@ -10,7 +10,7 @@ public class MainChartViewModel : ObservableObject
     public static double GridWidth = 7;
 
     IStockModel? _StockModel;
-    Grid? _ChartCanvas = new() { Width = 300, Height = 300 };
+    Size _Canvas = new(904, 356);
     ObservableCollection<Rectangle>? _Rectangles = new();
 
     public ICommand? MouseUpCommand { get; set; }
@@ -36,12 +36,16 @@ public class MainChartViewModel : ObservableObject
 
         SizeChangedCommand = new RelayCommand<SizeChangedEventArgs>(args =>
         {
+            Trace.WriteLine($"SizeChangedEventArgs {args.NewSize.Width} {args.NewSize.Height}");
+            _Canvas = args.NewSize;
+            Refresh();
         });
 
-        LoadedCommand = new RelayCommand<Grid>(grid => 
+        LoadedCommand = new RelayCommand<Grid>(grid =>
         {
-            _ChartCanvas = grid;
-            Refresh();
+            //Trace.WriteLine($"grid {grid.Width} {grid.Height}");
+            //_ChartCanvas = grid;
+            //Refresh();
         });
     }
 
@@ -51,26 +55,29 @@ public class MainChartViewModel : ObservableObject
         Refresh();
     }
 
-
-
     void Refresh()
     {
         _Rectangles = null;
         _Rectangles = new();
 
-        double max = _StockModel!.PriceData.Max(x => x.Value.mMax);
-        double min = _StockModel!.PriceData.Min(x => x.Value.mMin);
+        int count = 100;
+        int i = (_StockModel!.PriceData.Count() < count) ? _StockModel!.PriceData.Count() : count;
 
-        int i = _StockModel!.PriceData.Count();
-        double width = 7;
-        double ratio = _ChartCanvas!.Height / (max - min);
+        double width = (_Canvas!.Width / i) - 2;
+
+        double max = _StockModel!.PriceData.Take(i).Max(x => x.Value.mMax);
+        double min = _StockModel!.PriceData.Take(i).Min(x => x.Value.mMin);
+
+        double ratio = _Canvas!.Height / (max - min);
+        i--;
         foreach ((DateTime date, Price price) in _StockModel!.PriceData)
         {
             _Rectangles.Add(CreateThick(price, i, max, min, width, ratio));
             _Rectangles.Add(CreateThin(price, i, max, min, width, ratio));
-
-            i--;
+            if (i-- <= 0)
+                break;
         }
+        Trace.WriteLine($"_Rectangles.Count() {_Rectangles.Count()}");
         Rectangles = _Rectangles;
 
         static Rectangle CreateThick(Price price, int i, double max, double min, double width, double ratio) 
@@ -79,11 +86,13 @@ public class MainChartViewModel : ObservableObject
             double low = price.mStart < price.mEnd ? price.mStart : price.mEnd;
             double top = ratio * (max - high);
             double left = i * (width + 2);
+            double height = ratio * (high - low);
 
             Rectangle rect = new();
             rect.Width = width;
-            rect.Height = ratio * (high - low);
-            rect.Fill = price.mStart > price.mEnd ? iColor.Green : iColor.Red;
+            rect.Height = high == low ? 1 : ratio * (high - low);
+            rect.Fill = price.mStart == price.mEnd ? iColor.Gray : price.mStart > price.mEnd ? iColor.Green : iColor.Red;
+            //rect.Margin = new(1, 1, 0, 0);
 
             Canvas.SetTop(rect, top);
             Canvas.SetLeft(rect, left);
@@ -95,12 +104,12 @@ public class MainChartViewModel : ObservableObject
             double high = price.mMax;
             double low = price.mMin;
             double top = ratio * (max - high);
-            double left = i * (width + 2) + (width / 2);
+            double left = i * (width + 2) + ((width - 1) / 2);
 
             Rectangle rect = new();
             rect.Width = 1;
             rect.Height = ratio * (high - low);
-            rect.Fill = price.mStart > price.mEnd ? iColor.Green : iColor.Red;
+            rect.Fill = price.mStart == price.mEnd ? iColor.Gray : price.mStart > price.mEnd ? iColor.Green : iColor.Red;
 
             Canvas.SetTop(rect, top);
             Canvas.SetLeft(rect, left);
