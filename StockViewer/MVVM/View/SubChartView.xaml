@@ -13,47 +13,27 @@
     <Border CornerRadius="10"
             Margin="5,0"
             Background="{Binding ElementName=MainChart, Path=Background}">
-        <Grid x:Name="SubChartGrid" Margin="10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="{Binding mGridWidth}"/>
-            </Grid.ColumnDefinitions>
-            <ContentControl Grid.Column="0" Grid.ColumnSpan="2"
-                            VerticalAlignment="Stretch"
-                            Content="{Binding BarGridVM}"/>
+        <Grid x:Name="SubChartGrid">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" Background="YellowGreen" 
+                    BorderThickness="0" 
+                    CornerRadius="10, 10 ,0 ,0"/>
+            <ContentControl Grid.Row="1"  VerticalAlignment="Stretch"
+                            Content="Hi Again">
 
-            <ItemsControl x:Name="CandleControl" Grid.Column="0"
-                            ItemsSource="{Binding BarVMStruct.Middle}" 
-                            FlowDirection="RightToLeft">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <!-- The default for an ItemsControl is a StackPanel with a vertical orientation -->
-                        <StackPanel Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SizeChanged">
                         <core:EventCommandAction Command="{Binding SizeChangedCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-            </ItemsControl>
-            
-            <Grid Grid.Column="1">
-            </Grid>
-
+            </ContentControl>
         </Grid>
 
 
         <i:Interaction.Triggers>
-            <!--<i:EventTrigger EventName="MouseWheel">
-                <core:EventCommandAction Command="{Binding MouseWheelCommand}"/>
-            </i:EventTrigger>-->
-            <!--<i:EventTrigger EventName="MouseUp">
-                    <core:EventCommandAction Command="{Binding MouseUpCommand}"/>
-                </i:EventTrigger>-->
-            <!--<i:EventTrigger EventName="MouseMove">
-                    <core:EventCommandAction Command="{Binding MouseMoveCommand}"/>
-                </i:EventTrigger>-->
             <i:EventTrigger EventName="Loaded">
                 <i:InvokeCommandAction Command="{Binding LoadedCommand}"
                                        CommandParameter="{Binding ElementName=SubChartGrid}"/>

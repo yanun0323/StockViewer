@@ -13,12 +13,16 @@
             CornerRadius="10"
             Margin="5,0"
             Background="{Binding ElementName=MainChart, Path=Background}">
-        <Grid x:Name="MainChartGrid" Margin="10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="{Binding mGridWidth}"/>
-            </Grid.ColumnDefinitions>
-            <Border Grid.Column="0" x:Name="InfoPopupBorder" BorderThickness="1.5" CornerRadius="10" BorderBrush="PowderBlue" Background="White" Opacity="0.95"
+        <Grid x:Name="MainChartGrid">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Border Background="YellowGreen" 
+                    BorderThickness="0" 
+                    CornerRadius="10, 10 ,0 ,0"/>
+
+            <Border Grid.Row="1" x:Name="InfoPopupBorder" BorderThickness="1.5" CornerRadius="10" BorderBrush="PowderBlue" Background="White" Opacity="0.95"
                     Width="101" Height="150" Visibility="{Binding InfoPopShow}"
                     VerticalAlignment="Top"
                     HorizontalAlignment="Left"
@@ -68,29 +72,15 @@
                 </StackPanel>
             </Border>
 
-            <ContentControl Grid.Column="0" Grid.ColumnSpan="2"
+            <ContentControl Grid.Row="1"
                             VerticalAlignment="Stretch"
-                            Content="{Binding ChartGridVM}"/>
-
-            <ItemsControl x:Name="CandleControl" Grid.Column="0"
-                            ItemsSource="{Binding CandleVMStruct.Middle}" 
-                            FlowDirection="RightToLeft">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <!-- The default for an ItemsControl is a StackPanel with a vertical orientation -->
-                        <StackPanel Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
+                            Content="HI">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SizeChanged">
                         <core:EventCommandAction Command="{Binding SizeChangedCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-            </ItemsControl>
-
-            <Grid Grid.Column="1">
-            </Grid>
-            
+            </ContentControl>
         </Grid>
 
         <i:Interaction.Triggers>
