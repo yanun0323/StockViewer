@@ -1,29 +1,26 @@
 ﻿
-using System.Collections.ObjectModel;
-
-using System.Windows.Shapes;
-
 namespace StockViewer.MVVM.ViewModel;
 public class MainChartViewModel : ObservableObject
 {
     public static Thickness CandleMargin = new(1, 0, 1, 0);
     public static double GridWidth = 7;
 
-    IStockModel? _StockModel;
+    IStockModel _StockModel;
     Size _Canvas = new(904, 356);
-    ObservableCollection<Rectangle>? _Rectangles = new();
+    Func<IBarParameter> _Func;
+    IBarParameter _BarParam { get => _Func.Invoke(); }
+    ObservableCollection<RectengleModel>? _Rectangles = new();
 
     public ICommand? MouseUpCommand { get; set; }
     public ICommand? MouseMoveCommand { get; set; }
     public ICommand? SizeChangedCommand { get; set; }
     public ICommand? LoadedCommand { get; set; }
-    public ObservableCollection<Rectangle>? Rectangles { get => _Rectangles; set { _Rectangles = value; OnPropertyChanged(); } }
+    public ObservableCollection<RectengleModel>? Rectangles { get => _Rectangles; set { _Rectangles = value; OnPropertyChanged(); } }
 
-
-
-    public MainChartViewModel(IStockModel stockModel)
+    public MainChartViewModel(IStockModel stockModel, Func<IBarParameter> func)
     {
         _StockModel = stockModel;
+        _Func = func;
         Refresh();
 
         MouseUpCommand = new RelayCommand<MouseButtonEventArgs>(e => 
@@ -36,85 +33,98 @@ public class MainChartViewModel : ObservableObject
 
         SizeChangedCommand = new RelayCommand<SizeChangedEventArgs>(args =>
         {
-            Trace.WriteLine($"SizeChangedEventArgs {args.NewSize.Width} {args.NewSize.Height}");
             _Canvas = args.NewSize;
-            Refresh();
-        });
-
-        LoadedCommand = new RelayCommand<Grid>(grid =>
-        {
-            //Trace.WriteLine($"grid {grid.Width} {grid.Height}");
-            //_ChartCanvas = grid;
-            //Refresh();
+            Refresh(args.NewSize);
         });
     }
 
-    public void Update(IStockModel stockModel)
+
+
+    public void Update(IStockModel? stockModel = null)
     {
-        _StockModel = stockModel;
+        Trace.WriteLine($" --- _BarParam.Count: {_BarParam.Count}");
+        if (stockModel != null)
+            _StockModel = stockModel;
         Refresh();
     }
 
-    void Refresh()
+
+
+    void Refresh(Size? newSize = null)
     {
+        if (newSize != null)
+            _Canvas = newSize.Value;
+
         _Rectangles = null;
         _Rectangles = new();
 
-        int count = 100;
-        int i = (_StockModel!.PriceData.Count() < count) ? _StockModel!.PriceData.Count() : count;
+        _BarParam.Count = (_StockModel!.PriceData.Count() < _BarParam.Count) ? _StockModel!.PriceData.Count() : _BarParam.Count;
+        double width = (_Canvas.Width / _BarParam.Count) - 2;
 
-        double width = (_Canvas!.Width / i) - 2;
-
-        double max = _StockModel!.PriceData.Take(i).Max(x => x.Value.mMax);
-        double min = _StockModel!.PriceData.Take(i).Min(x => x.Value.mMin);
-
-        double ratio = _Canvas!.Height / (max - min);
-        i--;
-        foreach ((DateTime date, Price price) in _StockModel!.PriceData)
+        if (width < _BarParam.MinWidth)
         {
-            _Rectangles.Add(CreateThick(price, i, max, min, width, ratio));
-            _Rectangles.Add(CreateThin(price, i, max, min, width, ratio));
-            if (i-- <= 0)
-                break;
+            _BarParam.Count = (int)(_Canvas.Width / (_BarParam.MinWidth + 2));
+            width = (_Canvas.Width / _BarParam.Count) - 2;
         }
-        Trace.WriteLine($"_Rectangles.Count() {_Rectangles.Count()}");
+        _BarParam.Width = width;
+
+        int index = _BarParam.Count;
+        double max = _StockModel!.PriceData.Skip(_BarParam.Start).Take(index).Max(x => x.Value.mMax);
+        double min = _StockModel!.PriceData.Skip(_BarParam.Start).Take(index).Min(x => x.Value.mMin);
+
+        double ratio = _Canvas.Height / (max - min);
+        List<Task> tasks = new();
+        RectengleModel[] temp = new RectengleModel[index * 2];
+        int size = index;
+        foreach ((DateTime _, Price price) in _StockModel!.PriceData.Take(index + _BarParam.Start).Skip(_BarParam.Start))
+        {
+            if (--index < 0)
+                break;
+
+            int i = index;
+            Price copy = price;
+            Task t = new(() => {
+                temp[i] = (CreateThick(copy, i, max, min, width, ratio));
+                temp[i + size] = (CreateThin(copy, i, max, min, width, ratio));
+            });
+            t.Start();
+            tasks.Add(t);
+        }
+        Task.WhenAll(tasks).Wait();
+
+        for (int i = 0; i < temp.Count(); i++)
+        {
+            _Rectangles.Add(temp[i]);
+        }
+
         Rectangles = _Rectangles;
 
-        static Rectangle CreateThick(Price price, int i, double max, double min, double width, double ratio) 
+        static RectengleModel CreateThick(Price price, int i, double max, double min, double width, double ratio) 
         {
             double high = price.mStart > price.mEnd ? price.mStart : price.mEnd;
             double low = price.mStart < price.mEnd ? price.mStart : price.mEnd;
-            double top = ratio * (max - high);
-            double left = i * (width + 2);
-            double height = ratio * (high - low);
 
-            Rectangle rect = new();
-            rect.Width = width;
-            rect.Height = high == low ? 1 : ratio * (high - low);
-            rect.Fill = price.mStart == price.mEnd ? iColor.Gray : price.mStart > price.mEnd ? iColor.Green : iColor.Red;
-            //rect.Margin = new(1, 1, 0, 0);
-
-            Canvas.SetTop(rect, top);
-            Canvas.SetLeft(rect, left);
-
-            return rect;
+            return new RectengleModel() { 
+                Width = width,
+                Left = i * (width + 2),
+                Top = ratio * (max - high),
+                Height = high == low ? 1 : ratio * (high - low),
+                Color = price.mStart == price.mEnd ? iColor.Gray : price.mEnd > price.mStart ? iColor.Red : iColor.Green,
+            };
         }
-        static Rectangle CreateThin(Price price, int i, double max, double min, double width, double ratio)
+        static RectengleModel CreateThin(Price price, int i, double max, double min, double width, double ratio)
         {
             double high = price.mMax;
             double low = price.mMin;
-            double top = ratio * (max - high);
-            double left = i * (width + 2) + ((width - 1) / 2);
 
-            Rectangle rect = new();
-            rect.Width = 1;
-            rect.Height = ratio * (high - low);
-            rect.Fill = price.mStart == price.mEnd ? iColor.Gray : price.mStart > price.mEnd ? iColor.Green : iColor.Red;
-
-            Canvas.SetTop(rect, top);
-            Canvas.SetLeft(rect, left);
-
-            return rect;
+            return new RectengleModel()
+            {
+                Width = 1,
+                Left = i * (width + 2) + ((width - 1) / 2),
+                Top = ratio * (max - high),
+                Height = ratio * (high - low),
+                Color = price.mStart == price.mEnd ? iColor.Gray : price.mEnd > price.mStart ? iColor.Red : iColor.Green,
+            };
         }
     }
 }

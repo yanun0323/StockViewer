@@ -276,7 +276,8 @@
             </TabControl>
 
             <!-- [Tree] Main Chart -->
-            <Grid x:Name="ChartGridRoot" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,10">
+            <Grid x:Name="ChartGridRoot" Grid.Row="1" Grid.Column="1" 
+                  HorizontalAlignment="Stretch" Margin="0,0,0,10">
                 <Grid.Resources>
                     <Style x:Key="MainChart" TargetType="RowDefinition">
                         <Setter Property="MinHeight" Value="200"/>
@@ -295,6 +296,10 @@
                     </i:EventTrigger>
                     <i:EventTrigger EventName="MouseMove">
                         <core:EventCommandAction Command="{Binding MouseMoveCommand}"/>
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="Loaded">
+                        <i:InvokeCommandAction Command="{Binding LoadedCommand}"
+                                       CommandParameter="{Binding ElementName=ChartGridRoot}"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
 

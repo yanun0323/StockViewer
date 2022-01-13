@@ -1,194 +1,102 @@
 ﻿namespace StockViewer.MVVM.ViewModel;
 public class SubChartViewModel : ObservableObject
 {
-    private Size _ChartSize = new(854, 77.5);
-    private double _BarWidth = 10;
+    IStockModel _StockModel;
+    Size _Canvas = new(854, 77.5);
+    Func<IBarParameter> _Func;
+    IBarParameter _BarParam { get => _Func.Invoke(); }
+    ObservableCollection<RectengleModel>? _Rectangles = new();
 
-    private Point? _MouseClickPosition;
-    private StockModel? _mStockModel;
-    private ChartGridViewModel? _BarGridVM;
-    private double _HighestPrice;
-    private double _LowestPrice;
-
-    public ICommand? LoadedCommand { get; set; }
+    public ICommand? MouseUpCommand { get; set; }
+    public ICommand? MouseMoveCommand { get; set; }
     public ICommand? SizeChangedCommand { get; set; }
-    public double mGridWidth { get => MainChartViewModel.GridWidth; }
-    public ChartStructure<BarViewModel> BarVMStruct { get; set; }
-        = new(new((BarViewModel b) => (b.Insti.mTrustSuper, b.Insti.mTrustSuper, b.mDate)));
-    public ChartGridViewModel? BarGridVM { get => _BarGridVM; set { _BarGridVM = value; OnPropertyChanged(); } }
-    
-    public StockModel mStockModel
+    public ICommand? LoadedCommand { get; set; }
+    public ObservableCollection<RectengleModel>? Rectangles { get => _Rectangles; set { _Rectangles = value; OnPropertyChanged(); } }
+
+    public SubChartViewModel(IStockModel stockModel, Func<IBarParameter> func)
     {
-        get => _mStockModel ?? new();
-        set
+        _StockModel = stockModel;
+        _Func = func;
+        Refresh();
+
+        MouseUpCommand = new RelayCommand<MouseButtonEventArgs>(e =>
         {
-            _mStockModel = value;
-            Refresh();
-            OnPropertyChanged();
-        }
-    }
+        });
 
+        MouseMoveCommand = new RelayCommand<MouseEventArgs>(e =>
+        {
+        });
 
-
-
-    public SubChartViewModel(StockModel stockModel, InstitutionOption option)
-    {
-        mStockModel = stockModel; 
-        
         SizeChangedCommand = new RelayCommand<SizeChangedEventArgs>(args =>
         {
-            if (_ChartSize.Width == args.NewSize.Width)
-            {
-            _ChartSize = args.NewSize;
-                ResizeBar();
-            }
-            else
-            {
-                _ChartSize = args.NewSize;
-                BarSizeChanged();
-            }
+            _Canvas = args.NewSize;
+            Refresh(args.NewSize);
         });
     }
 
-    public void UpdateChart(StockModel stockModel) => mStockModel = stockModel;
-    public void SetBarWidth(double width) => _BarWidth = width;
-    public void SetMouseClickPosition(Point pos) => _MouseClickPosition = pos; 
-    public bool BarSizeChanged()
+
+
+    public void Update(IStockModel? stockModel = null)
     {
-        var newCandleCount = GetNewBarCount();
-        var candleCount = BarVMStruct!.Count();
-        if (newCandleCount > candleCount)
-        {
-            var addCount = newCandleCount - candleCount;
-            BarVMStruct.ZoomOut(addCount);
-            ResizeBar();
-        }
-        else if (newCandleCount < candleCount)
-        {
-            var reduceCount = candleCount - newCandleCount;
-            BarVMStruct.ZoomIn(reduceCount);
-            ResizeBar();
-        }
-        //ResizeBar();
-        _BarGridVM!.Resize(_ChartSize);
-        BarGridVM = _BarGridVM;
-        return true;
-    }
-    public void MouseDrag(Point pos)
-    {
-        if (BarVMStruct.AllShow)
-            return;
-
-        var count = GetCountFromCount(pos);
-        if (count > 0) { 
-            BarVMStruct.PanRight(count);
-            ResizeBar();
-        }
-        else if (count < 0) { 
-            BarVMStruct.PanLeft(-count);
-            ResizeBar();
-        }
-
-        //ResizeBar();
-
-        if (count != 0)
-            _MouseClickPosition = pos;
-
-        int GetCountFromCount(Point _pos) => (int)((_MouseClickPosition!.Value.X - _pos.X) / _BarWidth);
-        
+        if (stockModel != null)
+            _StockModel = stockModel;
+        Refresh();
     }
 
 
 
-
-    private int GetNewBarCount() => (int)(_ChartSize.Width / _BarWidth) + 1;
-    private void Refresh()
+    void Refresh(Size? newSize = null)
     {
-        Update_BarVMCollection_Stack();
-        Queue<BarViewModel> show = new();
-        var count = GetNewBarCount();
-        while (count > 0)
-        {
-            BarVMStruct.Generate(count);
-            count--;
-        }
-        ResizeBar();
+        if (newSize != null)
+            _Canvas = newSize.Value;
 
-        void Update_BarVMCollection_Stack()
-        {
-            BarVMStruct.Clear();
-            foreach ((DateTime date, Price price) in mStockModel.PriceData)
-            {
-                if (mStockModel.InstitutionData.ContainsKey(date))
-                    BarVMStruct.Push(CreateBarVM(date, mStockModel.InstitutionData[date]));
-                else
-                    BarVMStruct.Push(CreateBarVM(date));
-            }
-        }
-    }
-    private BarViewModel CreateBarVM(DateTime date, Institution? institution = null)
-    {
-        Institution insti = institution ?? Institution.Deafult();
-        ChartParameter cp = new()
-        {
-            Width = _BarWidth,
-            Height = _ChartSize.Height,
-            Highest = 0,
-            Lowest = 0,
-        };
-        return new BarViewModel(date, insti, cp, InstitutionOption.TrustSuper);
-    }
-    private void ResizeBar()
-    {
-        ResizeChartGrid(_ChartSize.Height);
+        _Rectangles = null;
+        _Rectangles = new();
 
+        double width = _BarParam.Width;
+        int index = _BarParam.Count;
+
+        double max = _StockModel!.InstitutionData.Skip(_BarParam.Start).Take(index).Max(x => x.Value.mTrustSuper);
+        double min = _StockModel!.InstitutionData.Skip(_BarParam.Start).Take(index).Min(x => x.Value.mTrustSuper);
+
+        double ratio = _Canvas.Height / (max - min);
         List<Task> tasks = new();
-        foreach (BarViewModel barVm in BarVMStruct.Middle!)
+        RectengleModel[] temp = new RectengleModel[index];
+        foreach ((DateTime _, Institution instit) in _StockModel!.InstitutionData.Skip(_BarParam.Start))
         {
-            var copy = barVm;
-            Task task = new(() =>
-            {
-                copy.Resize(_ChartSize.Height, _BarWidth, _HighestPrice, _LowestPrice);
+            if (--index < 0)
+                break;
+
+            if (instit.mTrustSuper == 0)
+                continue;
+
+            int i = index;
+            Institution copy = instit;
+            Task t = new(() => {
+                temp[i] = (CreateThick(copy, i, max, min, width, ratio));
             });
-            task.Start();
-            tasks.Add(task);
+            t.Start();
+            tasks.Add(t);
         }
         Task.WhenAll(tasks).Wait();
-        BarVMStruct.Refresh();
-    }
-    private void ResizeChartGrid(double chartHeight)
-    {
-        _HighestPrice = BarVMStruct.Max;
-        _LowestPrice = BarVMStruct.Min;
-        if (Math.Abs(_HighestPrice) > Math.Abs(_LowestPrice))
-            _LowestPrice = -_HighestPrice;
-        else
-            _HighestPrice = -_LowestPrice;
 
-
-        if (_HighestPrice == 0 && _LowestPrice == 0)
+        for (int i = 0; i < temp.Count(); i++)
         {
-            _BarGridVM = new ChartGridViewModel(new ChartParameter()
-            {
-                Highest = 1,
-                Lowest = -1,
-                Width = _ChartSize.Width,
-                Height = _ChartSize.Height,
-            }, true, 1, 0, -1);
+            _Rectangles.Add(temp[i]);
         }
-        else
+
+        Rectangles = _Rectangles;
+
+        static RectengleModel CreateThick(Institution instit, int i, double max, double min, double width, double ratio)
         {
-            _BarGridVM = new ChartGridViewModel(new ChartParameter()
+            return new RectengleModel()
             {
-                Highest = _HighestPrice,
-                Lowest = _LowestPrice,
-                Width = _ChartSize.Width,
-                Height = _ChartSize.Height,
-            }, true, _HighestPrice, _HighestPrice / 2, 0, _LowestPrice / 2, _LowestPrice);
+                Width = width,
+                Left = i * (width + 2),
+                Top = ratio * (max - instit.mTrustSuper),
+                Height = ratio * Math.Abs(instit.mTrustSuper),
+                Color = instit.mTrustSuper > 0 ? iColor.Red : iColor.Green,
+            };
         }
-        BarGridVM = _BarGridVM;
-
     }
-
-
 }

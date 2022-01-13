@@ -10,7 +10,7 @@ public class MainViewModel : ObservableObject
     private Grid? MainChartGrid;
     private Point? MouseClickPosition;
     private ObservableCollection<PickStockBlockViewModel> _SmartPickVMCollection = new();
-    private double _ChartBarWidth = 10;
+    private BarParameter _BarParam = new(60, 10, 10, 10);
 
     private StockModel _mStockModel = new();
     public ICommand? MouseWheelCommand { get; set; }
@@ -62,35 +62,15 @@ public class MainViewModel : ObservableObject
 
         StockList = GenerateStockList();
 
-        MainChartVM = new(mStockModel!);
-        SubChartVM1 = new(mStockModel!, InstitutionOption.TrustSuper);
-        SubChartVM2 = new(mStockModel!, InstitutionOption.ForeignSuper);
+        MainChartVM = new(mStockModel!, new(() =>_BarParam));
+        SubChartVM1 = new(mStockModel!, new(() => _BarParam));
+        SubChartVM2 = new(mStockModel!, new(() => _BarParam));
 
         MouseWheelCommand = new RelayCommand<MouseWheelEventArgs>(e =>
         {
-            double step = (_ChartBarWidth > 20) ? 3 : 1;
-            double scale = ((e.Delta > 0) ? 1 : -1) * step;
-            if (_ChartBarWidth + scale > _ChartBarWidth_Min && _ChartBarWidth + scale < _ChartBarWidth_Max)
-            {
-                _ChartBarWidth += scale;
-                //MainChartVM.SetBarWidth(_ChartBarWidth);
-                SubChartVM1.SetBarWidth(_ChartBarWidth);
-                SubChartVM2.SetBarWidth(_ChartBarWidth);
-
-            }
-
-            //if (!MainChartVM.BarSizeChanged())
-            //{
-            //    _ChartBarWidth -= scale;
-            //    //MainChartVM.SetBarWidth(_ChartBarWidth);
-            //    SubChartVM1.SetBarWidth(_ChartBarWidth);
-            //    SubChartVM2.SetBarWidth(_ChartBarWidth);
-            //}
-            //else
-            //{
-            //    SubChartVM1.BarSizeChanged();
-            //    SubChartVM2.BarSizeChanged();
-            //}
+            int step = (e.Delta > 0) ? 1 : -1;
+            _BarParam.Count = _BarParam.Count + step;
+            RepaintChart();
         });
 
         MouseMoveCommand = new RelayCommand<MouseEventArgs>(e =>
@@ -98,23 +78,18 @@ public class MainViewModel : ObservableObject
             if (e.LeftButton == MouseButtonState.Pressed && MouseClickPosition != null)
             {
                 Point pos = e.MouseDevice.GetPosition(MainChartGrid);
-                //MainChartVM.MouseDrag(pos);
-                SubChartVM1.MouseDrag(pos);
-                SubChartVM2.MouseDrag(pos);
+                _BarParam.Start += (int)(pos.X / (_BarParam.Width + 2));
+                RepaintChart();
             }
             else
             {
                 MouseClickPosition = e.MouseDevice.GetPosition(MainChartGrid);
-                //MainChartVM.SetMouseClickPosition(MouseClickPosition!.Value);
-                SubChartVM1.SetMouseClickPosition(MouseClickPosition!.Value);
-                SubChartVM2.SetMouseClickPosition(MouseClickPosition!.Value);
             }
         });
 
         LoadedCommand = new RelayCommand<Grid>(obj =>
         {
-            MainChartGrid = obj;
-            Trace.WriteLine("LoadedCommand");
+            MainChartGrid = obj;    
         });
     }
 
@@ -146,9 +121,15 @@ public class MainViewModel : ObservableObject
     {
         _mStockModel!.Refresh(stockId);
         mStockModel = _mStockModel;
-        MainChartVM?.Update(mStockModel!);
-        SubChartVM1?.UpdateChart(mStockModel!);
-        SubChartVM2?.UpdateChart(mStockModel!);
+        MainChartVM?.Update(mStockModel);
+        SubChartVM1?.Update(mStockModel);
+        SubChartVM2?.Update(mStockModel);
+    }
+    public void RepaintChart()
+    {
+        MainChartVM?.Update();
+        SubChartVM1?.Update();
+        SubChartVM2?.Update();
     }
 
     static Dictionary<char, HashSet<string>> GenerateStockList()

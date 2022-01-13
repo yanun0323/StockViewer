@@ -21,15 +21,35 @@
             <Border Grid.Row="0" Background="YellowGreen" 
                     BorderThickness="0" 
                     CornerRadius="10, 10 ,0 ,0"/>
-            <ContentControl Grid.Row="1"  VerticalAlignment="Stretch"
-                            Content="Hi Again">
-
+            <Grid Grid.Row="1">
+                <Canvas Grid.Row="1">
+                    <ItemsControl ItemsSource="{Binding Rectangles}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Rectangle Width="{Binding Width}"
+                                       Height="{Binding Height}"
+                                       Fill="{Binding Color}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="Canvas.Left" Value="{Binding Left}" />
+                                <Setter Property="Canvas.Top" Value="{Binding Top}" />
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+                    </ItemsControl>
+                </Canvas>
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SizeChanged">
                         <core:EventCommandAction Command="{Binding SizeChangedCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-            </ContentControl>
+            </Grid>
         </Grid>
 
 

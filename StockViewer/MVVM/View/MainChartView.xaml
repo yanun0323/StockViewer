@@ -72,22 +72,35 @@
                 </StackPanel>
             </Border>-->
 
-            <Border Grid.Row="1">
+            <Grid Grid.Row="1">
                 <Canvas Grid.Row="1">
                     <ItemsControl ItemsSource="{Binding Rectangles}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <Canvas />
+                                <Canvas/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                            <Rectangle Width="{Binding Width}"
+                                       Height="{Binding Height}"
+                                       Fill="{Binding Color}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="Canvas.Left" Value="{Binding Left}" />
+                                <Setter Property="Canvas.Top" Value="{Binding Top}" />
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
                     </ItemsControl>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="SizeChanged">
-                            <core:EventCommandAction Command="{Binding SizeChangedCommand}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
                 </Canvas>
-            </Border>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SizeChanged">
+                        <core:EventCommandAction Command="{Binding SizeChangedCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Grid>
         </Grid>
 
         <i:Interaction.Triggers>
