@@ -42,7 +42,6 @@ public class MainChartViewModel : ObservableObject
 
     public void Update(IStockModel? stockModel = null)
     {
-        Trace.WriteLine($" --- _BarParam.Count: {_BarParam.Count}");
         if (stockModel != null)
             _StockModel = stockModel;
         Refresh();
