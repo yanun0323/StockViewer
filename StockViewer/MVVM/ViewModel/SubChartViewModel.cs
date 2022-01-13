@@ -50,19 +50,20 @@ public class SubChartViewModel : ObservableObject
         if (newSize != null)
             _Canvas = newSize.Value;
 
-        _Rectangles = null;
-        _Rectangles = new();
-
         double width = _BarParam.Width;
 
         int index = _BarParam.Count;
-        double max = _StockModel!.InstitutionData.Skip(_BarParam.Start).Take(index).Max(x => x.Value.mTrustSuper);
-        double min = _StockModel!.InstitutionData.Skip(_BarParam.Start).Take(index).Min(x => x.Value.mTrustSuper);
+        var data = _StockModel!.InstitutionData.Reverse().Skip(_BarParam.Start).Take(index);
+        double max = data.Max(x => x.Value.mTrustSuper);
+        double min = data.Min(x => x.Value.mTrustSuper);
+
+        max = (max > -min) ? max : -min;
+        min = (max > -min) ? -max : min;
 
         double ratio = _Canvas.Height / (max - min);
         List<Task> tasks = new();
         RectengleModel[] temp = new RectengleModel[index];
-        foreach ((DateTime _, Institution instit) in _StockModel!.InstitutionData.Skip(_BarParam.Start))
+        foreach ((DateTime _, Institution instit) in data)
         {
             if (--index < 0)
                 break;
@@ -80,6 +81,9 @@ public class SubChartViewModel : ObservableObject
         }
         Task.WhenAll(tasks).Wait();
 
+        _Rectangles = null;
+        _Rectangles = new();
+
         for (int i = 0; i < temp.Count(); i++)
         {
             _Rectangles.Add(temp[i]);
@@ -93,7 +97,7 @@ public class SubChartViewModel : ObservableObject
             {
                 Width = width,
                 Left = i * (width + 2),
-                Top = ratio * (max - instit.mTrustSuper),
+                Top = ratio * (instit.mTrustSuper > 0 ? (max - instit.mTrustSuper): max),
                 Height = ratio * Math.Abs(instit.mTrustSuper),
                 Color = instit.mTrustSuper > 0 ? iColor.Red : iColor.Green,
             };

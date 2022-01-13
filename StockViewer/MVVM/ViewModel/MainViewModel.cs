@@ -50,7 +50,7 @@ public class MainViewModel : ObservableObject
 
         MouseWheelCommand = new RelayCommand<MouseWheelEventArgs>(e =>
         {
-            int step = (e.Delta < 0 ? 1 : -1) * (barParam.Count / 7);
+            int step = (e.Delta < 0 ? 1 : -1) * (barParam.Count / barParam.MinCount);
             barParam.Count += + step;
             RepaintChart();
         });
@@ -63,7 +63,7 @@ public class MainViewModel : ObservableObject
                 mouseClickPosition = e.MouseDevice.GetPosition(mainChartGrid);
 
             Point pos = e.MouseDevice.GetPosition(mainChartGrid);
-            int step = (int)((pos.X - mouseClickPosition.Value.X) / (barParam.Width + 2)) * 3 / 5;
+            int step = (int)((pos.X - mouseClickPosition.Value.X) / (barParam.Width + 2)) * 4 / 5;
             barParam.Start = step + barParam.StartTemp;
             RepaintChart();
         }); 

@@ -10,11 +10,13 @@ public class MainChartViewModel : ObservableObject
     Func<IBarParameter> _Func;
     IBarParameter _BarParam { get => _Func.Invoke(); }
     ObservableCollection<RectengleModel>? _Rectangles = new();
+    string _PER = "";
 
     public ICommand? MouseUpCommand { get; set; }
     public ICommand? MouseMoveCommand { get; set; }
     public ICommand? SizeChangedCommand { get; set; }
     public ICommand? LoadedCommand { get; set; }
+    public string PER { get => _PER; set { _PER = value; OnPropertyChanged(); } }
     public ObservableCollection<RectengleModel>? Rectangles { get => _Rectangles; set { _Rectangles = value; OnPropertyChanged(); } }
 
     public MainChartViewModel(IStockModel stockModel, Func<IBarParameter> func)
@@ -43,7 +45,11 @@ public class MainChartViewModel : ObservableObject
     public void Update(IStockModel? stockModel = null)
     {
         if (stockModel != null)
-            _StockModel = stockModel;
+        {
+            _StockModel = stockModel; 
+            _PER = string.Join(" : ", $"{ _StockModel.LastPrice.Key:yyyy/MM/dd}", _StockModel.LastPrice.Value.Per);
+            PER = _PER;
+        }
         Refresh();
     }
 
@@ -53,9 +59,6 @@ public class MainChartViewModel : ObservableObject
     {
         if (newSize != null)
             _Canvas = newSize.Value;
-
-        _Rectangles = null;
-        _Rectangles = new();
 
         _BarParam.Count = (_StockModel!.PriceData.Count() < _BarParam.Count) ? _StockModel!.PriceData.Count() : _BarParam.Count;
         double width = (_Canvas.Width / _BarParam.Count) - 2;
@@ -68,14 +71,15 @@ public class MainChartViewModel : ObservableObject
         _BarParam.Width = width;
 
         int index = _BarParam.Count;
-        double max = _StockModel!.PriceData.Skip(_BarParam.Start).Take(index).Max(x => x.Value.mMax);
-        double min = _StockModel!.PriceData.Skip(_BarParam.Start).Take(index).Min(x => x.Value.mMin);
+        var data = _StockModel!.PriceData.Reverse().Skip(_BarParam.Start).Take(index);
+        double max = data.Max(x => x.Value.mMax);
+        double min = data.Min(x => x.Value.mMin);
 
         double ratio = _Canvas.Height / (max - min);
         List<Task> tasks = new();
         RectengleModel[] temp = new RectengleModel[index * 2];
         int size = index;
-        foreach ((DateTime _, Price price) in _StockModel!.PriceData.Take(index + _BarParam.Start).Skip(_BarParam.Start))
+        foreach ((DateTime d, Price price) in data)
         {
             if (--index < 0)
                 break;
@@ -90,6 +94,9 @@ public class MainChartViewModel : ObservableObject
             tasks.Add(t);
         }
         Task.WhenAll(tasks).Wait();
+
+        _Rectangles = null;
+        _Rectangles = new();
 
         for (int i = 0; i < temp.Count(); i++)
         {
