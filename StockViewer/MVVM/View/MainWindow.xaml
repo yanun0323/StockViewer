@@ -297,6 +297,12 @@
                     <i:EventTrigger EventName="MouseMove">
                         <core:EventCommandAction Command="{Binding MouseMoveCommand}"/>
                     </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseUp">
+                        <core:EventCommandAction Command="{Binding MouseUpCommand}"/>
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseEnter">
+                        <core:EventCommandAction Command="{Binding MouseEnterCommand}"/>
+                    </i:EventTrigger>
                     <i:EventTrigger EventName="Loaded">
                         <i:InvokeCommandAction Command="{Binding LoadedCommand}"
                                        CommandParameter="{Binding ElementName=ChartGridRoot}"/>

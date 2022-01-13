@@ -2,92 +2,90 @@
 namespace StockViewer.MVVM.ViewModel;
 public class MainViewModel : ObservableObject
 {
-    private readonly string _DefaultStockId = "2330";
-    private string _searchWords = "";
-    private Grid? MainChartGrid;
-    private Point? MouseClickPosition;
-    private ObservableCollection<PickStockBlockViewModel> _SmartPickVMCollection = new();
-    private BarParameter _BarParam;
+    private readonly string defaultStockId = "2330";
+    private string searchWords = "";
+    private bool isPressLeave = false;
+    private Grid? mainChartGrid;
+    private Point? mouseClickPosition;
+    private ObservableCollection<PickStockBlockViewModel> smartPickVMCollection = new();
+    private BarParameter barParam = new(50, 5, 10, 7); // Count , MinCount , Width , MinWidth
+    private StockModel stockModel = new();
 
-    private StockModel _mStockModel = new();
+
+
     public ICommand? MouseWheelCommand { get; set; }
     public ICommand? MouseMoveCommand { get; set; }
+    public ICommand? MouseUpCommand { get; set; }
+    public ICommand? MouseEnterCommand { get; set; }
     public ICommand? LoadedCommand { get; set; }
     
-    public StockModel mStockModel
-    {
-        get { return _mStockModel; }
-        set
-        {
-            _mStockModel = value;
-            OnPropertyChanged();
-        }
-    }
 
-    public ObservableCollection<PickStockBlockViewModel> SmartPickVMCollection
-    {
-        get { return _SmartPickVMCollection; }
-        set { _SmartPickVMCollection = value; OnPropertyChanged(); }
-    }
 
+    public StockModel mStockModel { get => stockModel; set { stockModel = value; OnPropertyChanged(); }}
+    public ObservableCollection<PickStockBlockViewModel> SmartPickVMCollection { get => smartPickVMCollection; set { smartPickVMCollection = value; OnPropertyChanged(); }}
     public Dictionary<char, HashSet<string>> StockList { get; set; } = new();
     public MainChartViewModel? MainChartVM { get; set; }
     public SubChartViewModel? SubChartVM1 { get; set; }
     public SubChartViewModel? SubChartVM2 { get; set; }
-    public string SearchWords
-    { 
-        get => _searchWords; 
-        set 
-        { 
-            _searchWords = value;
-            //Search();
-            OnPropertyChanged(); 
-        } 
-    }
+    public string SearchWords { get => searchWords; set { searchWords = value; OnPropertyChanged(); }}
+
+
 
     public MainViewModel()
     {
         var path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        _BarParam = new(60, 10, 10, 10);
         MainCrawler.Run();
         MainConverter.Run();
         Server.Connect();
 
-        _mStockModel = new();
-        UpdateStock(_DefaultStockId);
+        stockModel = new();
+        UpdateStock(defaultStockId);
         SmartPick();
 
         StockList = GenerateStockList();
 
-        MainChartVM = new(mStockModel!, new(() =>_BarParam));
-        SubChartVM1 = new(mStockModel!, new(() => _BarParam));
-        SubChartVM2 = new(mStockModel!, new(() => _BarParam));
+        MainChartVM = new(mStockModel!, new(() =>barParam));
+        SubChartVM1 = new(mStockModel!, new(() => barParam));
+        SubChartVM2 = new(mStockModel!, new(() => barParam));
 
         MouseWheelCommand = new RelayCommand<MouseWheelEventArgs>(e =>
         {
-            int step = (e.Delta < 0 ? 1 : -1) * (_BarParam.Count > 20 ? 5 : 1);
-            _BarParam.Count += + step;
+            int step = (e.Delta < 0 ? 1 : -1) * (barParam.Count / 7);
+            barParam.Count += + step;
             RepaintChart();
         });
 
         MouseMoveCommand = new RelayCommand<MouseEventArgs>(e =>
         {
-            if (e.LeftButton == MouseButtonState.Pressed && MouseClickPosition != null)
-            {
-                Point pos = e.MouseDevice.GetPosition(MainChartGrid);
-                Trace.WriteLine($"pos {pos.X}");
-                _BarParam.Start += (int)(pos.X / (_BarParam.Width + 2));
-                RepaintChart();
-            }
-            else
-            {
-                MouseClickPosition = e.MouseDevice.GetPosition(MainChartGrid);
-            }
+            if (e.LeftButton != MouseButtonState.Pressed)
+                return;
+            if(mouseClickPosition == null)
+                mouseClickPosition = e.MouseDevice.GetPosition(mainChartGrid);
+
+            Point pos = e.MouseDevice.GetPosition(mainChartGrid);
+            int step = (int)((pos.X - mouseClickPosition.Value.X) / (barParam.Width + 2)) * 3 / 5;
+            barParam.Start = step + barParam.StartTemp;
+            RepaintChart();
+        }); 
+        
+        MouseUpCommand = new RelayCommand<MouseEventArgs>(e =>
+        {
+            mouseClickPosition = null;
+            barParam.StartTemp =barParam.Start;
+        });
+
+        MouseEnterCommand = new RelayCommand<MouseEventArgs>(e =>
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+                return;
+
+            mouseClickPosition = null;
+            barParam.StartTemp = barParam.Start;
         });
 
         LoadedCommand = new RelayCommand<Grid>(obj =>
         {
-            MainChartGrid = obj;    
+            mainChartGrid = obj;    
         });
     }
 
@@ -102,7 +100,7 @@ public class MainViewModel : ObservableObject
         InstitutionConverter.Catch(target, stockModelCollection);
         HashSet<StockModel> list = stockModelCollection.Select(x => x.Value).Where(x => x.InstitutionData.Any()).ToHashSet();
 
-        _SmartPickVMCollection = new();
+        smartPickVMCollection = new();
         int count = 0;
         while (count++ < 100)
         {
@@ -110,15 +108,15 @@ public class MainViewModel : ObservableObject
             if (picked.InstitutionData[target].mTrustSuper <= 0)
                 break;
             list.Remove(picked!);
-            _SmartPickVMCollection!.Add(new(picked, new(() => this)));
+            smartPickVMCollection!.Add(new(picked, new(() => this)));
         }
-        SmartPickVMCollection = _SmartPickVMCollection;
+        SmartPickVMCollection = smartPickVMCollection;
     }
 
     public void UpdateStock(string stockId)
     {
-        _mStockModel!.Refresh(stockId);
-        mStockModel = _mStockModel;
+        stockModel!.Refresh(stockId);
+        mStockModel = stockModel;
         MainChartVM?.Update(mStockModel);
         SubChartVM1?.Update(mStockModel);
         SubChartVM2?.Update(mStockModel);

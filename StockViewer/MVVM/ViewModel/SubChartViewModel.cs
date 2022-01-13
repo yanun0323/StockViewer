@@ -54,8 +54,8 @@ public class SubChartViewModel : ObservableObject
         _Rectangles = new();
 
         double width = _BarParam.Width;
-        int index = _BarParam.Count;
 
+        int index = _BarParam.Count;
         double max = _StockModel!.InstitutionData.Skip(_BarParam.Start).Take(index).Max(x => x.Value.mTrustSuper);
         double min = _StockModel!.InstitutionData.Skip(_BarParam.Start).Take(index).Min(x => x.Value.mTrustSuper);
 
